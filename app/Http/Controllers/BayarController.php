@@ -40,6 +40,10 @@ class BayarController extends Controller
             ]);
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
+        } catch (\Throwable) {
+            report(new \RuntimeException('Gagal menghubungi payment gateway.'));
+
+            return response()->json(['message' => 'Gateway pembayaran tidak dapat dihubungi. Coba lagi nanti.'], 502);
         }
 
         return response()->json([
@@ -51,6 +55,10 @@ class BayarController extends Controller
 
     public function callback(Request $request, PaymentService $pay): JsonResponse
     {
+        // Driver simulasi tidak punya signature: tolak di production.
+        if (app()->isProduction() && $pay->activeDriverKey() === 'simulated') {
+            return response()->json(['ok' => false, 'message' => 'Driver simulasi nonaktif di production.'], 403);
+        }
         // Header signature diteruskan ke adapter (Tripay pakai HMAC body).
         $payload = $request->all() + [
             '_signature' => $request->header('X-Callback-Signature'),

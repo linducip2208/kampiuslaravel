@@ -2,11 +2,16 @@
 
 namespace App\Livewire\Nilai;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Nilai;
 use Livewire\Component;
 
 class KunciNilai extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['dosen', 'superadmin', 'admin_prodi'];
+
     public int $kelasId;
 
     public function mount(int $kelasId): void

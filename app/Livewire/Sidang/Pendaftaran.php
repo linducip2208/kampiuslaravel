@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Sidang;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\AuditLog;
 use App\Models\Mahasiswa;
 use App\Models\Ruang;
@@ -13,6 +14,11 @@ use Livewire\Component;
 
 class Pendaftaran extends Component
 {
+    use RequiresRoles;
+
+    /** Otorisasi owner-scope dicek manual di mount(). */
+    public array $allowedRoles = [];
+
     public ?int $judul_id = null;
 
     public string $jenis = 'proposal';

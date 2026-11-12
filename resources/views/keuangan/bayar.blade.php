@@ -4,6 +4,11 @@
 @section('page-title', 'Bayar Tagihan')
 
 @section('content')
+<div class="card mb-3">
+    <div class="card-body d-flex gap-2">
+        <a href="{{ route('keuangan.bayar.manual') }}" class="btn btn-outline-primary">Upload Bukti Transfer Manual</a>
+    </div>
+</div>
 <div class="card">
     <div class="table-responsive">
         <table class="table table-vcenter">

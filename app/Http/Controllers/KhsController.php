@@ -2,24 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Nilai;
+use App\Http\Controllers\Concerns\AuthorizesMahasiswaData;
+use App\Services\AkademikService;
 use Illuminate\Contracts\View\View;
 
 class KhsController extends Controller
 {
+    use AuthorizesMahasiswaData;
+
     public function show(int $mahasiswaId): View
     {
-        $nilai = Nilai::where('mahasiswa_id', $mahasiswaId)->get();
+        $this->authorizeMahasiswa($mahasiswaId);
 
-        $ipk = $nilai->isEmpty() ? 0.0 : round($nilai->avg('bobot'), 2);
-        $totalSks = 0;
+        $ringkasan = AkademikService::ringkasan($mahasiswaId);
 
         return view('khs.show', [
             'mahasiswaId' => $mahasiswaId,
-            'nilai' => $nilai,
-            'ipk' => $ipk,
-            'ip' => $ipk,
-            'totalSks' => $totalSks,
+            'nilai' => $ringkasan['nilai'],
+            'ipk' => $ringkasan['ipk'],
+            'ip' => $ringkasan['ipk'],
+            'totalSks' => $ringkasan['total_sks'],
+            'perTahun' => $ringkasan['per_tahun'],
         ]);
     }
 }

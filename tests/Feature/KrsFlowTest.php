@@ -6,6 +6,7 @@ use App\Livewire\Krs\Pengajuan;
 use App\Livewire\Krs\PersetujuanPa;
 use App\Models\Krs;
 use App\Models\User;
+use Database\Seeders\RolesPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -27,7 +28,9 @@ class KrsFlowTest extends TestCase
     {
         parent::setUp();
 
+        $this->seed(RolesPermissionsSeeder::class);
         $user = User::factory()->create();
+        $user->assignRole('dosen');
         $this->actingAs($user);
 
         // Baris prasyarat modul M1 dibuat langsung via query builder

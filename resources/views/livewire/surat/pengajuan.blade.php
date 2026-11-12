@@ -1,18 +1,38 @@
 <div>
-    @if ($message)<p>{{ $message }}</p>@endif
-    <form wire:submit="save">
-        <select wire:model="jenis">
-            <option value="aktif_kuliah">aktif_kuliah</option>
-            <option value="pengantar_kp">pengantar_kp</option>
-            <option value="keterangan_lulus">keterangan_lulus</option>
-            <option value="legalisir">legalisir</option>
-        </select>
-        <textarea wire:model="keperluan" placeholder="Keperluan"></textarea>
-        <button type="submit">Ajukan</button>
+    @if($message)
+        <div class="alert alert-success" role="alert">{{ $message }}</div>
+    @endif
+    <form wire:submit="save" class="card mb-3">
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">Jenis surat</label>
+                <select wire:model="jenis" class="form-select">
+                    <option value="aktif_kuliah">Surat aktif kuliah</option>
+                    <option value="pengantar_kp">Pengantar KP</option>
+                    <option value="keterangan_lulus">Keterangan lulus</option>
+                    <option value="legalisir">Legalisir</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Keperluan</label>
+                <textarea wire:model="keperluan" class="form-control" rows="2"></textarea>
+                @error('keperluan')<div class="text-danger">{{ $message }}</div>@enderror
+            </div>
+            <button type="submit" class="btn btn-primary">Ajukan</button>
+        </div>
     </form>
-    <ul>
-        @foreach ($riwayat as $surat)
-            <li>{{ $surat->jenis }} — {{ $surat->nomor_surat ?? '-' }} — {{ $surat->status }}</li>
-        @endforeach
-    </ul>
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-vcenter">
+                <thead><tr><th>Jenis</th><th>Nomor</th><th>Status</th></tr></thead>
+                <tbody>
+                    @forelse($riwayat as $surat)
+                        <tr><td>{{ $surat->jenis }}</td><td>{{ $surat->nomor_surat ?? '-' }}</td><td><span class="badge bg-secondary">{{ $surat->status }}</span></td></tr>
+                    @empty
+                        <tr><td colspan="3" class="text-secondary">Belum ada pengajuan.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

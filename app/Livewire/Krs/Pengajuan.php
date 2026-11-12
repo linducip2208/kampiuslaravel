@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Krs;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Krs;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -15,6 +16,11 @@ use Livewire\Component;
  */
 class Pengajuan extends Component
 {
+    use RequiresRoles;
+
+    /** Otorisasi owner-scope dicek manual di mount(). */
+    public array $allowedRoles = [];
+
     public ?int $tahunAkademikId = null;
 
     public float $ipk = 0.0;
@@ -134,6 +140,30 @@ class Pengajuan extends Component
             return;
         }
 
+        // Revisi KRS yang sudah disetujui tidak boleh menimpa sepihak.
+        $berjalan = $this->krsBerjalan();
+        if ($berjalan && $berjalan->status === Krs::STATUS_DISETUJUI) {
+            $this->addError('kelasDipilih', 'KRS sudah disetujui Dosen PA. Hubungi admin prodi untuk revisi.');
+
+            return;
+        }
+
+        foreach ($this->cekPrasyarat() as $pesan) {
+            $this->addError('kelasDipilih', $pesan);
+        }
+
+        foreach ($this->cekBentrok() as $pesan) {
+            $this->addError('kelasDipilih', $pesan);
+        }
+
+        foreach ($this->cekKuota() as $pesan) {
+            $this->addError('kelasDipilih', $pesan);
+        }
+
+        if ($this->getErrorBag()->has('kelasDipilih')) {
+            return;
+        }
+
         $sksMap = $this->sksPerKelas();
         $mahasiswaId = $this->mahasiswaId();
 
@@ -203,6 +233,97 @@ class Pengajuan extends Component
         } catch (\Throwable) {
             return null;
         }
+    }
+
+    /** @return list<string> */
+    private function cekPrasyarat(): array
+    {
+        $pesan = [];
+
+        try {
+            $kelas = DB::table('kelas')
+                ->leftJoin('matakuliah', 'matakuliah.id', '=', 'kelas.matakuliah_id')
+                ->whereIn('kelas.id', $this->kelasDipilih)
+                ->select(['matakuliah.kode', 'matakuliah.nama as mk_nama', 'matakuliah.prasyarat_id'])
+                ->get();
+
+            foreach ($kelas as $k) {
+                if (! $k->prasyarat_id) {
+                    continue;
+                }
+
+                $lulus = DB::table('nilai')
+                    ->where('mahasiswa_id', $this->mahasiswaId())
+                    ->whereIn('kelas_id', function ($q) use ($k): void {
+                        $q->select('id')->from('kelas')->where('matakuliah_id', $k->prasyarat_id);
+                    })
+                    ->where('bobot', '>', 0)
+                    ->exists();
+
+                if (! $lulus) {
+                    $nama = $k->mk_nama ?? $k->kode ?? 'matakuliah';
+                    $pesan[] = "Prasyarat belum lulus untuk mengambil {$nama}.";
+                }
+            }
+        } catch (\Throwable) {
+            // Tabel pendukung belum ada — lewati cek.
+        }
+
+        return $pesan;
+    }
+
+    /** @return list<string> */
+    private function cekBentrok(): array
+    {
+        $pesan = [];
+
+        try {
+            $kelas = DB::table('kelas')->whereIn('id', $this->kelasDipilih)
+                ->select(['id', 'nama', 'hari', 'jam_mulai', 'jam_selesai'])->get()
+                ->filter(fn ($k) => $k->hari && $k->jam_mulai && $k->jam_selesai)
+                ->values();
+
+            foreach ($kelas as $i => $a) {
+                foreach ($kelas as $j => $b) {
+                    if ($j <= $i || $a->hari !== $b->hari) {
+                        continue;
+                    }
+
+                    if ($a->jam_mulai < $b->jam_selesai && $b->jam_mulai < $a->jam_selesai) {
+                        $pesan[] = "Jadwal bentrok: kelas {$a->nama} dengan {$b->nama} ({$a->hari} {$a->jam_mulai}-{$a->jam_selesai}).";
+                    }
+                }
+            }
+        } catch (\Throwable) {
+            // Kolom jadwal belum ada — lewati cek.
+        }
+
+        return $pesan;
+    }
+
+    /** @return list<string> */
+    private function cekKuota(): array
+    {
+        $pesan = [];
+
+        try {
+            foreach ($this->kelasDipilih as $kelasId) {
+                $kuota = (int) DB::table('kelas')->where('id', $kelasId)->value('kuota');
+                if ($kuota <= 0) {
+                    continue;
+                }
+
+                $terisi = DB::table('krs_detail')->where('kelas_id', $kelasId)->count();
+
+                if ($terisi >= $kuota) {
+                    $pesan[] = "Kuota kelas #{$kelasId} penuh ({$terisi}/{$kuota}).";
+                }
+            }
+        } catch (\Throwable) {
+            // Tabel pendukung belum ada — lewati cek.
+        }
+
+        return $pesan;
     }
 
     public function render(): View

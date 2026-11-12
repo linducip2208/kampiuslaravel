@@ -2,12 +2,17 @@
 
 namespace App\Livewire\Lms;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Materi;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class MateriCrud extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['dosen', 'superadmin', 'admin_prodi'];
+
     use WithFileUploads;
 
     public int $pertemuanId;
@@ -28,7 +33,7 @@ class MateriCrud extends Component
             'judul' => 'required|string|max:255',
             'link' => 'nullable|url|max:500',
             'deskripsi' => 'nullable|string',
-            'file' => 'nullable|file|max:10240',
+            'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,jpg,jpeg,png,zip,mp4',
         ];
     }
 

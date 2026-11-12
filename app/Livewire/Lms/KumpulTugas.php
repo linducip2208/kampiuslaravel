@@ -2,13 +2,21 @@
 
 namespace App\Livewire\Lms;
 
+use App\Livewire\Concerns\RequiresRoles;
+use App\Models\Mahasiswa;
 use App\Models\Tugas;
 use App\Models\TugasKumpul;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class KumpulTugas extends Component
 {
+    use RequiresRoles;
+
+    /** Otorisasi owner-scope dicek manual di mount(). */
+    public array $allowedRoles = [];
+
     use WithFileUploads;
 
     public int $tugasId;
@@ -19,13 +27,19 @@ class KumpulTugas extends Component
 
     public function mount(int $tugasId, int $mahasiswaId): void
     {
+        // Mahasiswa hanya boleh kumpul untuk dirinya sendiri (anti-spoofing).
+        $user = Auth::user();
+        if ($user && $user->hasRole('mahasiswa') && ! $user->hasAnyRole(['superadmin', 'admin_prodi', 'dosen'])) {
+            $mahasiswaId = (int) Mahasiswa::where('user_id', $user->id)->value('id');
+        }
+
         $this->tugasId = $tugasId;
         $this->mahasiswaId = $mahasiswaId;
     }
 
     public function save(): void
     {
-        $this->validate(['file' => 'required|file|max:10240']);
+        $this->validate(['file' => 'required|file|max:10240|mimes:pdf,doc,docx,zip,jpg,jpeg,png']);
 
         $tugas = Tugas::findOrFail($this->tugasId);
         if ($tugas->deadline && now()->greaterThan($tugas->deadline)) {

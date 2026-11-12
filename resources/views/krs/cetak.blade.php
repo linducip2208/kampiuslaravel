@@ -16,16 +16,15 @@
     </div>
     <div class="card-body">
         <dl class="row">
-            <dt class="col-4">Mahasiswa ID</dt><dd class="col-8">{{ $krs->mahasiswa_id }}</dd>
-            <dt class="col-4">Tahun Akademik ID</dt><dd class="col-8">{{ $krs->tahun_akademik_id }}</dd>
+            <dt class="col-4">Mahasiswa</dt><dd class="col-8">{{ $krs->mahasiswa->nim ?? '#' }}{{ $krs->mahasiswa_id }} — {{ $krs->mahasiswa->user->name ?? '' }}</dd>
             <dt class="col-4">Total SKS</dt><dd class="col-8">{{ $krs->total_sks }}</dd>
         </dl>
         <div class="table-responsive">
             <table class="table table-vcenter">
-                <thead><tr><th>No</th><th>Kelas ID</th><th>SKS</th><th>Status</th></tr></thead>
+                <thead><tr><th>No</th><th>Matakuliah</th><th>Kelas</th><th>SKS</th><th>Status</th></tr></thead>
                 <tbody>
                     @foreach($krs->details as $i => $detail)
-                        <tr><td>{{ $i + 1 }}</td><td>{{ $detail->kelas_id }}</td><td>{{ $detail->sks }}</td><td>{{ $detail->status }}</td></tr>
+                        <tr><td>{{ $i + 1 }}</td><td>{{ $detail->kelas->matakuliah->kode ?? '' }} — {{ $detail->kelas->matakuliah->nama ?? 'Kelas #'.$detail->kelas_id }}</td><td>{{ $detail->kelas->nama ?? '-' }}</td><td>{{ $detail->sks }}</td><td><span class="badge bg-secondary">{{ $detail->status }}</span></td></tr>
                     @endforeach
                 </tbody>
             </table>

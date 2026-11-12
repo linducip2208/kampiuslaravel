@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Setting;
 use App\Services\Payment\PaymentService;
 use Illuminate\Support\Facades\Http;
@@ -10,6 +11,10 @@ use Livewire\Component;
 
 class Integrasi extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['superadmin', 'admin_prodi'];
+
     public string $pay_driver = '';
 
     public string $pay_server_key = '';

@@ -60,6 +60,7 @@
                                 ['route' => 'media.generate', 'label' => 'Generate Gambar', 'icon' => 'M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z', 'pattern' => 'media.*'],
                                 ['route' => 'publik.pengumuman', 'label' => 'Pengumuman', 'icon' => 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M10.3 21a1.9 1.9 0 0 0 3.4 0', 'pattern' => 'notifikasi.*|publik.pengumuman*'],
                                 ['route' => 'dashboard.pimpinan', 'label' => 'Laporan', 'icon' => 'M3 3v18h18M7 15l4-4 3 3 5-6', 'pattern' => 'dashboard.pimpinan|pddikti.*'],
+                                ['route' => 'admin.master', 'label' => 'Data Master', 'roles' => ['superadmin', 'admin_prodi'], 'icon' => 'M4 4h16v12H4zM4 16l2-2m14 2l-2-2M8 9h8M8 12h5', 'pattern' => 'admin.master'],
                                 ['route' => 'admin.integrasi', 'label' => 'Integrasi', 'icon' => 'M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6', 'pattern' => 'admin.integrasi'],
                             ];
                         @endphp

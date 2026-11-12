@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Skripsi;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\AuditLog;
 use App\Models\Dosen;
 use App\Models\SkripsiJudul;
@@ -10,6 +11,10 @@ use Livewire\Component;
 
 class SetPembimbing extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['superadmin', 'admin_prodi'];
+
     public ?int $judulId = null;
 
     public ?int $pembimbing1_id = null;

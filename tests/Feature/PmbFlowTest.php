@@ -7,6 +7,7 @@ use App\Models\PmbGelombang;
 use App\Models\PmbPendaftar;
 use App\Models\Prodi;
 use App\Models\User;
+use Database\Seeders\RolesPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -79,7 +80,9 @@ class PmbFlowTest extends TestCase
 
     public function test_admin_dapat_memverifikasi_pendaftar(): void
     {
+        $this->seed(RolesPermissionsSeeder::class);
         $admin = User::factory()->create();
+        $admin->assignRole('admin_prodi');
         $pendaftar = PmbPendaftar::factory()->create(['status' => PmbPendaftar::STATUS_DIAJUKAN]);
 
         Livewire::actingAs($admin)

@@ -14,6 +14,7 @@ use App\Models\SkripsiJudul;
 use App\Models\Surat;
 use App\Models\User;
 use App\Services\SuratNomorService;
+use Database\Seeders\RolesPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -24,9 +25,13 @@ class SkripsiFlowTest extends TestCase
 
     public function test_happy_path_judul_sampai_sidang_lulus_dan_nomor_surat(): void
     {
+        $this->seed(RolesPermissionsSeeder::class);
         $mhs = Mahasiswa::factory()->create(['angkatan' => 2024]);
+        $mhs->user->assignRole('mahasiswa');
         $admin = User::factory()->create();
+        $admin->assignRole('admin_prodi');
         $dosen = Dosen::factory()->create();
+        $dosen->user->assignRole('dosen');
         $ruang = Ruang::factory()->create();
 
         $this->actingAs($mhs->user);

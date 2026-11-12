@@ -66,8 +66,9 @@ class XenditAdapter implements PaymentGatewayInterface
         }
 
         return match (strtolower((string) $res->json('status'))) {
-            'active' => 'pending',
-            'paid', 'completed', 'inactive' => 'verified',
+            'active', 'pending' => 'pending',
+            'expired', 'inactive' => 'failed',
+            'completed', 'paid' => 'verified',
             default => 'pending',
         };
     }

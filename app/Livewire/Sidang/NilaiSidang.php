@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Sidang;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\AuditLog;
 use App\Models\Dosen;
 use App\Models\Sidang as SidangModel;
@@ -11,6 +12,10 @@ use Livewire\Component;
 
 class NilaiSidang extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['dosen', 'superadmin', 'admin_prodi'];
+
     public ?int $sidang_id = null;
 
     public ?int $dosen_id = null;

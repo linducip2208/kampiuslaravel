@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pertemuan extends Model
 {
@@ -21,5 +23,20 @@ class Pertemuan extends Model
             'window_mulai' => 'datetime',
             'window_selesai' => 'datetime',
         ];
+    }
+
+    public function kelas(): BelongsTo
+    {
+        return $this->belongsTo(Kelas::class);
+    }
+
+    public function materi(): HasMany
+    {
+        return $this->hasMany(Materi::class);
+    }
+
+    public function absensi(): HasMany
+    {
+        return $this->hasMany(Absensi::class);
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Livewire\Admin\Integrasi as AdminIntegrasi;
+use App\Livewire\Master\Data;
 use App\Models\Mahasiswa;
 use App\Models\Notifikasi;
 use App\Models\Pembayaran;
@@ -75,12 +76,14 @@ class IntegrasiTest extends TestCase
 
         $this->assertSame(1, app(NotifikasiService::class)->broadcast('mahasiswa', 'Halo', 'Isi'));
 
-        $this->actingAs($user, 'sanctum')->getJson('/api/v1/notifikasi')
+        $token = $user->createToken('mobile', ['mobile'])->plainTextToken;
+
+        $this->withToken($token)->getJson('/api/v1/notifikasi')
             ->assertOk()
             ->assertJsonCount(1, 'data');
 
         $notif = Notifikasi::first();
-        $this->actingAs($user, 'sanctum')->postJson("/api/v1/notifikasi/{$notif->id}/read")->assertOk();
+        $this->withToken($token)->postJson("/api/v1/notifikasi/{$notif->id}/read")->assertOk();
         $this->assertNotNull($notif->fresh()->dibaca_at);
     }
 
@@ -88,7 +91,9 @@ class IntegrasiTest extends TestCase
     {
         $this->tagihan();
 
+        $this->seed(RolesPermissionsSeeder::class);
         $user = User::factory()->create();
+        $user->assignRole('pimpinan');
         $this->actingAs($user)->get(route('pddikti.export', 'mahasiswa'))->assertOk();
         $this->actingAs($user)->get(route('pddikti.export', 'nilai'))->assertOk();
         $this->actingAs($user)->get(route('pddikti.export', 'kelulusan'))->assertOk();
@@ -96,7 +101,9 @@ class IntegrasiTest extends TestCase
 
     public function test_integrasi_page_renders(): void
     {
+        $this->seed(RolesPermissionsSeeder::class);
         $user = User::factory()->create();
+        $user->assignRole('superadmin');
         $this->actingAs($user)->get(route('admin.integrasi'))->assertOk();
     }
 
@@ -147,7 +154,9 @@ class IntegrasiTest extends TestCase
     {
         Setting::set('pay.driver', 'simulated');
 
+        $this->seed(RolesPermissionsSeeder::class);
         $owner = User::factory()->create();
+        $owner->assignRole('mahasiswa');
         $tagihan = Tagihan::create([
             'mahasiswa_id' => Mahasiswa::factory()->create(['user_id' => $owner->id])->id,
             'tahun_akademik_id' => TahunAkademik::factory()->create()->id,
@@ -242,7 +251,9 @@ class IntegrasiTest extends TestCase
         Setting::set('pay.server_key', null);
         Setting::set('pay.private_key', null);
 
+        $this->seed(RolesPermissionsSeeder::class);
         $owner = User::factory()->create();
+        $owner->assignRole('mahasiswa');
         $tagihan = Tagihan::create([
             'mahasiswa_id' => Mahasiswa::factory()->create(['user_id' => $owner->id])->id,
             'tahun_akademik_id' => TahunAkademik::factory()->create()->id,
@@ -262,7 +273,11 @@ class IntegrasiTest extends TestCase
         Setting::set('fcm.project_id', null);
         Setting::set('fcm.service_account_path', null);
 
-        Livewire::test(AdminIntegrasi::class)
+        $this->seed(RolesPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('superadmin');
+        Livewire::actingAs($user)
+            ->test(AdminIntegrasi::class)
             ->call('test', 'fcm')
             ->assertSet('tes.fcm', 'Belum dikonfigurasi (isi Project ID + path JSON service-account). Notifikasi tetap masuk inbox.');
     }
@@ -281,8 +296,32 @@ class IntegrasiTest extends TestCase
             'status' => 'belum_bayar',
         ]);
 
-        $this->actingAs($owner, 'sanctum')->postJson("/api/v1/tagihan/{$tagihan->id}/va")
+        $token = $owner->createToken('mobile', ['mobile'])->plainTextToken;
+
+        $this->withToken($token)->postJson("/api/v1/tagihan/{$tagihan->id}/va")
             ->assertCreated()
             ->assertJsonStructure(['reference', 'va_number', 'nominal']);
+    }
+
+    public function test_master_crud_butuh_admin_dan_berfungsi(): void
+    {
+        $this->seed(RolesPermissionsSeeder::class);
+        $biasa = User::factory()->create();
+        $this->actingAs($biasa)->get(route('admin.master'))->assertForbidden();
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin_prodi');
+        $this->actingAs($admin)->get(route('admin.master'))->assertOk();
+
+        Livewire::actingAs($admin)
+            ->test(Data::class)
+            ->set('entitas', 'ruang')
+            ->set('form.gedung', 'Gedung A')
+            ->set('form.nama', 'R101')
+            ->set('form.kapasitas', 40)
+            ->call('simpan')
+            ->assertSee('Data tersimpan');
+
+        $this->assertDatabaseHas('ruang', ['nama' => 'R101', 'kapasitas' => 40]);
     }
 }

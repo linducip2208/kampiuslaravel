@@ -72,6 +72,12 @@ class KeuanganService
     {
         DB::transaction(function () use ($pembayaranId, $verifiedBy, $approve) {
             $pembayaran = Pembayaran::lockForUpdate()->findOrFail($pembayaranId);
+
+            // Idempotency: pembayaran yang sudah diproses tidak boleh diproses ulang.
+            if ($pembayaran->status !== 'pending') {
+                return;
+            }
+
             $tagihan = Tagihan::lockForUpdate()->findOrFail($pembayaran->tagihan_id);
 
             if ($approve) {

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Skripsi;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\AuditLog;
 use App\Models\Mahasiswa;
 use App\Models\SkripsiJudul;
@@ -10,6 +11,11 @@ use Livewire\Component;
 
 class PengajuanJudul extends Component
 {
+    use RequiresRoles;
+
+    /** Otorisasi owner-scope dicek manual di mount(). */
+    public array $allowedRoles = [];
+
     public string $judul = '';
 
     public string $deskripsi = '';

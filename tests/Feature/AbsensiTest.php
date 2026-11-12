@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Kelas;
+use App\Models\Mahasiswa;
 use App\Models\Pertemuan;
 use App\Services\AbsensiService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,10 +14,22 @@ class AbsensiTest extends TestCase
 {
     use RefreshDatabase;
 
+    private int $kelasId;
+
+    private int $mahasiswaId;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->kelasId = Kelas::factory()->create()->id;
+        $this->mahasiswaId = Mahasiswa::factory()->create()->id;
+    }
+
     public function test_scan_token_valid_mencatat_hadir(): void
     {
         $pertemuan = Pertemuan::create([
-            'kelas_id' => 1,
+            'kelas_id' => $this->kelasId,
             'ke' => 1,
             'tanggal' => now()->toDateString(),
             'topik' => 'Intro',
@@ -25,19 +39,19 @@ class AbsensiTest extends TestCase
             'window_selesai' => now()->addHour(),
         ]);
 
-        $result = AbsensiService::scan($pertemuan, 1, $pertemuan->qr_token, now());
+        $result = AbsensiService::scan($pertemuan, $this->mahasiswaId, $pertemuan->qr_token, now());
 
         $this->assertTrue($result['ok']);
         $this->assertDatabaseHas('absensi', [
             'pertemuan_id' => $pertemuan->id,
-            'mahasiswa_id' => 1,
+            'mahasiswa_id' => $this->mahasiswaId,
         ]);
     }
 
     public function test_scan_token_salah_ditolak(): void
     {
         $pertemuan = Pertemuan::create([
-            'kelas_id' => 1,
+            'kelas_id' => $this->kelasId,
             'ke' => 2,
             'tanggal' => now()->toDateString(),
             'topik' => 'Topik 2',
@@ -45,19 +59,19 @@ class AbsensiTest extends TestCase
             'qr_expires_at' => now()->addHour(),
         ]);
 
-        $result = AbsensiService::scan($pertemuan, 1, 'token-salah', now());
+        $result = AbsensiService::scan($pertemuan, $this->mahasiswaId, 'token-salah', now());
 
         $this->assertFalse($result['ok']);
         $this->assertDatabaseMissing('absensi', [
             'pertemuan_id' => $pertemuan->id,
-            'mahasiswa_id' => 1,
+            'mahasiswa_id' => $this->mahasiswaId,
         ]);
     }
 
     public function test_scan_token_expired_ditolak(): void
     {
         $pertemuan = Pertemuan::create([
-            'kelas_id' => 1,
+            'kelas_id' => $this->kelasId,
             'ke' => 3,
             'tanggal' => now()->toDateString(),
             'topik' => 'Topik 3',
@@ -65,7 +79,7 @@ class AbsensiTest extends TestCase
             'qr_expires_at' => now()->subMinute(),
         ]);
 
-        $result = AbsensiService::scan($pertemuan, 1, $pertemuan->qr_token, now());
+        $result = AbsensiService::scan($pertemuan, $this->mahasiswaId, $pertemuan->qr_token, now());
 
         $this->assertFalse($result['ok']);
         $this->assertSame('Token QR kedaluwarsa.', $result['message']);
@@ -74,7 +88,7 @@ class AbsensiTest extends TestCase
     public function test_scan_di_luar_window_ditolak(): void
     {
         $pertemuan = Pertemuan::create([
-            'kelas_id' => 1,
+            'kelas_id' => $this->kelasId,
             'ke' => 4,
             'tanggal' => now()->toDateString(),
             'topik' => 'Topik 4',
@@ -84,7 +98,7 @@ class AbsensiTest extends TestCase
             'window_selesai' => now()->addHours(2),
         ]);
 
-        $result = AbsensiService::scan($pertemuan, 1, $pertemuan->qr_token, now());
+        $result = AbsensiService::scan($pertemuan, $this->mahasiswaId, $pertemuan->qr_token, now());
 
         $this->assertFalse($result['ok']);
         $this->assertDatabaseCount('absensi', 0);

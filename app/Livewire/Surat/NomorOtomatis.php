@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Surat;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\AuditLog;
 use App\Models\Surat as SuratModel;
 use App\Services\SuratNomorService;
@@ -10,6 +11,10 @@ use Livewire\Component;
 
 class NomorOtomatis extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['keuangan', 'superadmin', 'admin_prodi'];
+
     public string $statusFilter = 'diajukan';
 
     public string $message = '';

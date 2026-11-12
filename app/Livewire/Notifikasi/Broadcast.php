@@ -2,11 +2,16 @@
 
 namespace App\Livewire\Notifikasi;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Services\NotifikasiService;
 use Livewire\Component;
 
 class Broadcast extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['superadmin', 'admin_prodi', 'keuangan', 'pimpinan'];
+
     public string $role = 'mahasiswa';
 
     public string $judul = '';

@@ -5,6 +5,7 @@ namespace App\Services\Payment;
 use App\Models\Pembayaran;
 use App\Models\Setting;
 use App\Models\Tagihan;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class PaymentService
@@ -78,25 +79,27 @@ class PaymentService
         ])->fresh();
     }
 
-    /** Tandai pembayaran lunas berdasarkan reference, return true bila cocok. */
+    /** Tandai pembayaran lunas berdasarkan reference. Idempotent, aman dari double-settle. */
     public function settleByReference(string $reference): bool
     {
-        $pembayaran = Pembayaran::where('reference', $reference)->first();
+        return DB::transaction(function () use ($reference) {
+            $pembayaran = Pembayaran::where('reference', $reference)->lockForUpdate()->first();
 
-        if (! $pembayaran || $pembayaran->status === 'verified') {
-            return false;
-        }
+            if (! $pembayaran || $pembayaran->status === 'verified') {
+                return false;
+            }
 
-        $pembayaran->update(['status' => 'verified', 'verified_at' => now()]);
+            $pembayaran->update(['status' => 'verified', 'verified_at' => now()]);
 
-        $tagihan = $pembayaran->tagihan;
-        $terbayar = (int) $tagihan->terbayar + (int) $pembayaran->nominal;
-        $tagihan->update([
-            'terbayar' => $terbayar,
-            'status' => $terbayar >= (int) $tagihan->nominal ? 'lunas' : 'sebagian',
-        ]);
+            $tagihan = Tagihan::whereKey($pembayaran->tagihan_id)->lockForUpdate()->firstOrFail();
+            $terbayar = (int) $tagihan->terbayar + (int) $pembayaran->nominal;
+            $tagihan->update([
+                'terbayar' => $terbayar,
+                'status' => $terbayar >= (int) $tagihan->nominal ? 'lunas' : 'sebagian',
+            ]);
 
-        return true;
+            return true;
+        });
     }
 
     /** Sinkron status dari gateway; lunaskan bila gateway bilang verified. */

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Keuangan;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\AuditLog;
 use App\Models\Prodi;
 use App\Models\TahunAkademik;
@@ -11,6 +12,10 @@ use Livewire\Component;
 
 class TagihanMassal extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['keuangan', 'superadmin', 'admin_prodi'];
+
     public ?int $tahun_id = null;
 
     public string $jenis = 'UKT';

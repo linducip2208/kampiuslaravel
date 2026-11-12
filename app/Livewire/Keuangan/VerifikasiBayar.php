@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Keuangan;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\AuditLog;
 use App\Models\Pembayaran;
 use App\Services\KeuanganService;
@@ -10,6 +11,10 @@ use Livewire\Component;
 
 class VerifikasiBayar extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['keuangan', 'superadmin'];
+
     public string $statusFilter = 'pending';
 
     public string $message = '';

@@ -2,12 +2,20 @@
 
 namespace App\Livewire\Absensi;
 
+use App\Livewire\Concerns\RequiresRoles;
+use App\Models\Mahasiswa;
 use App\Models\Pertemuan;
 use App\Services\AbsensiService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class ScanQr extends Component
 {
+    use RequiresRoles;
+
+    /** Otorisasi owner-scope dicek manual di mount(). */
+    public array $allowedRoles = [];
+
     public string $qrToken = '';
 
     public int $mahasiswaId;
@@ -18,6 +26,12 @@ class ScanQr extends Component
 
     public function mount(int $mahasiswaId): void
     {
+        // Mahasiswa hanya boleh absen untuk dirinya sendiri (anti-spoofing).
+        $user = Auth::user();
+        if ($user && $user->hasRole('mahasiswa') && ! $user->hasAnyRole(['superadmin', 'admin_prodi', 'dosen', 'keuangan', 'pimpinan'])) {
+            $mahasiswaId = (int) Mahasiswa::where('user_id', $user->id)->value('id');
+        }
+
         $this->mahasiswaId = $mahasiswaId;
     }
 

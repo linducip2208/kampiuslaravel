@@ -3,12 +3,17 @@
 namespace App\Livewire\Media;
 
 use App\Jobs\GenerateMediaJob;
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Pengumuman;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 class Generator extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['superadmin', 'admin_prodi', 'keuangan', 'pimpinan'];
+
     public string $prompt = '';
 
     public string $negative = '';

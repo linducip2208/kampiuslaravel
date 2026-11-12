@@ -2,7 +2,10 @@
 
 namespace App\Livewire\Pmb;
 
+use App\Livewire\Concerns\RequiresRoles;
+use App\Models\Mahasiswa;
 use App\Models\PmbPendaftar;
+use App\Models\Tagihan;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +18,10 @@ use Livewire\WithPagination;
  */
 class Verifikasi extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['superadmin', 'admin_prodi'];
+
     use WithPagination;
 
     public string $search = '';
@@ -68,11 +75,12 @@ class Verifikasi extends Component
     }
 
     /**
-     * Daftar ulang: pendaftar lulus -> buatkan akun user + tautkan.
+     * Daftar ulang: pendaftar lulus -> akun user + data mahasiswa (NIM)
+     * + tagihan awal. Idempotent: tolak bila email sudah dipakai akun lain.
      */
     public function daftarUlang(int $id): void
     {
-        $pendaftar = PmbPendaftar::query()->findOrFail($id);
+        $pendaftar = PmbPendaftar::query()->with('gelombang')->findOrFail($id);
 
         if ($pendaftar->status !== PmbPendaftar::STATUS_LULUS) {
             $this->addError('selectedId', 'Hanya pendaftar berstatus lulus yang bisa daftar ulang.');
@@ -86,22 +94,55 @@ class Verifikasi extends Component
             return;
         }
 
-        $user = DB::transaction(function () use ($pendaftar) {
-            $user = User::query()->firstOrCreate(
-                ['email' => $pendaftar->email],
-                [
-                    'name' => $pendaftar->nama,
-                    'password' => str()->random(12),
-                ]
-            );
+        $taken = User::query()->where('email', $pendaftar->email)->exists();
+
+        if ($taken) {
+            $this->addError('selectedId', 'Email sudah dipakai akun lain. Minta pendaftar memakai email berbeda.');
+
+            return;
+        }
+
+        $result = DB::transaction(function () use ($pendaftar) {
+            $user = User::query()->create([
+                'name' => $pendaftar->nama,
+                'email' => $pendaftar->email,
+                'password' => str()->random(12),
+            ]);
+            $user->assignRole('mahasiswa');
+
+            $angkatan = (int) now()->format('Y');
+            $seq = (int) (Mahasiswa::query()->where('angkatan', $angkatan)->max('id') ?? 0) + 1;
+            $nim = $angkatan.sprintf('%02d', (int) $pendaftar->prodi1_id).sprintf('%04d', $seq);
+
+            $mahasiswa = Mahasiswa::query()->create([
+                'user_id' => $user->id,
+                'nim' => $nim,
+                'prodi_id' => $pendaftar->prodi1_id,
+                'angkatan' => $angkatan,
+                'status' => 'aktif',
+            ]);
+
+            $tagihan = null;
+            $biaya = (int) ($pendaftar->gelombang->biaya ?? 0);
+            if ($biaya > 0) {
+                $tagihan = Tagihan::query()->firstOrCreate(
+                    [
+                        'mahasiswa_id' => $mahasiswa->id,
+                        'tahun_akademik_id' => $pendaftar->gelombang->tahun_akademik_id,
+                        'jenis' => 'PMB',
+                    ],
+                    ['nominal' => $biaya, 'terbayar' => 0, 'status' => 'belum_bayar']
+                );
+            }
 
             $pendaftar->update(['user_id' => $user->id]);
 
-            return $user;
+            return compact('user', 'mahasiswa', 'tagihan');
         });
 
         $this->reset(['selectedId', 'catatan']);
-        session()->flash('info', "Akun {$user->email} berhasil dibuat untuk {$pendaftar->no_daftar}.");
+        session()->flash('info', "Daftar ulang OK: NIM {$result['mahasiswa']->nim} ({$result['user']->email}).".
+            ($result['tagihan'] ? ' Tagihan awal Rp '.number_format($result['tagihan']->nominal, 0, ',', '.') : ''));
     }
 
     public function render(): View

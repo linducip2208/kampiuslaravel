@@ -2,12 +2,17 @@
 
 namespace App\Livewire\Lms;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Tugas;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class TugasCrud extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['dosen', 'superadmin', 'admin_prodi'];
+
     use WithPagination;
 
     public int $kelasId;

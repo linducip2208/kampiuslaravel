@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Krs;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Krs;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,6 +16,10 @@ use Livewire\WithPagination;
  */
 class PersetujuanPa extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['dosen', 'superadmin', 'admin_prodi'];
+
     use WithPagination;
 
     public string $search = '';

@@ -2,11 +2,16 @@
 
 namespace App\Livewire\Nilai;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Nilai;
 use Livewire\Component;
 
 class InputNilai extends Component
 {
+    use RequiresRoles;
+
+    public array $allowedRoles = ['dosen', 'superadmin', 'admin_prodi'];
+
     public int $kelasId;
 
     /** @var array<int, array<string, mixed>> */

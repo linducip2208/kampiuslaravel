@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Surat;
 
+use App\Livewire\Concerns\RequiresRoles;
 use App\Models\AuditLog;
 use App\Models\Mahasiswa;
 use App\Models\Surat as SuratModel;
@@ -10,6 +11,11 @@ use Livewire\Component;
 
 class Pengajuan extends Component
 {
+    use RequiresRoles;
+
+    /** Otorisasi owner-scope dicek manual di mount(). */
+    public array $allowedRoles = [];
+
     public string $jenis = 'aktif_kuliah';
 
     public string $keperluan = '';
