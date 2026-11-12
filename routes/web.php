@@ -18,6 +18,7 @@ use App\Models\Krs;
 use App\Models\Mahasiswa;
 use App\Models\Matakuliah;
 use App\Models\Nilai;
+use App\Models\Pembayaran;
 use App\Models\Pengumuman;
 use App\Models\Pertemuan;
 use App\Models\PmbPendaftar;
@@ -73,6 +74,22 @@ Route::get('/', function () {
             $n = $safe('pengumuman', fn () => Pengumuman::whereNotNull('published_at')->latest('published_at')->take(3)->get());
 
             return is_iterable($n) ? $n : [];
+        })(),
+        'lunas_pct' => $safe('tagihan', function () {
+            $total = (float) Tagihan::sum('nominal');
+            $bayar = (float) Tagihan::sum('terbayar');
+
+            return $total > 0 ? (int) round($bayar / $total * 100) : 0;
+        }),
+        'bayar_bulanan' => (function () use ($safe) {
+            $out = ['labels' => [], 'nominal' => []];
+            for ($i = 5; $i >= 0; $i--) {
+                $b = now()->subMonths($i);
+                $out['labels'][] = $b->translatedFormat('M');
+                $out['nominal'][] = (int) $safe('pembayaran', fn () => Pembayaran::where('status', 'verified')->whereYear('verified_at', $b->year)->whereMonth('verified_at', $b->month)->sum('nominal'));
+            }
+
+            return $out;
         })(),
     ];
 

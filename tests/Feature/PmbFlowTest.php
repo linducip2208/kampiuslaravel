@@ -6,6 +6,7 @@ use App\Livewire\Pmb\Verifikasi;
 use App\Models\PmbGelombang;
 use App\Models\PmbPendaftar;
 use App\Models\Prodi;
+use App\Models\TahunAkademik;
 use App\Models\User;
 use Database\Seeders\RolesPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -46,9 +47,16 @@ class PmbFlowTest extends TestCase
         $response = $this->post(route('pmb.store'), []);
         $response->assertSessionHasErrors(['nama', 'email', 'hp', 'sekolah_asal', 'gelombang_id', 'prodi1_id']);
 
-        PmbPendaftar::factory()->create(['email' => 'ganda@example.com']);
+        PmbPendaftar::factory()->create([
+            'email' => 'ganda@example.com',
+            'gelombang_id' => PmbGelombang::factory()->create([
+                'tahun_akademik_id' => TahunAkademik::factory()->create(['tahun' => '2000/2001', 'semester' => 'ganjil'])->id,
+            ])->id,
+        ]);
 
-        $gelombang = PmbGelombang::factory()->create();
+        $gelombang = PmbGelombang::factory()->create([
+            'tahun_akademik_id' => TahunAkademik::factory()->create(['tahun' => '2001/2002', 'semester' => 'ganjil'])->id,
+        ]);
 
         $response = $this->post(route('pmb.store'), [
             'nama' => 'AB',
