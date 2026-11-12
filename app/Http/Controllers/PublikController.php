@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengumuman;
 use App\Models\Prodi;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PublikController extends Controller
@@ -44,5 +45,34 @@ class PublikController extends Controller
         $item = Pengumuman::with('prodi')->whereNotNull('published_at')->findOrFail($id);
 
         return view('publik.pengumuman-show', ['item' => $item]);
+    }
+
+    public function dokumen(?string $file = null): View
+    {
+        $dokumen = [
+            'ARSITEKTUR' => 'Arsitektur sistem',
+            'ERP_MODULES' => 'Modul ERP',
+            'ROLES_PERMISSIONS' => 'Role & permission',
+            'INSTALLATION' => 'Instalasi',
+            'USER_GUIDE' => 'Panduan pengguna',
+            'INTEGRASI' => 'Integrasi (payment, push, PDDikti)',
+            'COMFYUI' => 'Generate gambar AI',
+            'SECURITY' => 'Keamanan',
+            'TESTING' => 'Testing',
+            'CHANGELOG' => 'Changelog',
+        ];
+
+        $konten = null;
+        $aktif = null;
+
+        if ($file !== null) {
+            abort_unless(array_key_exists($file, $dokumen), 404);
+            $path = base_path('docs/'.$file.'.md');
+            abort_unless(is_file($path), 404);
+            $konten = Str::markdown((string) file_get_contents($path));
+            $aktif = $file;
+        }
+
+        return view('publik.dokumen', ['dokumen' => $dokumen, 'konten' => $konten, 'aktif' => $aktif]);
     }
 }

@@ -86,6 +86,8 @@ Route::get('/prodi', [PublikController::class, 'prodi'])->name('publik.prodi');
 Route::get('/prodi/{slug}', [PublikController::class, 'prodiDetail'])->name('publik.prodi.detail');
 Route::get('/pengumuman', [PublikController::class, 'pengumuman'])->name('publik.pengumuman');
 Route::get('/pengumuman/{id}', [PublikController::class, 'pengumumanDetail'])->name('publik.pengumuman.detail');
+Route::get('/dokumentasi', [PublikController::class, 'dokumen'])->name('dokumen.index');
+Route::get('/dokumentasi/{file}', [PublikController::class, 'dokumen'])->name('dokumen.show');
 
 // PMB publik
 Route::get('/pmb', [PmbController::class, 'create'])->middleware('throttle:public')->name('pmb.create');
