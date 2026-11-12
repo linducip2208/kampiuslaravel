@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KhsController;
 use App\Http\Controllers\KrsController;
 use App\Http\Controllers\KwitansiController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PddiktiController;
 use App\Http\Controllers\PmbController;
 use App\Http\Controllers\PublikController;
@@ -173,6 +174,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:keuangan|superadmin|admin_prodi')->group(function () {
         Route::get('/keuangan/tagihan', fn () => view('pages.livewire-page', ['component' => 'keuangan.tagihan-massal', 'title' => 'Tagihan Massal']))->name('keuangan.tagihan');
         Route::get('/keuangan/verifikasi', fn () => view('pages.livewire-page', ['component' => 'keuangan.verifikasi-bayar', 'title' => 'Verifikasi Pembayaran']))->name('keuangan.verifikasi');
+        Route::get('/keuangan/beasiswa', fn () => view('pages.livewire-page', ['component' => 'beasiswa.kelola', 'title' => 'Beasiswa']))->name('keuangan.beasiswa');
         Route::get('/surat/nomor', fn () => view('pages.livewire-page', ['component' => 'surat.nomor-otomatis', 'title' => 'Nomor Surat']))->name('surat.nomor');
     });
 
@@ -182,6 +184,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/pddikti', [PddiktiController::class, 'index'])->name('pddikti.index');
         Route::get('/pddikti/export/{jenis}', [PddiktiController::class, 'export'])->name('pddikti.export');
         Route::post('/pddikti/push', [PddiktiController::class, 'push'])->name('pddikti.push');
+        Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+        Route::get('/laporan/export/tagihan', [LaporanController::class, 'exportTagihan'])->name('laporan.export.tagihan');
+        Route::get('/laporan/export/absensi', [LaporanController::class, 'exportAbsensi'])->name('laporan.export.absensi');
+        Route::get('/skripsi/yudisium', fn () => view('pages.livewire-page', ['component' => 'skripsi.yudisium', 'title' => 'Yudisium']))->name('skripsi.yudisium');
     });
 
     // Admin platform
@@ -189,7 +195,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/pmb/verifikasi', fn () => view('admin.pmb-verifikasi'))->name('admin.pmb.verifikasi');
         Route::get('/admin/integrasi', fn () => view('pages.livewire-page', ['component' => 'admin.integrasi', 'title' => 'Integrasi']))->name('admin.integrasi');
         Route::get('/admin/master', fn () => view('pages.livewire-page', ['component' => 'master.data', 'title' => 'Data Master']))->name('admin.master');
+        Route::get('/admin/impor', fn () => view('pages.livewire-page', ['component' => 'admin.impor-csv', 'title' => 'Impor CSV']))->name('admin.impor');
+        Route::get('/admin/impor/template/{jenis}', [LaporanController::class, 'templateImpor'])->name('admin.impor.template');
     });
+
+    // Kalender & helpdesk: semua user login (kepemilikan dicek di komponen)
+    Route::get('/kalender', fn () => view('pages.livewire-page', ['component' => 'kalender.kelola', 'title' => 'Kalender Akademik']))->name('kalender.index');
+    Route::get('/helpdesk', fn () => view('pages.livewire-page', ['component' => 'helpdesk.tiket', 'title' => 'Helpdesk']))->name('helpdesk.index');
 
     // Staf internal
     Route::middleware('role:superadmin|admin_prodi|keuangan|pimpinan')->group(function () {

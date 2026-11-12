@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Mahasiswa;
+use App\Models\MahasiswaBeasiswa;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use Illuminate\Support\Facades\DB;
@@ -53,13 +54,29 @@ class KeuanganService
 
                     continue;
                 }
+
+                $beasiswa = MahasiswaBeasiswa::with('beasiswa')
+                    ->where('mahasiswa_id', $mhs->id)
+                    ->where('status', 'aktif')
+                    ->where(function ($q) use ($tahunAkademikId) {
+                        $q->whereNull('tahun_akademik_id')->orWhere('tahun_akademik_id', $tahunAkademikId);
+                    })
+                    ->get()
+                    ->map->beasiswa
+                    ->filter(fn ($b) => $b && $b->aktif)
+                    ->first();
+
+                $diskon = $beasiswa ? $beasiswa->hitungPotongan($nominal) : 0;
+
                 Tagihan::create([
                     'mahasiswa_id' => $mhs->id,
                     'tahun_akademik_id' => $tahunAkademikId,
                     'jenis' => $jenis,
-                    'nominal' => $nominal,
+                    'nominal' => $nominal - $diskon,
                     'terbayar' => 0,
                     'status' => 'belum_bayar',
+                    'beasiswa_id' => $beasiswa?->id,
+                    'diskon' => $diskon,
                 ]);
                 $created++;
             }

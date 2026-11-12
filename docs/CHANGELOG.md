@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-12 — Lanjutan master audit (tanpa commit/push)
+- Beasiswa (CRUD + penetapan + potongan otomatis generate tagihan), kalender akademik CRUD + agenda dashboard, yudisium bersyarat, helpdesk tiket + notifikasi, impor CSV + template, ekspor CSV tagihan/absensi, relasi model lengkap, FK 40+, 72 test hijau.
+
 ## 2026-11-12 — Hardening & finalisasi (master audit)
 - IPK tertimbang SKS terpusat (`AkademikService`); KHS/transkrip tampilkan nama + total SKS + IP per tahun.
 - Otorisasi: grup `role:*`, trait Livewire `RequiresRoles`, owner-check controller + mount, sidebar sadar peran.

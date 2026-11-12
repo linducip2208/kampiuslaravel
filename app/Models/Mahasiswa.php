@@ -6,6 +6,7 @@ use Database\Factories\MahasiswaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Mahasiswa extends Model
 {
@@ -38,5 +39,13 @@ class Mahasiswa extends Model
     public function dosenPa(): BelongsTo
     {
         return $this->belongsTo(Dosen::class, 'dosen_pa_id');
+    }
+
+    /**
+     * @return HasMany<Tagihan, $this>
+     */
+    public function tagihan(): HasMany
+    {
+        return $this->hasMany(Tagihan::class);
     }
 }

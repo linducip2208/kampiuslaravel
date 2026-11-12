@@ -13,7 +13,8 @@
 | Notifikasi | ✅ | Inbox + broadcast per role + FCM HTTP v1 + API mobile. |
 | PDDikti | ✅ | Export CSV mahasiswa/nilai/kelulusan + push record via Feeder (kredensial admin). |
 | ComfyUI/WAN | ✅ | Queue/history/view API, job antrean, cover pengumuman, Tes Koneksi. Butuh server ComfyUI + model. |
-| Kalender akademik | ⚠️ | Parsial: agenda dashboard (pertemuan + sidang mendatang). Belum ada CRUD kalender tersendiri. |
-| Wisuda/kelulusan | ⚠️ | Parsial: status `lulus`, export kelulusan, surat keterangan lulus. Belum ada modul yudisium. |
-| Beasiswa/diskon | ❌ | Belum ada. Tagihan memakai nominal penuh. |
-| Helpdesk tiket | ❌ | Belum ada. |
+| Kalender akademik | ✅ | CRUD agenda (kuliah/UTS/UAS/libur/pembayaran/PMB/wisuda) + tampil di dashboard. |
+| Wisuda/kelulusan | ✅ | Yudisium dengan syarat otomatis (sidang lulus + bebas tunggakan + IPK≥2.0), status `lulus`, surat keterangan lulus. |
+| Beasiswa/diskon | ✅ | Master beasiswa (persen/nominal) + penetapan per mahasiswa + potongan otomatis di generate tagihan. |
+| Helpdesk tiket | ✅ | Tiket + balasan + notifikasi, staf/mahasiswa terisolasi. |
+| Import/ekspor | ✅ | Impor CSV mahasiswa/matakuliah + template; ekspor CSV tagihan, absensi, PDDikti. |

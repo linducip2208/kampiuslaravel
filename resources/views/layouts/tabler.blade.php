@@ -60,7 +60,13 @@
                                 ['route' => 'media.generate', 'label' => 'Generate Gambar', 'icon' => 'M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z', 'pattern' => 'media.*'],
                                 ['route' => 'publik.pengumuman', 'label' => 'Pengumuman', 'icon' => 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M10.3 21a1.9 1.9 0 0 0 3.4 0', 'pattern' => 'notifikasi.*|publik.pengumuman*'],
                                 ['route' => 'dashboard.pimpinan', 'label' => 'Laporan', 'icon' => 'M3 3v18h18M7 15l4-4 3 3 5-6', 'pattern' => 'dashboard.pimpinan|pddikti.*'],
+                                ['route' => 'admin.impor', 'label' => 'Impor CSV', 'roles' => ['superadmin', 'admin_prodi'], 'icon' => 'M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2', 'pattern' => 'admin.impor*'],
                                 ['route' => 'admin.master', 'label' => 'Data Master', 'roles' => ['superadmin', 'admin_prodi'], 'icon' => 'M4 4h16v12H4zM4 16l2-2m14 2l-2-2M8 9h8M8 12h5', 'pattern' => 'admin.master'],
+                                ['route' => 'kalender.index', 'label' => 'Kalender', 'roles' => null, 'icon' => 'M8 7V3m8 4V3M3 11h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2', 'pattern' => 'kalender.*'],
+                                ['route' => 'helpdesk.index', 'label' => 'Helpdesk', 'roles' => null, 'icon' => 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M10.3 21a1.9 1.9 0 0 0 3.4 0', 'pattern' => 'helpdesk.*'],
+                                ['route' => 'skripsi.yudisium', 'label' => 'Yudisium', 'roles' => ['pimpinan', 'superadmin'], 'icon' => 'M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z', 'pattern' => 'skripsi.yudisium'],
+                                ['route' => 'keuangan.beasiswa', 'label' => 'Beasiswa', 'roles' => ['keuangan', 'superadmin', 'admin_prodi'], 'icon' => 'M12 2l2.5 5.5L20 8l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 2z', 'pattern' => 'keuangan.beasiswa'],
+                                ['route' => 'laporan.index', 'label' => 'Laporan', 'roles' => ['pimpinan', 'superadmin', 'keuangan'], 'icon' => 'M3 3v18h18M7 15l-4-4 3 3 5-6', 'pattern' => 'laporan.*'],
                                 ['route' => 'admin.integrasi', 'label' => 'Integrasi', 'icon' => 'M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6', 'pattern' => 'admin.integrasi'],
                             ];
                         @endphp

@@ -13,7 +13,7 @@ class Tagihan extends Model
 
     protected $table = 'tagihan';
 
-    protected $fillable = ['mahasiswa_id', 'tahun_akademik_id', 'jenis', 'nominal', 'terbayar', 'status'];
+    protected $fillable = ['mahasiswa_id', 'tahun_akademik_id', 'jenis', 'nominal', 'terbayar', 'status', 'beasiswa_id', 'diskon'];
 
     public function mahasiswa(): BelongsTo
     {
@@ -23,6 +23,11 @@ class Tagihan extends Model
     public function tahunAkademik(): BelongsTo
     {
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }
+
+    public function beasiswa(): BelongsTo
+    {
+        return $this->belongsTo(Beasiswa::class);
     }
 
     /** @return HasMany<Pembayaran> */

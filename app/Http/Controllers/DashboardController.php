@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
 use App\Models\Dosen;
+use App\Models\KalenderEvent;
 use App\Models\Krs;
 use App\Models\Mahasiswa;
 use App\Models\Matakuliah;
@@ -48,7 +49,14 @@ class DashboardController extends Controller
                     ->map(fn ($s) => ['tanggal' => Carbon::parse($s->tanggal)->format('d M'), 'judul' => 'Sidang '.($s->jenis ?? ''), 'sub' => $s->status])
             );
         }
-        $agenda = $agenda->take(6);
+        if (Schema::hasTable('kalender_events')) {
+            $agenda = $agenda->merge(
+                KalenderEvent::whereDate('tgl_mulai', '>=', today())
+                    ->orderBy('tgl_mulai')->take(5)->get()
+                    ->map(fn ($e) => ['tanggal' => $e->tgl_mulai->format('d M'), 'judul' => $e->judul, 'sub' => $e->jenis])
+            );
+        }
+        $agenda = $agenda->take(8);
 
         $aktivitas = Schema::hasTable('audit_logs')
             ? AuditLog::with('user')->latest('id')->take(6)->get()

@@ -1,15 +1,15 @@
 # FINAL AUDIT — Kampius ERP (SIMAK Kuliah)
 
-Tanggal: 12 Nov 2026. Evidence: 63 test hijau / 198 assertions, `pint` clean, smoke 30+ URL 200 + Tabler, MySQL 8.4 (50 tabel, FK lengkap), tanpa `migrate:fresh` pada data berisi, tanpa commit/push (sesuai proteksi).
+Tanggal: 12 Nov 2026 (revisi). Evidence: 72 test hijau / 222 assertions, `pint` clean, smoke 35+ URL 200 + Tabler, MySQL 8.4 (60+ tabel, FK lengkap), tanpa `migrate:fresh` pada data berisi, tanpa commit/push (sesuai proteksi).
 
-## Skor rubrik (total 84/100)
+## Skor rubrik (total 87/100)
 
 | # | Kategori (bobot) | Nilai | Evidence |
 |---|---|---|---|
 | 1 | UI/UX (15) | 13 | Landing UCN-style + mockup data live, dashboard chart SVG + agenda + aktivitas, login split, semua view Tabler, sidebar sadar peran, cetak print-friendly. Kurang: uji perangkat fisik. |
-| 2 | Akademik (15) | 12 | PMB→daftar ulang (akun+NIM+tagihan), KRS (SKS-maks/prasyarat/bentrok/kuota/approval/revisi-lock), LMS+QR, nilai terkunci, IPK tertimbang, KHS/transkrip, skripsi→sidang. Kurang: CRUD kalender tersendiri, modul yudisium, trek KP terpisah. |
-| 3 | Keuangan (10) | 9 | Tagihan massal, VA 4 gateway + callback/verify/status, upload manual + verifikasi idempoten, kwitansi, blokir otomatis. Kurang: beasiswa/diskon. |
-| 4 | CRUD (10) | 8 | Master Data (6 entitas + search + pagination + hapus-aman), semua modul CRUD + validasi + konfirmasi hapus. Kurang: import CSV, export Excel/PDF selain cetak browser. |
+| 2 | Akademik (15) | 13 | PMB→daftar ulang (akun+NIM+tagihan), KRS (SKS-maks/prasyarat/bentrok/kuota/approval/revisi-lock), LMS+QR, nilai terkunci, IPK tertimbang, KHS/transkrip, skripsi→sidang. Plus: kalender CRUD + agenda, yudisium bersyarat. Kurang: trek KP terpisah. |
+| 3 | Keuangan (10) | 10 | Tagihan massal, VA 4 gateway + callback/verify/status, upload manual + verifikasi idempoten, kwitansi, blokir otomatis. Plus: beasiswa/diskon otomatis. |
+| 4 | CRUD (10) | 9 | Master Data (6 entitas + search + pagination + hapus-aman), semua modul CRUD + validasi + konfirmasi hapus. Plus: impor CSV + ekspor CSV + helpdesk + beasiswa/kalender CRUD. Kurang: export Excel/PDF native. |
 | 5 | Keamanan (15) | 13 | Role middleware semua rute sensitif, trait Livewire, owner-check controller+mount, ability Sanctum + expiry, throttle, CSRF-except hanya callback, signature gateway, mimes upload, Xendit mapping benar, settle ber-lock, SecurityTest 6 test. Sisa: APP_DEBUG dev, kredensial eksternal, tanpa AV scan/WAF (infra). |
 | 6 | Database (8) | 7 | FK lengkap (migrasi 000008, restrict lindungi histori), unique, transaksi + lock, idempotency. Kurang: pasangan nullable+unique MySQL (edge NULL duplikat). |
 | 7 | Performa (8) | 6 | Eager loading (KHS/transkrip/KRS/cetak), pagination, settings di-cache. Kurang: Redis, query-cache laporan, audit N+1 menyeluruh (InputNilai loop). |
