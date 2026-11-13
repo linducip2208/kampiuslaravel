@@ -63,6 +63,8 @@
 - Keputusan: agregat dihitung langsung (bounded + index); CacheStoreTest mengunci perilaku aman default framework.
 ## 2026-11-14 — verifikasi pre-deploy cache
 - route:cache + view:cache + config:cache sukses; / & /dashboard lolos dengan cache aktif; optimize:clear setelahnya.
+## 2026-11-14 — konsistensi tombol alur KRS
+- 4 tombol tanpa kelas Tabler (ajukan, keluar waitlist, setujui/tolak PA) kini ber-style + loading; KrsFlowTest tetap hijau.
 ## 2026-11-14 — hardening konfigurasi produksi
 - .env.example: panduan produksi (SECURE_COOKIE, APP_DEBUG=false); DEPLOYMENT.md: checklist env + scheduler.
 - SecurityConfigTest: default cookie aman + throttle login teruji.

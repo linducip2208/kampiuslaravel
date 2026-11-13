@@ -40,7 +40,10 @@
 
         @error('kelasDipilih') <span>{{ $message }}</span> @enderror
 
-        <button type="submit">Ajukan KRS</button>
+        <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="ajukan">
+            <span wire:loading.remove wire:target="ajukan">Ajukan KRS</span>
+            <span wire:loading wire:target="ajukan"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Mengajukan…</span>
+        </button>
     </form>
 
     @if (isset($waitlistSaya) && $waitlistSaya->count() > 0)
@@ -50,7 +53,7 @@
                 <li>
                     Kelas #{{ $wl->kelas_id }} — {{ $wl->status }}
                     @if ($wl->status === 'menunggu')
-                        <button type="button" wire:click="keluarWaitlist({{ $wl->kelas_id }})">Keluar</button>
+                        <button type="button" wire:click="keluarWaitlist({{ $wl->kelas_id }})" class="btn btn-sm btn-outline-secondary">Keluar</button>
                     @endif
                 </li>
             @endforeach
