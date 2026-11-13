@@ -76,6 +76,7 @@
                                 'KEUANGAN' => [
                                     ['route' => $keuanganRoute, 'label' => 'Keuangan', 'roles' => ['mahasiswa', 'keuangan', 'superadmin', 'admin_prodi'], 'icon' => 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2-2H5', 'pattern' => 'keuangan.*|kwitansi.*'],
                                     ['route' => 'keuangan.beasiswa', 'label' => 'Beasiswa', 'roles' => ['keuangan', 'superadmin', 'admin_prodi'], 'icon' => 'M12 2l2.5 5.5L20 8l-4 4 1 6-5-3-5 3 1-6-4-4', 'pattern' => 'keuangan.beasiswa'],
+                                    ['route' => 'keuangan.denda', 'label' => 'Aturan Denda', 'roles' => ['keuangan', 'superadmin', 'admin_prodi'], 'icon' => 'M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z', 'pattern' => 'keuangan.denda'],
                                 ],
                                 'OPERASIONAL' => [
                                     ['route' => $suratRoute, 'label' => 'Surat', 'roles' => ['mahasiswa', 'keuangan', 'superadmin', 'admin_prodi'], 'icon' => 'M22 12h-6l-2 3h-4l-2-3H2', 'pattern' => 'surat.*'],

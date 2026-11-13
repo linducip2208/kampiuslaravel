@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DendaRule extends Model
 {
@@ -13,6 +14,11 @@ class DendaRule extends Model
     protected function casts(): array
     {
         return ['aktif' => 'boolean'];
+    }
+
+    public function tahunAkademik(): BelongsTo
+    {
+        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
     }
 
     public function hitungDenda(int $nominal, int $hariTerlambat): int
