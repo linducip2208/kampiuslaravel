@@ -246,6 +246,11 @@ class ImporCsv extends Component
             'jenis' => $jenis,
         ]);
 
+        // Jangan timpa tagihan yang sudah ada pembayaran/terbayar (anti-korupsi data keuangan).
+        if ($tagihan->exists && ((int) ($tagihan->terbayar ?? 0) > 0 || $tagihan->pembayarans()->exists())) {
+            throw new \RuntimeException("Tagihan {$nim} {$jenis} sudah memiliki pembayaran — nominal tidak ditimpa.");
+        }
+
         $tagihan->nominal = $nominal;
         if (! $tagihan->exists) {
             $tagihan->terbayar = 0;

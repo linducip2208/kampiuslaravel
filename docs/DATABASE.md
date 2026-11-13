@@ -1,13 +1,7 @@
-# Database — MySQL 8 (`kuliah`, ±50 tabel)
-
-Normalisasi 3NF per domain: `fakultas→prodi→mahasiswa/dosen`, `matakuliah→kelas→pertemuan→materi/tugas/quiz`, `krs→krs_detail`, `nilai`, `skripsi_judul→bimbingan/sidang→sidang_penguji`, `tagihan→pembayaran`, `surat`, `pengumuman`, `notifikasi`, `settings`, `audit_logs`, Spatie (roles/permissions), Sanctum (personal_access_tokens).
-
-## Konvensi
-- FK memakai `constrained()` + `nullOnDelete()` untuk kolom nullable; hard-FK untuk relasi inti intra-modul. Modul LMS menyusul via migrasi forward (data dev konsisten; audit `AUDIT_DB.md §6` untuk daftar).
-- Unique: `nim`, `no_daftar`, `qr_token`, `pembayaran.reference`, `surat.nomor_surat`, `prodi.slug`, `nilai(mhs,kelas)`, `absensi(pertemuan,mhs)`, `tugas_kumpul(tugas,mhs)`, `krs(mhs,tahun)`.
-- Enum status terkunci di migrasi (lihat model masing-masing; jangan ubah nilai historis).
-- `terbayar`/`status` tagihan hanya diubah lewat `KeuanganService` / `PaymentService` (transaction + `lockForUpdate` + idempotency).
-- Index: FK + kolom filter rutin (`status`, `tahun_akademik_id`, `prodi_id`, `angkatan`, `published_at`).
-
-## Seeding
-`RolesPermissionsSeeder` (6 role + permission) → `MasterDataSeeder` (fakultas/prodi/tahun/ruang/MK/kelas + akun demo + role) → `DemoSeeder` (data end-to-end). Idempotent via `firstOrCreate`/`updateOrCreate`.
+# DATABASE — audit Nov 2026 (read-only, tanpa migrasi destruktif)
+- Uang benar: unsignedBigInteger untuk nominal/terbayar/denda.
+- Risiko fresh migrate: FK ganda prodi/mahasiswa/kelas/tahun_akademik (migrasi awal vs 2026_11_13_000008). Jangan migrate:fresh sebelum dibersihkan; gunakan migrate biasa.
+- Unique bocor bila nullable: krs_detail(krs,kelas NULL), tagihan(mhs,tahun NULL,jenis), krs(mhs NULL,tahun NULL). Rencana: buat kolom identitas NOT NULL via migrasi aman bertahap + validasi.
+- 0 softDeletes: tagihan/pembayaran/mahasiswa/krs/nilai dihapus permanen. Rencana: tambah softDeletes + restrict delete.
+- N+1 diperbaiki sesi ini: Api Tagihan with(tahunAkademik,cicilan,beasiswa); InputNilai preload lock + transaction.
+- Sisa N+1: PersetujuanPa with details saja; VerifikasiBayar kurang nested tahunAkademik; AkademikService kuota per-kelas (preload COUNT GROUP BY).

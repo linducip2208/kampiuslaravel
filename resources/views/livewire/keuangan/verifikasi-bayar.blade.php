@@ -57,8 +57,8 @@
                             </td>
                             <td>@if($bayar->reconciled_at)<span class="badge bg-info">rekonsiliasi</span>@else<span class="text-secondary">-</span>@endif</td>
                             <td class="text-end">
-                                <button wire:click="verify({{ $bayar->id }})" class="btn btn-sm btn-outline-success">Verifikasi</button>
-                                <button wire:click="reject({{ $bayar->id }})" class="btn btn-sm btn-outline-danger">Tolak</button>
+                                <button wire:click="verify({{ $bayar->id }})" wire:confirm="Verifikasi pembayaran #{{ $bayar->id }} Rp {{ number_format($bayar->nominal, 0, ',', '.') }}?" class="btn btn-sm btn-outline-success">Verifikasi</button>
+                                <button wire:click="reject({{ $bayar->id }})" wire:confirm="Tolak pembayaran #{{ $bayar->id }}?" class="btn btn-sm btn-outline-danger">Tolak</button>
                                 @if($bayar->status === 'verified' && !$bayar->refunded_at)
                                     <button wire:click="refund({{ $bayar->id }})" wire:confirm="Refund pembayaran #{{ $bayar->id }}?" class="btn btn-sm btn-outline-warning">Refund</button>
                                 @endif

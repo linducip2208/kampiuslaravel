@@ -9,6 +9,7 @@ use App\Models\Sidang as SidangModel;
 use App\Models\SidangPenguji;
 use App\Services\BeritaAcaraService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class NilaiSidang extends Component
@@ -75,23 +76,33 @@ class NilaiSidang extends Component
             'status' => 'required|in:lulus,revisi,gagal,terdaftar',
         ]);
 
-        $sidang = SidangModel::findOrFail($this->sidang_id);
-        $sidang->update(['status' => $this->status]);
-        $this->recalc();
-        $sidang->refresh();
+        $berita = null;
+        DB::transaction(function () use (&$berita): void {
+            $sidang = SidangModel::whereKey($this->sidang_id)->lockForUpdate()->firstOrFail();
+            $sidang->update(['status' => $this->status]);
+            $avg = SidangPenguji::where('sidang_id', $sidang->id)->avg('nilai');
+            if ($avg !== null) {
+                $nilai = round((float) $avg, 2);
+                $sidang->update(['nilai' => $nilai]);
+                $this->rataRata = $nilai;
+                $this->hurufMutu = BeritaAcaraService::hurufMutu($nilai);
+            }
+            $sidang->refresh();
 
-        if ($this->status === 'lulus') {
-            $sidang->judul()->update(['status' => 'lulus']);
-            $this->beritaAcara = BeritaAcaraService::generate($sidang->fresh());
-        }
+            if ($this->status === 'lulus') {
+                $sidang->judul()->update(['status' => 'lulus']);
+                $berita = BeritaAcaraService::generate($sidang->fresh());
+            }
 
-        AuditLog::create([
-            'user_id' => Auth::id(),
-            'action' => 'sidang.nilai.'.$this->status,
-            'model' => SidangModel::class,
-            'model_id' => $sidang->id,
-            'created_at' => now(),
-        ]);
+            AuditLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'sidang.nilai.'.$this->status,
+                'model' => SidangModel::class,
+                'model_id' => $sidang->id,
+                'created_at' => now(),
+            ]);
+        });
+        $this->beritaAcara = $berita;
 
         $this->message = 'Status sidang diperbarui.';
     }

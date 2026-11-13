@@ -136,7 +136,7 @@ class PersetujuanPa extends Component
      */
     private function krsBimbingan(): Builder
     {
-        $query = Krs::query()->with('details');
+        $query = Krs::query()->with(['details.kelas.matakuliah', 'mahasiswa.user', 'mahasiswa.prodi']);
 
         $dosenId = $this->dosenId();
 

@@ -4,6 +4,7 @@ namespace App\Livewire\Pmb;
 
 use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Mahasiswa;
+use App\Models\PmbGelombang;
 use App\Models\PmbNilaiSeleksi;
 use App\Models\PmbPendaftar;
 use App\Models\Tagihan;
@@ -73,10 +74,17 @@ class Verifikasi extends Component
             return;
         }
 
-        $pendaftar->update([
-            'status' => $status,
-            'catatan_verifikasi' => $this->catatan ?: $pendaftar->catatan_verifikasi,
-        ]);
+        DB::transaction(function () use ($pendaftar, $status): void {
+            $p = PmbPendaftar::whereKey($pendaftar->id)->lockForUpdate()->firstOrFail();
+            $g = $p->gelombang_id ? PmbGelombang::whereKey($p->gelombang_id)->lockForUpdate()->first() : null;
+            if ($status === PmbPendaftar::STATUS_LULUS && $g && $g->kuotaLulusPenuh() && $p->status !== PmbPendaftar::STATUS_LULUS) {
+                abort(422, 'Kuota kelulusan gelombang ini sudah penuh.');
+            }
+            $p->update([
+                'status' => $status,
+                'catatan_verifikasi' => $this->catatan ?: $p->catatan_verifikasi,
+            ]);
+        });
 
         $this->reset(['selectedId', 'catatan']);
         session()->flash('info', "Status {$pendaftar->no_daftar} diubah menjadi {$status}.");
@@ -143,10 +151,19 @@ class Verifikasi extends Component
             return;
         }
 
-        $pendaftar->update([
-            'status' => $rata >= $ambang ? PmbPendaftar::STATUS_LULUS : PmbPendaftar::STATUS_TIDAK,
-            'catatan_verifikasi' => "Rata-rata seleksi: {$rata} (ambang {$ambang}).",
-        ]);
+        DB::transaction(function () use ($pendaftar, $rata, $ambang): void {
+            $p = PmbPendaftar::whereKey($pendaftar->id)->lockForUpdate()->firstOrFail();
+            $g = $p->gelombang_id ? PmbGelombang::whereKey($p->gelombang_id)->lockForUpdate()->first() : null;
+            $statusBaru = $rata >= $ambang ? PmbPendaftar::STATUS_LULUS : PmbPendaftar::STATUS_TIDAK;
+            if ($statusBaru === PmbPendaftar::STATUS_LULUS && $g && $g->kuotaLulusPenuh() && $p->status !== PmbPendaftar::STATUS_LULUS) {
+                abort(422, 'Kuota kelulusan gelombang ini sudah penuh.');
+            }
+            $p->update([
+                'status' => $statusBaru,
+                'catatan_verifikasi' => "Rata-rata seleksi: {$rata} (ambang {$ambang}).",
+            ]);
+            $pendaftar->status = $statusBaru;
+        });
 
         session()->flash('info', "Kelulusan {$pendaftar->no_daftar} ditentukan: {$pendaftar->status} (rata-rata {$rata}).");
     }

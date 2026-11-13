@@ -2,7 +2,7 @@
 
 @section('public-nav', true)
 @section('no-header', true)
-@section('title', 'Kampus ERP — Sistem Informasi Kampus Terpadu')
+@section('title', 'KAMPIUS — University ERP & Academic Management System')
 
 @section('content')
 {{-- ============ NAVBAR ============ --}}
@@ -40,7 +40,7 @@
         <div class="row align-items-center g-4">
             <div class="col-lg-5">
                 <span class="badge bg-blue-lt text-primary mb-3">● Sistem Informasi Kampus Terpadu</span>
-                <h1 class="display-4 fw-bold">Kampus ERP Solusi Lengkap Manajemen Perguruan Tinggi</h1>
+                <h1 class="display-4 fw-bold">KAMPIUS ERP Solusi Lengkap Manajemen Perguruan Tinggi</h1>
                 <p class="text-secondary">Kelola seluruh proses akademik, keuangan dan administrasi kampus dalam satu sistem yang modern, aman dan mudah digunakan.</p>
                 <div class="d-flex flex-wrap gap-2 mt-3">
                     <a href="{{ route('pmb.create') }}" class="btn btn-primary btn-lg">✈ Mulai Sekarang →</a>
@@ -338,7 +338,7 @@
 {{-- ============ FOOTER ============ --}}
 <footer class="container-xl mt-3 mb-3" style="max-width: 1280px" id="kontak">
     <div class="d-flex flex-wrap justify-content-between align-items-center text-secondary small">
-        <span><strong class="text-dark">🎓 Kampus</strong> <span class="text-secondary">University ERP</span></span>
+        <span><strong class="text-dark">🎓 KAMPIUS</strong> <span class="text-secondary">University ERP</span></span>
         <span>
             <a href="{{ route('home') }}" class="me-3">Beranda</a>
             <a href="#fitur" class="me-3">Fitur</a>

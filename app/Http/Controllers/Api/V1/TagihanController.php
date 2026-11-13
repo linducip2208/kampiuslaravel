@@ -31,7 +31,7 @@ class TagihanController extends Controller
                 ]);
             }
 
-            $tagihan = Tagihan::where('mahasiswa_id', $mhs->id)->latest('id')->get();
+            $tagihan = Tagihan::with(['tahunAkademik', 'cicilan', 'beasiswa'])->where('mahasiswa_id', $mhs->id)->latest('id')->get();
 
             $total = (float) $tagihan->sum('nominal');
             $terbayar = (float) $tagihan->sum('terbayar');
@@ -57,6 +57,7 @@ class TagihanController extends Controller
         $mhs = Mahasiswa::where('user_id', $request->user()->id)->first();
 
         abort_unless($mhs && $tagihan->mahasiswa_id === $mhs->id, 403);
+        abort_if($tagihan->status === 'lunas', 422, 'Tagihan sudah lunas.');
 
         $data = $request->validate(['method' => 'nullable|string|max:30']);
         $channel = strtolower((string) ($data['method'] ?? 'va'));

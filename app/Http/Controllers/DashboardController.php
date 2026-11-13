@@ -9,9 +9,13 @@ use App\Models\Krs;
 use App\Models\Mahasiswa;
 use App\Models\Matakuliah;
 use App\Models\Pembayaran;
+use App\Models\Pengumuman;
 use App\Models\Pertemuan;
+use App\Models\PmbPendaftar;
 use App\Models\Prodi;
 use App\Models\Sidang;
+use App\Models\Tagihan;
+use App\Models\TahunAkademik;
 use App\Services\KalenderService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -22,21 +26,105 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
+        $has = fn (string $table): bool => Schema::hasTable($table);
+
+        // --- Statistik utama (real queries, guarded) ---
+        $mahasiswaAktif = $has('mahasiswa') ? Mahasiswa::where('status', 'aktif')->count() : 0;
+        $mahasiswaBaru = $has('mahasiswa')
+            ? Mahasiswa::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count()
+            : 0;
+        $dosenAktif = $has('dosen') ? Dosen::where('status', 'aktif')->count() : 0;
+        $prodiCount = $has('prodi') ? Prodi::count() : 0;
+        $krsPending = $has('krs') ? Krs::where('status', 'diajukan')->count() : 0;
+        $pmbPending = $has('pmb_pendaftars') ? PmbPendaftar::where('status', 'menunggu')->count() : 0;
+        $verifikasiPending = $has('pembayaran') ? Pembayaran::where('status', 'pending')->count() : 0;
+
+        $outstanding = 0;
+        if ($has('tagihan')) {
+            $outstanding = (int) Tagihan::whereIn('status', ['belum_bayar', 'sebagian'])
+                ->selectRaw('COALESCE(SUM(nominal + COALESCE(denda,0) - COALESCE(terbayar,0)),0) as total')
+                ->value('total');
+        }
+
+        $pendapatanBulanIni = 0;
+        $pendapatanTotal = 0;
+        if ($has('pembayaran')) {
+            $pendapatanBulanIni = (int) Pembayaran::where('status', 'verified')
+                ->whereYear('verified_at', now()->year)->whereMonth('verified_at', now()->month)
+                ->sum('nominal');
+            $pendapatanTotal = (int) Pembayaran::where('status', 'verified')->sum('nominal');
+        }
+
+        // --- Earnings chart: 6 bulan terakhir, pemasukan (verified) vs tagihan terbit ---
         $pembayaranPerBulan = [];
+        $tagihanPerBulan = [];
         $labels = [];
         for ($i = 5; $i >= 0; $i--) {
             $bulan = now()->subMonths($i);
             $labels[] = $bulan->translatedFormat('M');
-            $pembayaranPerBulan[] = (int) Pembayaran::where('status', 'verified')
+            $pembayaranPerBulan[] = $has('pembayaran') ? (int) Pembayaran::where('status', 'verified')
                 ->whereYear('verified_at', $bulan->year)
                 ->whereMonth('verified_at', $bulan->month)
-                ->sum('nominal');
+                ->sum('nominal') : 0;
+            $tagihanPerBulan[] = $has('tagihan') ? (int) Tagihan::whereYear('created_at', $bulan->year)
+                ->whereMonth('created_at', $bulan->month)
+                ->sum('nominal') : 0;
         }
 
-        $krsStatus = Krs::selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status');
+        // --- Academic Performance: approval rate KRS per 8 tahun akademik terakhir ---
+        $perfLabels = [];
+        $perfValues = [];
+        if ($has('krs') && $has('tahun_akademik')) {
+            $taList = TahunAkademik::orderBy('tahun')->orderBy('semester')->take(8)->get();
+            // Fallback: ambil 8 terakhir bila data banyak
+            if ($taList->count() > 8) {
+                $taList = TahunAkademik::orderByDesc('tahun')->orderByDesc('semester')->take(8)->get()->reverse()->values();
+            }
+            foreach ($taList as $ta) {
+                $total = Krs::where('tahun_akademik_id', $ta->id)->count();
+                $ok = Krs::where('tahun_akademik_id', $ta->id)->where('status', 'disetujui')->count();
+                $perfLabels[] = ($ta->semester === 'genap' ? 'Genap' : 'Ganjil').' '.substr((string) $ta->tahun, 0, 4);
+                $perfValues[] = $total > 0 ? (int) round($ok / $total * 100) : 0;
+            }
+        }
+
+        // --- Donut mahasiswa per angkatan (top 4) ---
+        $angkatanBreakdown = [];
+        $totalMahasiswa = $has('mahasiswa') ? Mahasiswa::count() : 0;
+        if ($has('mahasiswa')) {
+            $angkatanBreakdown = Mahasiswa::selectRaw('angkatan, COUNT(*) as total')
+                ->groupBy('angkatan')->orderByDesc('total')->take(4)->pluck('total', 'angkatan')->all();
+        }
+
+        // --- Distribusi status mahasiswa ---
+        $statusBreakdown = $has('mahasiswa')
+            ? Mahasiswa::selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status')->all()
+            : [];
+
+        $krsStatus = $has('krs')
+            ? Krs::selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status')
+            : collect();
+
+        // --- Pesan / pengumuman terbaru (real) ---
+        $messages = $has('pengumuman')
+            ? Pengumuman::latest('published_at')->take(4)->get()
+            : collect();
+
+        // --- Aktivitas mahasiswa: KRS terbaru + sidang terbaru + pengumuman ---
+        $aktivitasMahasiswa = collect();
+        if ($has('krs')) {
+            $aktivitasMahasiswa = $aktivitasMahasiswa->merge(
+                Krs::with(['mahasiswa.user'])->latest('id')->take(3)->get()
+                    ->map(fn ($k) => [
+                        'icon' => 'krs',
+                        'judul' => 'KRS '.($k->mahasiswa->user->name ?? '#'.$k->mahasiswa_id),
+                        'sub' => 'Status: '.$k->status.' • '.($k->updated_at?->diffForHumans() ?? ''),
+                    ])
+            );
+        }
 
         $agenda = collect();
-        if (Schema::hasTable('pertemuan')) {
+        if ($has('pertemuan')) {
             $agenda = $agenda->merge(
                 Pertemuan::with('kelas.matakuliah')->whereDate('tanggal', '>=', today())
                     ->orderBy('tanggal')->take(5)->get()
@@ -50,7 +138,7 @@ class DashboardController extends Controller
                     ->map(fn ($s) => ['tanggal' => Carbon::parse($s->tanggal)->format('d M'), 'judul' => 'Sidang '.($s->jenis ?? ''), 'sub' => $s->status])
             );
         }
-        if (Schema::hasTable('kalender_events')) {
+        if ($has('kalender_events')) {
             $agenda = $agenda->merge(
                 KalenderEvent::whereDate('tgl_mulai', '>=', today())
                     ->orderBy('tgl_mulai')->take(5)->get()
@@ -65,13 +153,29 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'stats' => [
-                'mahasiswa' => Mahasiswa::count(),
+                'mahasiswa' => $totalMahasiswa,
+                'mahasiswa_aktif' => $mahasiswaAktif,
+                'mahasiswa_baru' => $mahasiswaBaru,
                 'dosen' => Dosen::count(),
-                'prodi' => Prodi::count(),
-                'matakuliah' => Matakuliah::count(),
+                'dosen_aktif' => $dosenAktif,
+                'prodi' => $prodiCount,
+                'matakuliah' => $has('matakuliah') ? Matakuliah::count() : 0,
+                'krs_pending' => $krsPending,
+                'pmb_pending' => $pmbPending,
+                'verifikasi_pending' => $verifikasiPending,
+                'outstanding' => $outstanding,
+                'pendapatan_bulan_ini' => $pendapatanBulanIni,
+                'pendapatan_total' => $pendapatanTotal,
             ],
             'chartLabels' => $labels,
             'chartNominal' => $pembayaranPerBulan,
+            'chartTagihan' => $tagihanPerBulan,
+            'perfLabels' => $perfLabels,
+            'perfValues' => $perfValues,
+            'angkatanBreakdown' => $angkatanBreakdown,
+            'statusBreakdown' => $statusBreakdown,
+            'messages' => $messages,
+            'aktivitasMahasiswa' => $aktivitasMahasiswa,
             'krsStatus' => $krsStatus,
             'agenda' => $agenda,
             'locks' => KalenderService::locks(),
@@ -94,6 +198,31 @@ class DashboardController extends Controller
             ? DB::table('pembayaran')->where('status', 'pending')->count()
             : 0;
 
-        return view('dashboard.pimpinan', ['stats' => $stats]);
+        $stats['pendapatan_verified'] = Schema::hasTable('pembayaran')
+            ? (int) DB::table('pembayaran')->where('status', 'verified')->sum('nominal')
+            : 0;
+
+        $stats['piutang'] = Schema::hasTable('tagihan')
+            ? (int) DB::table('tagihan')->whereIn('status', ['belum_bayar', 'sebagian'])->selectRaw('COALESCE(SUM(nominal - terbayar),0) as t')->value('t')
+            : 0;
+
+        $stats['krs_pending'] = Schema::hasTable('krs') ? DB::table('krs')->where('status', 'diajukan')->count() : 0;
+        $stats['krs_disetujui_hari_ini'] = Schema::hasTable('krs')
+            ? DB::table('krs')->where('status', 'disetujui')->whereDate('updated_at', today())->count()
+            : 0;
+        $stats['pmb_menunggu'] = Schema::hasTable('pmb_pendaftars') ? DB::table('pmb_pendaftars')->where('status', 'menunggu')->count() : 0;
+
+        $tren = [];
+        if (Schema::hasTable('pembayaran')) {
+            for ($i = 5; $i >= 0; $i--) {
+                $b = now()->subMonths($i);
+                $tren[] = [
+                    'label' => $b->translatedFormat('M'),
+                    'nominal' => (int) DB::table('pembayaran')->where('status', 'verified')->whereYear('verified_at', $b->year)->whereMonth('verified_at', $b->month)->sum('nominal'),
+                ];
+            }
+        }
+
+        return view('dashboard.pimpinan', ['stats' => $stats, 'tren' => $tren]);
     }
 }

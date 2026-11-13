@@ -31,8 +31,8 @@
                     <td>{{ $krs->total_sks }}</td>
                     <td>{{ $krs->details->count() }} kelas</td>
                     <td>
-                        <button type="button" wire:click="setujui({{ $krs->id }})">Setujui</button>
-                        <button type="button" wire:click="tolak({{ $krs->id }})">Tolak</button>
+                        <button type="button" wire:click="setujui({{ $krs->id }})" wire:confirm="Setujui KRS #{{ $krs->id }}?">Setujui</button>
+                        <button type="button" wire:click="tolak({{ $krs->id }})" wire:confirm="Tolak KRS #{{ $krs->id }}? Pastikan alasan penolakan sudah diisi.">Tolak</button>
                     </td>
                 </tr>
             @empty

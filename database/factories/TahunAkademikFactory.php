@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class TahunAkademikFactory extends Factory
 {
+    private static int $seq = 0;
+
     /**
      * Define the model's default state.
      *
@@ -17,11 +19,14 @@ class TahunAkademikFactory extends Factory
      */
     public function definition(): array
     {
-        $year = fake()->numberBetween(2022, 2027);
+        // Urutan deterministik agar unik (hindari collision unique tahun+semester di test).
+        self::$seq++;
+        $year = 2020 + self::$seq;
+        $semester = self::$seq % 2 === 0 ? 'genap' : 'ganjil';
 
         return [
             'tahun' => $year.'/'.($year + 1),
-            'semester' => fake()->randomElement(['ganjil', 'genap']),
+            'semester' => $semester,
             'aktif' => false,
         ];
     }

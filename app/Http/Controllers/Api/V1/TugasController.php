@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Dosen;
+use App\Models\Kelas;
+use App\Models\Krs;
+use App\Models\KrsDetail;
 use App\Models\Mahasiswa;
 use App\Models\Tugas;
 use App\Models\TugasKumpul;
@@ -19,9 +23,23 @@ class TugasController extends Controller
         }
 
         try {
-            $tugas = Tugas::query()->latest('id')->limit(20)->get();
+            $user = $request->user();
+            $query = Tugas::query()->with('kelas')->latest('id');
 
-            return response()->json(['data' => $tugas]);
+            if ($user && ! $user->hasAnyRole(['superadmin', 'admin_prodi', 'pimpinan', 'keuangan'])) {
+                if ($user->hasRole('mahasiswa') && class_exists(Mahasiswa::class)) {
+                    $mhsId = Mahasiswa::where('user_id', $user->id)->value('id');
+                    $krsIds = $mhsId ? Krs::where('mahasiswa_id', $mhsId)->pluck('id') : collect();
+                    $kelasIds = $krsIds->isNotEmpty() ? KrsDetail::whereIn('krs_id', $krsIds)->pluck('kelas_id') : collect();
+                    $query->whereIn('kelas_id', $kelasIds->filter()->all() ?: [0]);
+                } elseif ($user->hasRole('dosen')) {
+                    $dosenId = Dosen::where('user_id', $user->id)->value('id');
+                    $kelasIds = $dosenId ? Kelas::where('dosen_id', $dosenId)->pluck('id') : collect();
+                    $query->whereIn('kelas_id', $kelasIds->all() ?: [0]);
+                }
+            }
+
+            return response()->json(['data' => $query->limit(20)->get()]);
         } catch (\Throwable) {
             return response()->json(['data' => []]);
         }
@@ -50,6 +68,8 @@ class TugasController extends Controller
             if (class_exists(Mahasiswa::class)) {
                 $mahasiswaId = Mahasiswa::where('user_id', $request->user()->id)->value('id');
             }
+
+            abort_unless($mahasiswaId, 403, 'Akun mahasiswa tidak ditemukan.');
 
             $kumpul = TugasKumpul::updateOrCreate(
                 ['tugas_id' => $tugas->id, 'mahasiswa_id' => $mahasiswaId],

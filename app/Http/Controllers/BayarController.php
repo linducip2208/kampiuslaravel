@@ -34,6 +34,8 @@ class BayarController extends Controller
     {
         $this->authorizeTagihan($tagihan);
 
+        abort_if($tagihan->status === 'lunas', 422, 'Tagihan sudah lunas.');
+
         if (! KalenderService::isOpen('pembayaran')) {
             return response()->json(['message' => KalenderService::closedMessage('pembayaran')], 422);
         }
@@ -144,7 +146,7 @@ class BayarController extends Controller
     {
         $mahasiswaId = Mahasiswa::where('user_id', Auth::id())->value('id');
 
-        abort_unless($tagihan->mahasiswa_id === $mahasiswaId || Auth::user()->hasRole('keuangan'), 403);
+        abort_unless($tagihan->mahasiswa_id === $mahasiswaId || Auth::user()->hasAnyRole(['keuangan', 'superadmin', 'admin_prodi']), 403);
     }
 
     private function authorizePembayaran(Pembayaran $pembayaran): void

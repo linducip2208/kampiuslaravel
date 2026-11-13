@@ -39,6 +39,13 @@ class KumpulTugas extends Component
 
     public function save(): void
     {
+        // Re-resolve owner server-side: properti Livewire bisa dimanipulasi client.
+        $user = Auth::user();
+        if ($user && $user->hasRole('mahasiswa') && ! $user->hasAnyRole(['superadmin', 'admin_prodi', 'dosen'])) {
+            $resolved = (int) Mahasiswa::where('user_id', $user->id)->value('id');
+            abort_unless($resolved > 0, 403);
+            $this->mahasiswaId = $resolved;
+        }
         $this->validate(['file' => 'required|file|max:10240|mimes:pdf,doc,docx,zip,jpg,jpeg,png']);
 
         $tugas = Tugas::findOrFail($this->tugasId);

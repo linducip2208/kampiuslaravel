@@ -8,6 +8,7 @@ use App\Services\PmbVaService;
 use App\Services\WaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PmbController extends Controller
@@ -41,14 +42,28 @@ class PmbController extends Controller
             return back()->withErrors(['gelombang_id' => 'Kuota gelombang ini sudah penuh.'])->withInput();
         }
 
-        $pendaftar = PmbPendaftar::query()->create([
-            ...$validated,
-            'no_daftar' => $this->generateNoDaftar(),
-            'status' => PmbPendaftar::STATUS_DIAJUKAN,
-        ]);
+        $pendaftar = DB::transaction(function () use ($validated, $va) {
+            $g = PmbGelombang::whereKey($validated['gelombang_id'])->lockForUpdate()->firstOrFail();
+            if (! $g->isBuka() || $g->kuotaPenuh()) {
+                abort(422, 'Kuota gelombang ini sudah penuh.');
+            }
 
-        $infoVa = $va->issueFor($pendaftar);
-        $wa->welcome($pendaftar->fresh() ?? $pendaftar);
+            $p = PmbPendaftar::query()->create([
+                ...$validated,
+                'no_daftar' => $this->generateNoDaftar(),
+                'status' => PmbPendaftar::STATUS_DIAJUKAN,
+            ]);
+            $va->issueFor($p);
+
+            return $p;
+        });
+
+        $infoVa = ['va_number' => $pendaftar->fresh()?->va_number ?? '-', 'nominal' => app(PmbVaService::class)->nominal($pendaftar->fresh() ?? $pendaftar)];
+        try {
+            $wa->welcome($pendaftar->fresh() ?? $pendaftar);
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return redirect()
             ->route('pmb.cek', ['no_daftar' => $pendaftar->no_daftar])

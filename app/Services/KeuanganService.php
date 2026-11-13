@@ -12,6 +12,7 @@ use App\Models\TagihanCicilan;
 use App\Models\UktTemplate;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 
 class KeuanganService
@@ -81,66 +82,75 @@ class KeuanganService
         ?string $jatuhTempo = null,
         int $cicilan = 1,
     ): array {
-        $created = 0;
-        $skipped = 0;
+        return DB::transaction(function () use ($tahunAkademikId, $jenis, $nominal, $prodiId, $angkatan, $jalur, $jatuhTempo, $cicilan) {
+            $created = 0;
+            $skipped = 0;
 
-        $query = Mahasiswa::where('status', 'aktif');
-        if ($prodiId) {
-            $query->where('prodi_id', $prodiId);
-        }
-        if ($angkatan) {
-            $query->where('angkatan', $angkatan);
-        }
-        if ($jalur) {
-            $query->where('jalur', $jalur);
-        }
-
-        $query->chunkById(200, function ($mahasiswas) use ($tahunAkademikId, $jenis, $nominal, $jatuhTempo, $cicilan, &$created, &$skipped) {
-            foreach ($mahasiswas as $mhs) {
-                $exists = Tagihan::where('mahasiswa_id', $mhs->id)
-                    ->where('tahun_akademik_id', $tahunAkademikId)
-                    ->where('jenis', $jenis)
-                    ->exists();
-                if ($exists) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $dasar = $nominal;
-                if ($dasar <= 0) {
-                    $template = self::resolveTemplateNominal($mhs->prodi_id, (string) $mhs->angkatan, $mhs->jalur, $jenis);
-                    $dasar = $template?->nominal ?? 0;
-                }
-                if ($dasar <= 0) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $potongan = self::potonganBeasiswaOtomatis($mhs->id, $tahunAkademikId, $dasar);
-                $netto = max(0, $dasar - $potongan['diskon']);
-                $cicilanCount = max(1, $cicilan);
-
-                $tagihan = Tagihan::create([
-                    'mahasiswa_id' => $mhs->id,
-                    'tahun_akademik_id' => $tahunAkademikId,
-                    'jenis' => $jenis,
-                    'nominal' => $netto,
-                    'terbayar' => 0,
-                    'status' => 'belum_bayar',
-                    'beasiswa_id' => $potongan['beasiswa_id'],
-                    'diskon' => $potongan['diskon'],
-                    'jatuh_tempo' => $jatuhTempo,
-                    'denda' => 0,
-                ]);
-
-                self::bagiCicilan($tagihan, $cicilanCount, $jatuhTempo);
-                $created++;
+            $query = Mahasiswa::where('status', 'aktif');
+            if ($prodiId) {
+                $query->where('prodi_id', $prodiId);
             }
-        });
+            if ($angkatan) {
+                $query->where('angkatan', $angkatan);
+            }
+            if ($jalur) {
+                $query->where('jalur', $jalur);
+            }
 
-        return ['created' => $created, 'skipped' => $skipped];
+            $query->chunkById(200, function ($mahasiswas) use ($tahunAkademikId, $jenis, $nominal, $jatuhTempo, $cicilan, &$created, &$skipped) {
+                foreach ($mahasiswas as $mhs) {
+                    $exists = Tagihan::where('mahasiswa_id', $mhs->id)
+                        ->where('tahun_akademik_id', $tahunAkademikId)
+                        ->where('jenis', $jenis)
+                        ->exists();
+                    if ($exists) {
+                        $skipped++;
+
+                        continue;
+                    }
+
+                    $dasar = $nominal;
+                    if ($dasar <= 0) {
+                        $template = self::resolveTemplateNominal($mhs->prodi_id, (string) $mhs->angkatan, $mhs->jalur, $jenis);
+                        $dasar = $template?->nominal ?? 0;
+                    }
+                    if ($dasar <= 0) {
+                        $skipped++;
+
+                        continue;
+                    }
+
+                    $potongan = self::potonganBeasiswaOtomatis($mhs->id, $tahunAkademikId, $dasar);
+                    $netto = max(0, $dasar - $potongan['diskon']);
+                    $cicilanCount = max(1, $cicilan);
+
+                    try {
+                        $tagihan = Tagihan::create([
+                            'mahasiswa_id' => $mhs->id,
+                            'tahun_akademik_id' => $tahunAkademikId,
+                            'jenis' => $jenis,
+                            'nominal' => $netto,
+                            'terbayar' => 0,
+                            'status' => 'belum_bayar',
+                            'beasiswa_id' => $potongan['beasiswa_id'],
+                            'diskon' => $potongan['diskon'],
+                            'jatuh_tempo' => $jatuhTempo,
+                            'denda' => 0,
+                        ]);
+                    } catch (QueryException $e) {
+                        // Race: baris duplikat dibuat paralel — lewati dengan aman.
+                        $skipped++;
+
+                        continue;
+                    }
+
+                    self::bagiCicilan($tagihan, $cicilanCount, $jatuhTempo);
+                    $created++;
+                }
+            });
+
+            return ['created' => $created, 'skipped' => $skipped];
+        });
     }
 
     public static function bagiCicilan(Tagihan $tagihan, int $jumlah, ?string $jatuhTempo): void

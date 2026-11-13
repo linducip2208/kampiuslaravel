@@ -25,9 +25,9 @@
                             <td>{{ $surat->nomor_surat ?? '-' }}</td>
                             <td><span class="badge bg-secondary">{{ $surat->status }}</span></td>
                             <td class="text-end">
-                                <button wire:click="proses({{ $surat->id }})" class="btn btn-sm btn-outline-primary">Terbitkan Nomor</button>
-                                <button wire:click="selesaikan({{ $surat->id }})" class="btn btn-sm btn-outline-success">Selesai</button>
-                                <button wire:click="tolak({{ $surat->id }})" class="btn btn-sm btn-outline-danger">Tolak</button>
+                                <button wire:click="proses({{ $surat->id }})" wire:confirm="Terbitkan nomor untuk surat #{{ $surat->id }}?" class="btn btn-sm btn-outline-primary">Terbitkan Nomor</button>
+                                <button wire:click="selesaikan({{ $surat->id }})" wire:confirm="Tandai surat #{{ $surat->id }} selesai?" class="btn btn-sm btn-outline-success">Selesai</button>
+                                <button wire:click="tolak({{ $surat->id }})" wire:confirm="Tolak surat #{{ $surat->id }}?" class="btn btn-sm btn-outline-danger">Tolak</button>
                             </td>
                         </tr>
                     @empty

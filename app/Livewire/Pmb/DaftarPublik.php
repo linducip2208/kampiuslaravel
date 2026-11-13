@@ -11,6 +11,7 @@ use App\Services\PmbVaService;
 use App\Services\WaService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -133,22 +134,37 @@ class DaftarPublik extends Component
             return;
         }
 
-        $pendaftar = PmbPendaftar::query()->create([
-            'no_daftar' => $this->generateNoDaftar(),
-            'nama' => trim($this->nama),
-            'email' => trim($this->email),
-            'hp' => trim($this->hp),
-            'sekolah_asal' => trim($this->sekolah_asal),
-            'referral_kode' => $this->referral_kode ? trim($this->referral_kode) : null,
-            'beasiswa_id' => $this->beasiswa_id,
-            'prodi1_id' => $this->prodi1_id,
-            'prodi2_id' => $this->prodi2_id,
-            'gelombang_id' => $gelombang->id,
-            'status' => PmbPendaftar::STATUS_DIAJUKAN,
-        ]);
+        $pendaftar = DB::transaction(function () use ($va, $gelombang) {
+            $g = PmbGelombang::whereKey($gelombang->id)->lockForUpdate()->firstOrFail();
+            if (! $g->isBuka() || $g->kuotaPenuh()) {
+                abort(422, 'Kuota gelombang ini sudah penuh.');
+            }
 
-        $infoVa = $va->issueFor($pendaftar);
-        $wa->welcome($pendaftar->fresh() ?? $pendaftar);
+            $p = PmbPendaftar::query()->create([
+                'no_daftar' => $this->generateNoDaftar(),
+                'nama' => trim($this->nama),
+                'email' => trim($this->email),
+                'hp' => trim($this->hp),
+                'sekolah_asal' => trim($this->sekolah_asal),
+                'referral_kode' => $this->referral_kode ? trim($this->referral_kode) : null,
+                'beasiswa_id' => $this->beasiswa_id,
+                'prodi1_id' => $this->prodi1_id,
+                'prodi2_id' => $this->prodi2_id,
+                'gelombang_id' => $g->id,
+                'status' => PmbPendaftar::STATUS_DIAJUKAN,
+            ]);
+            $va->issueFor($p);
+
+            return $p;
+        });
+
+        try {
+            $wa->welcome($pendaftar->fresh() ?? $pendaftar);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $infoVa = ['va_number' => $pendaftar->fresh()?->va_number ?? '-', 'nominal' => $va->nominal($pendaftar->fresh() ?? $pendaftar)];
 
         $berkas = [];
         foreach (['berkas_ijazah' => 'ijazah', 'berkas_kk' => 'kk', 'berkas_foto' => 'foto'] as $prop => $key) {

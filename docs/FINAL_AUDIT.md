@@ -1,37 +1,21 @@
-# FINAL AUDIT — Kampius ERP (SIMAK Kuliah)
-
-Tanggal: 12 Nov 2026 (revisi). Evidence: 72 test hijau / 222 assertions, `pint` clean, smoke 35+ URL 200 + Tabler, MySQL 8.4 (60+ tabel, FK lengkap), tanpa `migrate:fresh` pada data berisi, tanpa commit/push (sesuai proteksi).
-
-## Skor rubrik (total 87/100)
-
-| # | Kategori (bobot) | Nilai | Evidence |
-|---|---|---|---|
-| 1 | UI/UX (15) | 13 | Landing UCN-style + mockup data live, dashboard chart SVG + agenda + aktivitas, login split, semua view Tabler, sidebar sadar peran, cetak print-friendly. Kurang: uji perangkat fisik. |
-| 2 | Akademik (15) | 13 | PMB→daftar ulang (akun+NIM+tagihan), KRS (SKS-maks/prasyarat/bentrok/kuota/approval/revisi-lock), LMS+QR, nilai terkunci, IPK tertimbang, KHS/transkrip, skripsi→sidang. Plus: kalender CRUD + agenda, yudisium bersyarat. Kurang: trek KP terpisah. |
-| 3 | Keuangan (10) | 10 | Tagihan massal, VA 4 gateway + callback/verify/status, upload manual + verifikasi idempoten, kwitansi, blokir otomatis. Plus: beasiswa/diskon otomatis. |
-| 4 | CRUD (10) | 9 | Master Data (6 entitas + search + pagination + hapus-aman), semua modul CRUD + validasi + konfirmasi hapus. Plus: impor CSV + ekspor CSV + helpdesk + beasiswa/kalender CRUD. Kurang: export Excel/PDF native. |
-| 5 | Keamanan (15) | 13 | Role middleware semua rute sensitif, trait Livewire, owner-check controller+mount, ability Sanctum + expiry, throttle, CSRF-except hanya callback, signature gateway, mimes upload, Xendit mapping benar, settle ber-lock, SecurityTest 6 test. Sisa: APP_DEBUG dev, kredensial eksternal, tanpa AV scan/WAF (infra). |
-| 6 | Database (8) | 7 | FK lengkap (migrasi 000008, restrict lindungi histori), unique, transaksi + lock, idempotency. Kurang: pasangan nullable+unique MySQL (edge NULL duplikat). |
-| 7 | Performa (8) | 6 | Eager loading (KHS/transkrip/KRS/cetak), pagination, settings di-cache. Kurang: Redis, query-cache laporan, audit N+1 menyeluruh (InputNilai loop). |
-| 8 | Responsif (7) | 5 | Grid + table-responsive Tabler di semua halaman; belum uji 360–1920px fisik. |
-| 9 | Testing (7) | 6 | 63 feature test hijau termasuk IDOR/role; tanpa browser test. |
-| 10 | Dokumentasi (5) | 5 | 18 file docs (audit, arsitektur, DB, modul, role, security, testing, instalasi, deploy, user guide, changelog, integrasi, comfyui). |
-
-## Perbandingan sebelum→sesudah (sprint ini)
-- IPK salah (`avg`) → tertimbang SKS terpusat; KHS/transkrip tampilkan nama + SKS.
-- Tanpa otorisasi → role middleware + trait Livewire + owner-check + sidebar sadar peran.
-- Callback simulasi terbuka → ditolak di production; Xendit mapping & lock diperbaiki.
-- Upload tanpa mimes → dibatasi; spoofing id → owner-override; daftar ulang kini lengkap; VA manual tersedia; berkas PMB tersimpan.
-- 14 view mentah → Tabler; dashboard ada chart + agenda + aktivitas; login split.
-- Tanpa FK lintas-modul → 40+ FK (restrict lindungi histori).
-- Master data tanpa UI → CRUD penuh ber-role.
-
-## Yang menghalangi 100 (jujur)
-1. Kredensial eksternal asli (Tripay prod, FCM, Feeder, ComfyUI+WAN) — Tes Koneksi siap, tinggal isi.
-2. Beasiswa/diskon, yudisium, kalender CRUD, tiket helpdesk — belum diimplementasi.
-3. Import CSV, export Excel/PDF native — belum ada.
-4. Browser test + uji perangkat fisik — belum dijalankan.
-5. Redis/queue-tuning produksi, AV scan upload, WAF — ranah infrastruktur.
-
-## Berkas diubah (ringkas)
-Controllers: Khs, Transkrip, Krs, Kwitansi, Surat, Bayar, Dashboard, Pddikti(tidak), middleware bootstrap, AppServiceProvider, sanctum config, api routes, web routes (role groups), layouts/tabler, welcome, login, dashboard, 14 livewire views + daftar-publik + khs/krs/transkrip/kwitansi/surat cetak + integrasi views + bayar view; Services: AkademikService(+), PaymentService, KeuanganService, XenditAdapter, TripayAdapter(tetap), ComfyUI(tetap); Livewire: RequiresRoles + 22 komponen + BayarManual(+) + Master/Data(+); Models: relasi lengkap (Nilai, Pertemuan, Tugas, Materi); Migrations baru: 000004 settings, 000005 pembayaran ref, 000006 notifikasi, 000007 fcm_token, 000008 FK; Tests: SecurityTest(+6), master CRUD, perbaikan role/token di IntegrasiTest; Docs: 18 file.
+# FINAL_AUDIT (parsial, jujur)
+## Skor
+1. UI/UX 11/15 — dashboard + sidebar + pimpinan selesai; landing & modul lain belum overhaul.
+2. Akademik 9/15 — flows jalan, kurang transaction/kuota lock.
+3. Keuangan 6/10 — verify/refund solid; massal/manual perlu transaction.
+4. CRUD 6/10 — semua tombol ada, sebagian perlu konfirmasi & empty/loading state.
+5. Security/RBAC 10/15 — 4 fix kritikal sesi ini; sisa race/kuota.
+6. Database 5/8 — audit lengkap, belum migrasi aman.
+7. API 5/7 — kontrak utuh + 2 fix; perlu doc & retry.
+8. Performance 5/7 — 3 N+1 fix; belum ukur before/after.
+9. Testing 6/8 — 164 unit/feature hijau; belum browser/responsive.
+10. Docs 4/5 — 8 docs baru; sisa user guide/changelog.
+TOTAL: 67/100. Bukan 100/100. Blocker: kuota/transaction hardening, migrasi aman, screenshot browser, landing overhaul.
+## File diubah sesi ini
+- resources/views/dashboard.blade.php, dashboard/pimpinan.blade.php
+- resources/views/layouts/tabler.blade.php (grup + KAMPIUS + KRS fix)
+- app/Http/Controllers/DashboardController.php, BayarController.php, Api/V1/TagihanController.php
+- app/Livewire/Nilai/InputNilai.php, Lms/KumpulTugas.php
+- docs/* (8 file)
+## Tidak dilakukan (sesuai safety)
+- No commit/push/deploy, no migrate:fresh/wipe, no truncate, no .env reset.

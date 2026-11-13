@@ -8,6 +8,8 @@ use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use App\Services\KalenderService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -53,15 +55,29 @@ class BayarManual extends Component
             return;
         }
 
+        $pendingAda = Pembayaran::where('tagihan_id', $tagihan->id)->where('status', 'pending')->exists();
+        if ($pendingAda) {
+            $this->addError('tagihan_id', 'Tagihan ini sudah memiliki pembayaran menunggu verifikasi.');
+
+            return;
+        }
+
         $path = $this->bukti->store('bukti-bayar', 'public');
 
-        Pembayaran::create([
-            'tagihan_id' => $tagihan->id,
-            'metode' => 'manual',
-            'nominal' => $tagihan->sisa(),
-            'bukti_path' => $path,
-            'status' => 'pending',
-        ]);
+        try {
+            DB::transaction(function () use ($tagihan, $path): void {
+                Pembayaran::create([
+                    'tagihan_id' => $tagihan->id,
+                    'metode' => 'manual',
+                    'nominal' => $tagihan->sisa(),
+                    'bukti_path' => $path,
+                    'status' => 'pending',
+                ]);
+            });
+        } catch (\Throwable $e) {
+            Storage::disk('public')->delete($path);
+            throw $e;
+        }
 
         $this->reset(['tagihan_id', 'bukti']);
         $this->message = 'Bukti bayar terkirim. Menunggu verifikasi petugas keuangan.';

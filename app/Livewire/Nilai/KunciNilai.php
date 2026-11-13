@@ -3,6 +3,7 @@
 namespace App\Livewire\Nilai;
 
 use App\Livewire\Concerns\RequiresRoles;
+use App\Models\Dosen;
 use App\Models\Kelas;
 use App\Models\Nilai;
 use Livewire\Component;
@@ -19,12 +20,14 @@ class KunciNilai extends Component
 
     public function mount(int $kelasId, ?int $tahunAkademikId = null): void
     {
+        $this->authorizeKelas($kelasId);
         $this->kelasId = $kelasId;
         $this->tahunAkademikId = $tahunAkademikId ?? Kelas::where('id', $kelasId)->value('tahun_akademik_id');
     }
 
     public function kunci(): void
     {
+        $this->authorizeKelas($this->kelasId);
         $kurang = Nilai::where('kelas_id', $this->kelasId)
             ->where('kehadiran', '<', Nilai::KEHADIRAN_MINIMAL)
             ->count();
@@ -38,6 +41,8 @@ class KunciNilai extends Component
 
     public function buka(): void
     {
+        // Buka kunci = aksi admin; dosen pengampu tidak boleh membuka sendiri.
+        abort_unless(auth()->user()?->hasAnyRole(['superadmin', 'admin_prodi']), 403);
         Nilai::where('kelas_id', $this->kelasId)->update(['is_locked' => false]);
         session()->flash('success', 'Kunci nilai dibuka (revisi admin).');
     }
@@ -65,5 +70,18 @@ class KunciNilai extends Component
                 ->where('kehadiran', '<', Nilai::KEHADIRAN_MINIMAL)->count(),
             'edom' => $this->edomRekap(),
         ]);
+    }
+
+    private function authorizeKelas(int $kelasId): void
+    {
+        $user = auth()->user();
+        if (! $user || $user->hasAnyRole(['superadmin', 'admin_prodi'])) {
+            return;
+        }
+        if ($user->hasRole('dosen')) {
+            $dosenId = Dosen::where('user_id', $user->id)->value('id');
+            $ownerId = Kelas::where('id', $kelasId)->value('dosen_id');
+            abort_unless($dosenId && $ownerId && (int) $dosenId === (int) $ownerId, 403);
+        }
     }
 }

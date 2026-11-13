@@ -3,7 +3,11 @@
 namespace App\Livewire\Nilai;
 
 use App\Livewire\Concerns\RequiresRoles;
+use App\Models\Dosen;
+use App\Models\Kelas;
 use App\Models\Nilai;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class InputNilai extends Component
@@ -40,6 +44,7 @@ class InputNilai extends Component
 
     public function mount(int $kelasId): void
     {
+        $this->authorizeKelas($kelasId);
         $this->kelasId = $kelasId;
         $this->rows = Nilai::where('kelas_id', $kelasId)->get()
             ->map(fn (Nilai $nilai) => [
@@ -78,30 +83,33 @@ class InputNilai extends Component
     {
         $this->validate();
         Nilai::normalisasiBobot($this->bobot);
+        $this->authorizeKelas($this->kelasId);
 
-        foreach ($this->rows as $row) {
-            $locked = Nilai::where('mahasiswa_id', $row['mahasiswa_id'])
-                ->where('kelas_id', $this->kelasId)->value('is_locked');
-            if ($locked) {
-                continue;
+        $lockedIds = Nilai::where('kelas_id', $this->kelasId)->where('is_locked', true)->pluck('mahasiswa_id')->flip();
+
+        DB::transaction(function () use ($lockedIds): void {
+            foreach ($this->rows as $row) {
+                if (isset($lockedIds[$row['mahasiswa_id']])) {
+                    continue;
+                }
+
+                $na = Nilai::hitungNa((float) $row['tugas'], (float) $row['uts'], (float) $row['uas'], (float) $row['kehadiran'], $this->bobot);
+                $huruf = Nilai::konversiHuruf($na);
+
+                Nilai::updateOrCreate(
+                    ['mahasiswa_id' => $row['mahasiswa_id'], 'kelas_id' => $this->kelasId],
+                    [
+                        'tugas' => $row['tugas'],
+                        'uts' => $row['uts'],
+                        'uas' => $row['uas'],
+                        'kehadiran' => $row['kehadiran'],
+                        'na' => $na,
+                        'huruf' => $huruf,
+                        'bobot' => Nilai::bobotHuruf($huruf),
+                    ]
+                );
             }
-
-            $na = Nilai::hitungNa((float) $row['tugas'], (float) $row['uts'], (float) $row['uas'], (float) $row['kehadiran'], $this->bobot);
-            $huruf = Nilai::konversiHuruf($na);
-
-            Nilai::updateOrCreate(
-                ['mahasiswa_id' => $row['mahasiswa_id'], 'kelas_id' => $this->kelasId],
-                [
-                    'tugas' => $row['tugas'],
-                    'uts' => $row['uts'],
-                    'uas' => $row['uas'],
-                    'kehadiran' => $row['kehadiran'],
-                    'na' => $na,
-                    'huruf' => $huruf,
-                    'bobot' => Nilai::bobotHuruf($huruf),
-                ]
-            );
-        }
+        });
 
         $peringatan = count($this->warningKehadiran());
         session()->flash('success', $peringatan > 0
@@ -116,6 +124,7 @@ class InputNilai extends Component
     {
         $this->validate(['remedial.'.$mahasiswaId => 'required|numeric|min:0|max:100']);
         Nilai::normalisasiBobot($this->bobot);
+        $this->authorizeKelas($this->kelasId);
 
         $nilai = Nilai::where('mahasiswa_id', $mahasiswaId)->where('kelas_id', $this->kelasId)->firstOrFail();
 
@@ -141,5 +150,18 @@ class InputNilai extends Component
         return view('livewire.nilai.input-nilai', [
             'peringatan' => $this->warningKehadiran(),
         ]);
+    }
+
+    private function authorizeKelas(int $kelasId): void
+    {
+        $user = Auth::user();
+        if (! $user || $user->hasAnyRole(['superadmin', 'admin_prodi'])) {
+            return;
+        }
+        if ($user->hasRole('dosen')) {
+            $dosenId = Dosen::where('user_id', $user->id)->value('id');
+            $ownerId = Kelas::where('id', $kelasId)->value('dosen_id');
+            abort_unless($dosenId && $ownerId && (int) $dosenId === (int) $ownerId, 403);
+        }
     }
 }

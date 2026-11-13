@@ -101,10 +101,10 @@ class VerifikasiBayar extends Component
     public function render()
     {
         return view('livewire.keuangan.verifikasi-bayar', [
-            'pembayarans' => Pembayaran::with(['tagihan.mahasiswa'])
+            'pembayarans' => Pembayaran::with(['tagihan.mahasiswa', 'tagihan.tahunAkademik'])
                 ->when($this->statusFilter !== 'semua', fn ($q) => $q->where('status', $this->statusFilter))
                 ->latest()->paginate(10),
-            'jurnal' => JurnalKeuangan::with('pembayaran')->latest()->take(10)->get(),
+            'jurnal' => JurnalKeuangan::with('pembayaran.tagihan')->latest()->take(10)->get(),
         ]);
     }
 }

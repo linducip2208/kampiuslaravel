@@ -43,8 +43,8 @@
                         <td><span class="badge bg-secondary">{{ $p->status }}</span></td>
                         <td>
                             @if($bisaKelola && $p->status === 'diajukan')
-                                <button wire:click="setujui({{ $p->id }})" class="btn btn-sm btn-success">Setujui</button>
-                                <button wire:click="tolak({{ $p->id }})" class="btn btn-sm btn-danger">Tolak</button>
+                                <button wire:click="setujui({{ $p->id }})" wire:confirm="Setujui peminjaman ruang #{{ $p->id }}?" class="btn btn-sm btn-success">Setujui</button>
+                                <button wire:click="tolak({{ $p->id }})" wire:confirm="Tolak peminjaman ruang #{{ $p->id }}?" class="btn btn-sm btn-danger">Tolak</button>
                             @else
                                 <span class="text-secondary">—</span>
                             @endif
