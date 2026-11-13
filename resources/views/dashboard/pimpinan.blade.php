@@ -4,6 +4,15 @@
 @section('pretitle', 'Laporan Eksekutif')
 @section('page-title', 'Dashboard Pimpinan')
 
+@push('styles')
+<style>
+    .kampius-stat { border: 1px solid #E8EEF7; border-radius: 16px; background: #fff; }
+    .kampius-stat .value { color: #10234B; font-weight: 700; font-size: 1.9rem; line-height: 1.1; }
+    .kampius-card { border: 1px solid #E8EEF7; border-radius: 16px; }
+    @media (max-width: 768px) { .kampius-stat .value { font-size: 1.5rem; } }
+</style>
+@endpush
+
 @section('content')
 <div class="row row-deck row-cards">
     @php
@@ -24,10 +33,10 @@
     @endphp
     @foreach($cards as $card)
         <div class="col-sm-6 col-lg-3">
-            <div class="card">
+            <div class="card kampius-stat">
                 <div class="card-body">
                     <div class="subheader">{{ $card['label'] }}</div>
-                    <div class="h1 mb-0 text-{{ $card['color'] }}">{{ number_format($card['value']) }}</div>
+                    <div class="value mt-1 text-{{ $card['color'] }}">{{ number_format($card['value']) }}</div>
                 </div>
             </div>
         </div>
@@ -36,7 +45,7 @@
 
 <div class="row row-cards mt-3">
     <div class="col-lg-6">
-        <div class="card h-100">
+        <div class="card kampius-card h-100">
             <div class="card-header"><h3 class="card-title">Keuangan Ringkas (real)</h3></div>
             <div class="card-body">
                 <div class="d-flex justify-content-between mb-2"><span>Pendapatan terverifikasi</span><strong>Rp {{ number_format($stats['pendapatan_verified'] ?? 0, 0, ',', '.') }}</strong></div>
@@ -46,7 +55,7 @@
         </div>
     </div>
     <div class="col-lg-6">
-        <div class="card h-100">
+        <div class="card kampius-card h-100">
             <div class="card-header"><h3 class="card-title">Tren Pendapatan 6 Bulan</h3></div>
             <div class="card-body">
                 @if(!empty($tren) && collect($tren)->sum('nominal') > 0)

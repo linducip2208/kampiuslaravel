@@ -36,6 +36,8 @@ class DendaRuleKelola extends Component
 
     public string $message = '';
 
+    public string $search = '';
+
     public function simpan(): void
     {
         $this->validate([
@@ -95,8 +97,15 @@ class DendaRuleKelola extends Component
     public function render()
     {
         return view('livewire.keuangan.denda-rule-kelola', [
-            'rules' => DendaRule::with('tahunAkademik')->latest('id')->paginate(10),
+            'rules' => DendaRule::with('tahunAkademik')
+                ->when($this->search !== '', fn ($q) => $q->where('jenis', 'like', '%'.$this->search.'%'))
+                ->latest('id')->paginate(10),
             'tahuns' => TahunAkademik::orderByDesc('id')->get(),
         ]);
+    }
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
     }
 }

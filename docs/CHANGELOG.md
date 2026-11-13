@@ -54,6 +54,9 @@
 - Approval-rate KRS per TA: GROUP BY + SUM kondisional (DB-agnostic, binding status).
 ## 2026-11-14 — prasyarat ganda dicek validasi KRS
 - AkademikService::validasiKrs kini memeriksa relasi mk_prasyarat (jenis=prasyarat) selain kolom legacy; PrasyaratTest (2 tes).
+## 2026-11-14 — konsistensi visual + pencarian denda
+- Dashboard pimpinan memakai token kampius-stat/kampius-card (radius 16px, tipografi navy) selaras dashboard utama.
+- DendaRuleKelola: kolom pencarian jenis + reset halaman.
 ## 2026-11-13 (ronde 20) — proteksi hapus akun sendiri di data dosen/tendik
 - DosenData::hapus meniru UserData: tolak hapus diri sendiri (tendik & dosen), cegah lockout admin.
 - DosenDataTest +1: hapus diri ditolak + akun tetap ada.

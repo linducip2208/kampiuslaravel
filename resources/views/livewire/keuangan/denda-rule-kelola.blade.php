@@ -34,6 +34,10 @@
         </div>
         <div class="col-lg-8">
             <div class="card">
+                <div class="card-header d-flex gap-2 align-items-center">
+                    <h3 class="card-title">Daftar Aturan</h3>
+                    <div class="ms-auto"><input type="search" wire:model.live="search" class="form-control form-control-sm" placeholder="Cari jenis…" style="width:180px"></div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-vcenter">
                         <thead><tr><th>TA</th><th>Jenis</th><th>Min. Telat</th><th>Denda</th><th>Status</th><th class="text-end">Aksi</th></tr></thead>
