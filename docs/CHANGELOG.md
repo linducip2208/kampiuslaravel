@@ -43,6 +43,8 @@
 ## 2026-11-13 (ronde 15) — kunci regresi middleware rute
 - RouteGuardTest (2 tes, 54 asersi): 16 rute sensitif wajib auth+role; 3 rute publik tetap terbuka.
 - Menutup kelas bug audit: controller tanpa auth di file aman hanya via middleware rute.
+## 2026-11-13 (ronde 16) — revisi KRS ditolak teruji
+- KrsFlowTest +1: KRS DITOLAK bisa diajukan ulang (kembali DIAJUKAN, detail diperbarui); DISETUJUI tetap terkunci.
 ## 2026-11-13 (ronde 5) — tes kalkulasi + SEO/API + aksesibilitas + audit link
 - CalculationTest (4 tes): hitungNa/bobot, konversi huruf, batas SKS IPK, sisa/total tagihan, remedial D/E maks 55.
 - Aksesibilitas: skip-link + #main-content di layout.

@@ -289,4 +289,25 @@ class KrsFlowTest extends TestCase
 
         $this->get(route('krs.cetak', $krs))->assertOk()->assertSee((string) $krs->id);
     }
+
+    public function test_krs_ditolak_dapat_direvisi_mahasiswa(): void
+    {
+        $krs = Krs::factory()->create([
+            'mahasiswa_id' => $this->mahasiswaId,
+            'tahun_akademik_id' => $this->tahunId,
+            'status' => Krs::STATUS_DITOLAK,
+            'total_sks' => 3,
+            'ipk_snapshot' => 3.50,
+        ]);
+        $krs->details()->create(['kelas_id' => $this->kelasIds[0], 'sks' => 3, 'status' => 'aktif']);
+
+        Livewire::test(Pengajuan::class, ['tahunId' => $this->tahunId])
+            ->set('ipk', 3.50)
+            ->call('toggleKelas', $this->kelasIds[1])
+            ->call('ajukan')
+            ->assertHasNoErrors();
+
+        $this->assertSame(Krs::STATUS_DIAJUKAN, $krs->fresh()->status);
+        $this->assertCount(2, $krs->fresh()->details);
+    }
 }
