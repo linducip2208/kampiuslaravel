@@ -158,10 +158,20 @@ class DosenData extends Component
     {
         try {
             if ($this->tab === 'tendik') {
+                if ($id === (int) auth()->id()) {
+                    $this->addError('form.hapus', 'Tidak bisa menghapus akun sendiri.');
+
+                    return;
+                }
                 User::findOrFail($id)->delete();
                 $this->message = 'Data tendik dihapus.';
             } else {
                 $dosen = Dosen::findOrFail($id);
+                if ((int) $dosen->user_id === (int) auth()->id()) {
+                    $this->addError('form.hapus', 'Tidak bisa menghapus akun sendiri.');
+
+                    return;
+                }
                 DB::transaction(function () use ($dosen) {
                     $userId = $dosen->user_id;
                     $dosen->delete();

@@ -112,4 +112,17 @@ class DosenDataTest extends TestCase
 
         Livewire::actingAs($mhs)->test(DosenData::class)->assertForbidden();
     }
+
+    public function test_admin_tidak_bisa_hapus_akun_sendiri(): void
+    {
+        $admin = $this->admin();
+
+        Livewire::actingAs($admin)
+            ->test(DosenData::class)
+            ->call('gantiTab', 'tendik')
+            ->call('hapus', $admin->id)
+            ->assertHasErrors(['form.hapus']);
+
+        $this->assertNotNull(User::find($admin->id));
+    }
 }
