@@ -58,6 +58,9 @@
 - KRS menunggu untuk dosen dihitung khusus mahasiswanya (selaras PersetujuanPa), bukan global; HardeningTest +1.
 ## 2026-11-14 — wisuda anti-overbook + guard teruji
 - Yudisium::daftarkanWisuda dalam transaksi + lock batch (cek status & kuota ulang di dalam); KelulusanMbkmTest +1 (kuota penuh & batch tutup ditolak).
+## 2026-11-14 — hardening konfigurasi produksi
+- .env.example: panduan produksi (SECURE_COOKIE, APP_DEBUG=false); DEPLOYMENT.md: checklist env + scheduler.
+- SecurityConfigTest: default cookie aman + throttle login teruji.
 ## 2026-11-14 — konsistensi visual + pencarian denda
 - Dashboard pimpinan memakai token kampius-stat/kampius-card (radius 16px, tipografi navy) selaras dashboard utama.
 - DendaRuleKelola: kolom pencarian jenis + reset halaman.
