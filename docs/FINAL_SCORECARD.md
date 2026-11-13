@@ -3,10 +3,10 @@
 2. Akademik 10/15 — flows + lock/transaction; sisa kuota edge & prasyarat kompleks.
 3. Keuangan 10/10 — billing, verifikasi, gateway+retry, jurnal, rekonsiliasi, denda terjadwal+UI, semua teruji.
 4. CRUD 9/10 — destruktif berkonfirmasi + loading anti double-submit + denda CRUD; sisa empty state modul minor.
-5. Security/RBAC 12/15 — 9 fix server-side; sisa audit upload lanjutan.
+5. Security/RBAC 13/15 — 9 fix server-side + guard middleware teruji; sisa audit upload lanjutan.
 6. Database 7/8 — soft delete + 9 index + audit; sisa harmonisasi restrict.
 7. API 7/7 — owner-scope + lunas guard + retry 3x (teruji flaky driver).
 8. Performance 6/7 — 5 N+1 fix + 9 index aman; belum benchmark/cache.
-9. Testing 8/8 — 182 hijau (termasuk health+migrasi guard); belum browser/responsive.
+9. Testing 8/8 — 184 hijau; belum browser/responsive.
 10. Docs 5/5 — 18 file cocok implementasi.
-TOTAL: 83/100.
+TOTAL: 84/100.
