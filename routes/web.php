@@ -44,7 +44,18 @@ Route::get('/health', function () {
     try {
         DB::select('select 1');
 
-        return response()->json(['ok' => true, 'db' => 'up', 'time' => now()->toIso8601String()]);
+        // Deteksi migrasi yang sudah di-push tapi belum jalan (contoh insiden deleted_at).
+        $pending = 0;
+        try {
+            $ran = app('migrator')->getRepository()->getRan();
+            $files = collect(glob(database_path('migrations/*.php')) ?: [])
+                ->map(fn ($f) => basename($f, '.php'))->all();
+            $pending = count(array_diff($files, $ran));
+        } catch (Throwable) {
+            $pending = -1;
+        }
+
+        return response()->json(['ok' => $pending === 0, 'db' => 'up', 'pending_migrations' => $pending, 'time' => now()->toIso8601String()], $pending === 0 ? 200 : 503);
     } catch (Throwable $e) {
         return response()->json(['ok' => false, 'db' => 'down'], 503);
     }

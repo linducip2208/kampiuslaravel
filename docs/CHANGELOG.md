@@ -37,6 +37,9 @@
 ## 2026-11-13 (ronde 13) — denda benar-benar otomatis
 - Command denda:terapkan [--tahun] + jadwal harian 01:00 (tanpa overlap) + audit scheduler.
 - DendaOtomatisTest: terapkan 50rb, catat audit, idempoten di jalan kedua.
+## 2026-11-13 (ronde 14) — insiden migrasi + health guard
+- Insiden: deleted_at 500 di MySQL dev karena migrasi 145235 belum dijalankan (tes SQLite hijau menutupi). Migrasi dijalankan + kolom/index terverifikasi live.
+- /health kini lapor pending_migrations (503 bila >0); HealthTest kunci regresi.
 ## 2026-11-13 (ronde 5) — tes kalkulasi + SEO/API + aksesibilitas + audit link
 - CalculationTest (4 tes): hitungNa/bobot, konversi huruf, batas SKS IPK, sisa/total tagihan, remedial D/E maks 55.
 - Aksesibilitas: skip-link + #main-content di layout.
