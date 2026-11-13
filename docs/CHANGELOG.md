@@ -26,6 +26,9 @@
 ## 2026-11-13 (ronde 9) — loading state aksi async
 - Spinner + disable pada: generate tagihan, terapkan denda, rekonsiliasi CSV, verifikasi/tolak bayar, impor CSV, simpan nilai, setujui/tolak KRS.
 - Cegah double-submit saat request Livewire berjalan.
+## 2026-11-13 (ronde 10) — empty-state PMB + guard finansial teruji
+- DaftarPublik: peringatan jelas bila tidak ada gelombang dibuka.
+- CalculationTest +2: denda clamp persen/maksimal/nonaktif/belum-jatuh-tempo; beasiswa tidak melebihi tagihan.
 ## 2026-11-13 (ronde 5) — tes kalkulasi + SEO/API + aksesibilitas + audit link
 - CalculationTest (4 tes): hitungNa/bobot, konversi huruf, batas SKS IPK, sisa/total tagihan, remedial D/E maks 55.
 - Aksesibilitas: skip-link + #main-content di layout.

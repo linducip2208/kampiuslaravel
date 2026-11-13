@@ -51,6 +51,9 @@
                 @endforeach
             </select>
             @error('gelombang_id')<div class="text-danger">{{ $message }}</div>@enderror
+            @if($gelombangs->isEmpty())
+                <div class="alert alert-warning mt-2 mb-0" role="alert">Saat ini tidak ada gelombang PMB yang dibuka. Silakan cek kembali nanti atau hubungi panitia PMB.</div>
+            @endif
             @if($gelombangTerpilih)
                 <small class="form-hint">
                     Biaya pendaftaran: Rp {{ number_format($gelombangTerpilih->biaya, 0, ',', '.') }}

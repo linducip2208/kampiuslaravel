@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Beasiswa;
+use App\Models\DendaRule;
 use App\Models\Krs;
 use App\Models\Nilai;
 use App\Models\Tagihan;
@@ -49,5 +51,31 @@ class CalculationTest extends TestCase
 
         $bagus = new Nilai(['tugas' => 90, 'uts' => 90, 'uas' => 90, 'kehadiran' => 100, 'huruf' => 'A']);
         $this->assertFalse($bagus->terapkanRemedial(100));
+    }
+
+    #[Test]
+    public function denda_dibatasi_persen_dan_maksimal(): void
+    {
+        $persen = new DendaRule(['terlambat_hari_min' => 1, 'mode' => 'persen', 'nilai' => 150, 'maksimal' => null, 'aktif' => true]);
+        $this->assertSame(1000000, $persen->hitungDenda(1000000, 5));
+
+        $batas = new DendaRule(['terlambat_hari_min' => 1, 'mode' => 'persen', 'nilai' => 10, 'maksimal' => 50000, 'aktif' => true]);
+        $this->assertSame(50000, $batas->hitungDenda(1000000, 5));
+
+        $nonaktif = new DendaRule(['terlambat_hari_min' => 1, 'mode' => 'persen', 'nilai' => 10, 'maksimal' => null, 'aktif' => false]);
+        $this->assertSame(0, $nonaktif->hitungDenda(1000000, 5));
+
+        $belum = new DendaRule(['terlambat_hari_min' => 7, 'mode' => 'nominal', 'nilai' => 50000, 'maksimal' => null, 'aktif' => true]);
+        $this->assertSame(0, $belum->hitungDenda(1000000, 3));
+    }
+
+    #[Test]
+    public function potongan_beasiswa_tidak_melebihi_tagihan(): void
+    {
+        $persen = new Beasiswa(['jenis' => 'persen', 'nilai' => 200, 'aktif' => true]);
+        $this->assertSame(1000000, $persen->hitungPotongan(1000000));
+
+        $nominal = new Beasiswa(['jenis' => 'nominal', 'nilai' => 2500000, 'aktif' => true]);
+        $this->assertSame(1000000, $nominal->hitungPotongan(1000000));
     }
 }
