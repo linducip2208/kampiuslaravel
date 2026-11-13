@@ -52,6 +52,8 @@
 - Blade + HardeningTest: mahasiswa melihat 1.300.000 miliknya.
 ## 2026-11-13 (ronde 19) — agregat performa 2N menjadi 1 query
 - Approval-rate KRS per TA: GROUP BY + SUM kondisional (DB-agnostic, binding status).
+## 2026-11-14 — prasyarat ganda dicek validasi KRS
+- AkademikService::validasiKrs kini memeriksa relasi mk_prasyarat (jenis=prasyarat) selain kolom legacy; PrasyaratTest (2 tes).
 ## 2026-11-13 (ronde 20) — proteksi hapus akun sendiri di data dosen/tendik
 - DosenData::hapus meniru UserData: tolak hapus diri sendiri (tendik & dosen), cegah lockout admin.
 - DosenDataTest +1: hapus diri ditolak + akun tetap ada.

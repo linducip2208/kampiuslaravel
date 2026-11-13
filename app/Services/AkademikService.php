@@ -188,30 +188,46 @@ class AkademikService
             $pesan[] = 'Pengajuan KRS diblokir: masih ada tagihan menunggak. Lunasi tagihan terlebih dahulu.';
         }
 
-        // Prasyarat.
+        // Prasyarat: kolom legacy tunggal + relasi ganda mk_prasyarat (jenis=prasyarat).
         try {
             $kelas = DB::table('kelas')
                 ->leftJoin('matakuliah', 'matakuliah.id', '=', 'kelas.matakuliah_id')
                 ->whereIn('kelas.id', $kelasIds)
-                ->select(['matakuliah.kode', 'matakuliah.nama as mk_nama', 'matakuliah.prasyarat_id'])
+                ->select(['kelas.id as kelas_id', 'matakuliah.id as mk_id', 'matakuliah.kode', 'matakuliah.nama as mk_nama', 'matakuliah.prasyarat_id'])
                 ->get();
 
+            $tambahan = collect();
+            $mkIds = $kelas->pluck('mk_id')->filter()->map(fn ($v): int => (int) $v)->all();
+            if ($mkIds !== [] && Schema::hasTable('mk_prasyarat')) {
+                $tambahan = DB::table('mk_prasyarat')
+                    ->whereIn('matakuliah_id', $mkIds)
+                    ->where('jenis', 'prasyarat')
+                    ->get(['matakuliah_id', 'prasyarat_id']);
+            }
+
             foreach ($kelas as $k) {
-                if (! $k->prasyarat_id) {
-                    continue;
+                $wajib = [];
+                if ($k->prasyarat_id) {
+                    $wajib[(int) $k->prasyarat_id] = true;
+                }
+                foreach ($tambahan->where('matakuliah_id', $k->mk_id) as $rel) {
+                    $wajib[(int) $rel->prasyarat_id] = true;
                 }
 
-                $lulus = DB::table('nilai')
-                    ->where('mahasiswa_id', $mahasiswaId)
-                    ->whereIn('kelas_id', function ($q) use ($k): void {
-                        $q->select('id')->from('kelas')->where('matakuliah_id', $k->prasyarat_id);
-                    })
-                    ->where('bobot', '>', 0)
-                    ->exists();
+                foreach (array_keys($wajib) as $praId) {
+                    $lulus = DB::table('nilai')
+                        ->where('mahasiswa_id', $mahasiswaId)
+                        ->whereIn('kelas_id', function ($q) use ($praId): void {
+                            $q->select('id')->from('kelas')->where('matakuliah_id', $praId);
+                        })
+                        ->where('bobot', '>', 0)
+                        ->exists();
 
-                if (! $lulus) {
-                    $nama = $k->mk_nama ?? $k->kode ?? 'matakuliah';
-                    $pesan[] = "Prasyarat belum lulus untuk mengambil {$nama}.";
+                    if (! $lulus) {
+                        $nama = $k->mk_nama ?? $k->kode ?? 'matakuliah';
+                        $pesan[] = "Prasyarat belum lulus untuk mengambil {$nama}.";
+                        break;
+                    }
                 }
             }
         } catch (\Throwable) {
