@@ -61,6 +61,8 @@
 ## 2026-11-14 — cache agregat ditolak dengan bukti (bukan asumsi)
 - Investigasi: DatabaseStore + config serializable_classes=false menolak unserialize objek Eloquent (anti object-injection) — cache angka landing sebagai objek akan rusak saat dibaca.
 - Keputusan: agregat dihitung langsung (bounded + index); CacheStoreTest mengunci perilaku aman default framework.
+## 2026-11-14 — verifikasi pre-deploy cache
+- route:cache + view:cache + config:cache sukses; / & /dashboard lolos dengan cache aktif; optimize:clear setelahnya.
 ## 2026-11-14 — hardening konfigurasi produksi
 - .env.example: panduan produksi (SECURE_COOKIE, APP_DEBUG=false); DEPLOYMENT.md: checklist env + scheduler.
 - SecurityConfigTest: default cookie aman + throttle login teruji.
