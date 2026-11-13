@@ -50,6 +50,8 @@
 ## 2026-11-13 (ronde 18) — scope pribadi dashboard mahasiswa
 - DashboardController: hitung outstanding/tagihan/KRS milik sendiri (owner-scope); sebelumnya kartu "Tagihan Saya" menampilkan angka global.
 - Blade + HardeningTest: mahasiswa melihat 1.300.000 miliknya.
+## 2026-11-13 (ronde 19) — agregat performa 2N menjadi 1 query
+- Approval-rate KRS per TA: GROUP BY + SUM kondisional (DB-agnostic, binding status).
 ## 2026-11-13 (ronde 5) — tes kalkulasi + SEO/API + aksesibilitas + audit link
 - CalculationTest (4 tes): hitungNa/bobot, konversi huruf, batas SKS IPK, sisa/total tagihan, remedial D/E maks 55.
 - Aksesibilitas: skip-link + #main-content di layout.

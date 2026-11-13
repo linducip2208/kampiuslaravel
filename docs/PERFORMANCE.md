@@ -4,4 +4,5 @@
 - Dashboard: semua agregat guarded + paginate 10 (KRS/sidang/keuangan).
 - Index: 9 index status/komposit terverifikasi live di MySQL 8.4 (cek Schema::getIndexes pembayaran: status, verified_at, komposit ada).
 - Benchmark teruji: DashboardPerfTest — dashboard superadmin DB kosong = 79 query, ambang regresi 90 (sqlite, 2026-11-13).
+- Optimasi: approval-rate KRS per TA dari 2N query menjadi 1 agregat (GROUP BY + SUM kondisional); chart 6 bulan tetap 12 agregat index (bounded).
 - Belum: cache agregat 60s (risiko stale verifikasi pending — ditunda sadar), benchmark data besar, browser test.

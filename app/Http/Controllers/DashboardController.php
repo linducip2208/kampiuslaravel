@@ -80,9 +80,16 @@ class DashboardController extends Controller
             if ($taList->count() > 8) {
                 $taList = TahunAkademik::orderByDesc('tahun')->orderByDesc('semester')->take(8)->get()->reverse()->values();
             }
+            $taIds = $taList->pluck('id')->all();
+            $rekap = $taIds !== []
+                ? Krs::selectRaw('tahun_akademik_id, COUNT(*) as total, SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as ok', [Krs::STATUS_DISETUJUI])
+                    ->whereIn('tahun_akademik_id', $taIds)
+                    ->groupBy('tahun_akademik_id')
+                    ->get()->keyBy('tahun_akademik_id')
+                : collect();
             foreach ($taList as $ta) {
-                $total = Krs::where('tahun_akademik_id', $ta->id)->count();
-                $ok = Krs::where('tahun_akademik_id', $ta->id)->where('status', 'disetujui')->count();
+                $total = (int) ($rekap[$ta->id]->total ?? 0);
+                $ok = (int) ($rekap[$ta->id]->ok ?? 0);
                 $perfLabels[] = ($ta->semester === 'genap' ? 'Genap' : 'Ganjil').' '.substr((string) $ta->tahun, 0, 4);
                 $perfValues[] = $total > 0 ? (int) round($ok / $total * 100) : 0;
             }
