@@ -32,6 +32,8 @@
 ## 2026-11-13 (ronde 11) — kelola aturan denda via UI
 - Livewire keuangan.denda-rule-kelola + route keuangan.denda + menu sidebar: CRUD aturan (TA/jenis/min-telat/mode/nilai/maksimal/aktif), validasi persen maks 100%.
 - DendaRuleTest (4 tes): simpan, tolak persen >100, mahasiswa 403, hapus.
+## 2026-11-13 (ronde 12) — bukti benchmark performa
+- DashboardPerfTest: dashboard = 79 query (ambang regresi 90), index MySQL terverifikasi live.
 ## 2026-11-13 (ronde 5) — tes kalkulasi + SEO/API + aksesibilitas + audit link
 - CalculationTest (4 tes): hitungNa/bobot, konversi huruf, batas SKS IPK, sisa/total tagihan, remedial D/E maks 55.
 - Aksesibilitas: skip-link + #main-content di layout.
