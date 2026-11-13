@@ -7,8 +7,11 @@ use App\Livewire\Nilai\KunciNilai;
 use App\Models\Dosen;
 use App\Models\Kelas;
 use App\Models\Mahasiswa;
+use App\Models\Setting;
 use App\Models\Tagihan;
 use App\Models\User;
+use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\Payment\PaymentService;
 use Database\Seeders\RolesPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -84,5 +87,56 @@ class HardeningTest extends TestCase
 
         $this->assertSoftDeleted('tagihan', ['id' => $tagihan->id]);
         $this->assertNotNull(Tagihan::withTrashed()->find($tagihan->id));
+    }
+
+    public function test_gateway_retry_berhasil_setelah_gagal_transient(): void
+    {
+        $mhs = Mahasiswa::factory()->create();
+        $tagihan = Tagihan::create([
+            'mahasiswa_id' => $mhs->id,
+            'jenis' => 'UKT',
+            'nominal' => 500000,
+            'terbayar' => 0,
+            'status' => 'belum_bayar',
+        ]);
+
+        $flaky = new class implements PaymentGatewayInterface
+        {
+            public int $calls = 0;
+
+            public function createTransaction(Tagihan $tagihan, array $customer): array
+            {
+                $this->calls++;
+                if ($this->calls < 3) {
+                    throw new \RuntimeException('timeout sementara');
+                }
+
+                return ['reference' => 'FLAKY-'.$tagihan->id, 'va_number' => '88880001', 'expires_at' => now()->addDay()];
+            }
+
+            public function verifyCallback(array $payload): ?string
+            {
+                return null;
+            }
+
+            public function checkStatus(string $reference): string
+            {
+                return 'pending';
+            }
+
+            public function requiredSettings(): array
+            {
+                return [];
+            }
+        };
+
+        config(['payment.drivers.flaky' => ['class' => get_class($flaky), 'label' => 'Flaky']]);
+        app()->instance(get_class($flaky), $flaky);
+        Setting::set('pay.driver', 'flaky');
+
+        $bayar = app(PaymentService::class)->createVa($tagihan, ['nama' => 'Tes']);
+
+        $this->assertSame(3, $flaky->calls);
+        $this->assertSame('FLAKY-'.$tagihan->id, $bayar->reference);
     }
 }

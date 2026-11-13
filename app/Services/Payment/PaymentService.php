@@ -8,6 +8,7 @@ use App\Models\Tagihan;
 use App\Services\KeuanganService;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
+use Throwable;
 
 class PaymentService
 {
@@ -117,7 +118,7 @@ class PaymentService
             return $existing;
         }
 
-        $result = $driver->createTransaction($tagihan, $customer);
+        $result = $this->callDriverWithRetry(fn () => $driver->createTransaction($tagihan, $customer));
 
         $suffix = $group === 'ewallet' && isset($customer['method'])
             ? '-'.strtolower((string) $customer['method'])
@@ -172,6 +173,36 @@ class PaymentService
         return KeuanganService::refundPembayaran($pembayaran->id, $by, $reason);
     }
 
+    /**
+     * Panggil driver dengan retry 3x untuk kegagalan transient (network/timeout).
+     * Gagal permanen setelah 3x dibungkus RuntimeException agar controller
+     * merespons 422/502 yang konsisten (bukan 500).
+     *
+     * @template T
+     *
+     * @param  callable(): T  $call
+     * @return T
+     */
+    private function callDriverWithRetry(callable $call): mixed
+    {
+        $attempts = 0;
+
+        do {
+            try {
+                return $call();
+            } catch (Throwable $e) {
+                $attempts++;
+                report($e);
+
+                if ($attempts >= 3) {
+                    throw new RuntimeException('Gateway pembayaran tidak dapat dihubungi setelah 3x percobaan.', 0, $e);
+                }
+
+                usleep(200000);
+            }
+        } while (true);
+    }
+
     /** Sinkron status dari gateway; lunaskan bila gateway bilang verified. */
     public function syncStatus(Pembayaran $pembayaran): string
     {
@@ -179,7 +210,7 @@ class PaymentService
             return 'verified';
         }
 
-        $status = $this->driver()->checkStatus((string) $pembayaran->reference);
+        $status = $this->callDriverWithRetry(fn () => $this->driver()->checkStatus((string) $pembayaran->reference));
 
         if ($status === 'verified') {
             $this->settleByReference((string) $pembayaran->reference);

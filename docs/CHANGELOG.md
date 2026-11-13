@@ -19,6 +19,10 @@
 ## 2026-11-13 (ronde 7) — konfirmasi aksi destruktif
 - Tambah wire:confirm pada: surat terbitkan/selesai/tolak, KRS setujui/tolak, verifikasi/tolak bayar, cuti setujui/tolak, pinjam ruang setujui/tolak.
 - Audit: seluruh tombol hapus/reset/lulus/kunci/refund sebelumnya sudah berkonfirmasi; ronde ini menutup 5 celah sisanya.
+## 2026-11-13 (ronde 8) — gateway retry + panel peran
+- PaymentService: callDriverWithRetry 3x (200ms jeda) untuk createTransaction & checkStatus; gagal permanen -> RuntimeException (422/502 konsisten).
+- HardeningTest +1: driver flaky gagal 2x lalu sukses (3 calls, reference benar).
+- Dashboard strip kini role-aware (keuangan/KRS/PMB/mahasiswa/pimpinan).
 ## 2026-11-13 (ronde 5) — tes kalkulasi + SEO/API + aksesibilitas + audit link
 - CalculationTest (4 tes): hitungNa/bobot, konversi huruf, batas SKS IPK, sisa/total tagihan, remedial D/E maks 55.
 - Aksesibilitas: skip-link + #main-content di layout.
