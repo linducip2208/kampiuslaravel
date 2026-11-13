@@ -21,6 +21,19 @@
             <dt class="col-4">Metode</dt><dd class="col-8">{{ $pembayaran->metode }}</dd>
             <dt class="col-4">Terverifikasi</dt><dd class="col-8">{{ $pembayaran->verified_at ?? '-' }}</dd>
         </dl>
+        <hr>
+        <h4>Rincian Pajak</h4>
+        <dl class="row">
+            @if(!empty($pajak['npwp'] ?? ''))
+                <dt class="col-4">NPWP Kampus</dt><dd class="col-8">{{ $pajak['npwp'] }}</dd>
+            @endif
+            <dt class="col-4">DPP</dt><dd class="col-8">Rp {{ number_format($pajak['dpp'] ?? $pembayaran->nominal, 0, ',', '.') }}</dd>
+            <dt class="col-4">PPN ({{ rtrim(rtrim(number_format($pajak['tarif'] ?? 0, 2, ',', '.'), '0'), ',') }}%)</dt><dd class="col-8">Rp {{ number_format($pajak['ppn'] ?? 0, 0, ',', '.') }}</dd>
+            <dt class="col-4"><strong>Total bayar (termasuk PPN)</strong></dt><dd class="col-8"><strong>Rp {{ number_format($pajak['bruto'] ?? $pembayaran->nominal, 0, ',', '.') }}</strong></dd>
+        </dl>
+        @if(($pajak['tarif'] ?? 0) == 0)
+            <p class="text-secondary">Jasa pendidikan — PPN 0% sesuai ketentuan yang berlaku.</p>
+        @endif
     </div>
 </div>
 @endsection

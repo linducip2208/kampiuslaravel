@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Pendaftar PMB (calon mahasiswa).
@@ -54,12 +55,18 @@ class PmbPendaftar extends Model
         'email',
         'hp',
         'sekolah_asal',
+        'referral_kode',
         'prodi1_id',
         'prodi2_id',
         'gelombang_id',
+        'beasiswa_id',
+        'va_reference',
+        'va_number',
+        'bayar_status',
         'berkas_json',
         'status',
         'catatan_verifikasi',
+        'last_follow_up_at',
         'user_id',
     ];
 
@@ -70,6 +77,7 @@ class PmbPendaftar extends Model
     {
         return [
             'berkas_json' => 'array',
+            'last_follow_up_at' => 'datetime',
         ];
     }
 
@@ -103,5 +111,37 @@ class PmbPendaftar extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * @return BelongsTo<Beasiswa, $this>
+     */
+    public function beasiswa(): BelongsTo
+    {
+        return $this->belongsTo(Beasiswa::class, 'beasiswa_id');
+    }
+
+    /**
+     * @return HasMany<PmbNilaiSeleksi, $this>
+     */
+    public function nilaiSeleksi(): HasMany
+    {
+        return $this->hasMany(PmbNilaiSeleksi::class, 'pendaftar_id');
+    }
+
+    public function nilaiJenis(string $jenis): ?float
+    {
+        $nilai = $this->nilaiSeleksi->firstWhere('jenis', $jenis);
+
+        return $nilai ? (float) $nilai->nilai : null;
+    }
+
+    public function nilaiAkhir(): ?float
+    {
+        if ($this->nilaiSeleksi->isEmpty()) {
+            return null;
+        }
+
+        return round((float) $this->nilaiSeleksi->avg('nilai'), 2);
     }
 }

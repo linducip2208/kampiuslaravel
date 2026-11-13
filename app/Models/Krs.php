@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\AkademikService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -84,22 +85,12 @@ class Krs extends Model
     }
 
     /**
-     * Batas SKS sederhana berdasarkan IPK semester lalu (aturan umum kampus).
+     * Batas SKS berdasarkan IPK semester lalu (aturan umum kampus).
+     * Satu sumber kebenaran: App\Services\AkademikService::batasSks().
+     * >=3.00 → 24, >=2.50 → 22, >=2.00 → 20, <2.00 → 18.
      */
     public static function sksMaksByIpk(float $ipk): int
     {
-        if ($ipk >= 3.00) {
-            return 24;
-        }
-
-        if ($ipk >= 2.50) {
-            return 21;
-        }
-
-        if ($ipk >= 2.00) {
-            return 18;
-        }
-
-        return 15;
+        return AkademikService::batasSks($ipk);
     }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\PmbGelombang;
 use App\Models\PmbPendaftar;
+use App\Services\PmbVaService;
+use App\Services\WaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -15,16 +17,18 @@ class PmbController extends Controller
         return view('pmb.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, PmbVaService $va, WaService $wa): RedirectResponse
     {
         $validated = $request->validate([
             'nama' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'email:rfc', 'max:100', 'unique:pmb_pendaftars,email'],
             'hp' => ['required', 'regex:/^[0-9+\- ]{9,16}$/'],
             'sekolah_asal' => ['required', 'string', 'min:3', 'max:150'],
+            'referral_kode' => ['nullable', 'string', 'max:30', 'exists:pmb_referrals,kode'],
+            'beasiswa_id' => ['nullable', 'integer', 'exists:beasiswa,id'],
             'gelombang_id' => ['required', 'integer', 'exists:pmb_gelombangs,id'],
-            'prodi1_id' => ['required', 'integer', 'min:1'],
-            'prodi2_id' => ['nullable', 'integer', 'min:1', 'different:prodi1_id'],
+            'prodi1_id' => ['required', 'integer', 'exists:prodi,id'],
+            'prodi2_id' => ['nullable', 'integer', 'exists:prodi,id', 'different:prodi1_id'],
         ]);
 
         $gelombang = PmbGelombang::findOrFail($validated['gelombang_id']);
@@ -33,15 +37,23 @@ class PmbController extends Controller
             return back()->withErrors(['gelombang_id' => 'Gelombang yang dipilih sudah tutup.'])->withInput();
         }
 
+        if ($gelombang->kuotaPenuh()) {
+            return back()->withErrors(['gelombang_id' => 'Kuota gelombang ini sudah penuh.'])->withInput();
+        }
+
         $pendaftar = PmbPendaftar::query()->create([
             ...$validated,
             'no_daftar' => $this->generateNoDaftar(),
             'status' => PmbPendaftar::STATUS_DIAJUKAN,
         ]);
 
+        $infoVa = $va->issueFor($pendaftar);
+        $wa->welcome($pendaftar->fresh() ?? $pendaftar);
+
         return redirect()
             ->route('pmb.cek', ['no_daftar' => $pendaftar->no_daftar])
-            ->with('sukses', "Pendaftaran berhasil! Nomor pendaftaran Anda: {$pendaftar->no_daftar}.");
+            ->with('sukses', "Pendaftaran berhasil! Nomor pendaftaran Anda: {$pendaftar->no_daftar}. ".
+                "VA biaya pendaftaran: {$infoVa['va_number']} (Rp ".number_format($infoVa['nominal'], 0, ',', '.').').');
     }
 
     public function cek(Request $request): View
@@ -54,7 +66,7 @@ class PmbController extends Controller
 
         if ($request->filled('no_daftar')) {
             $pendaftar = PmbPendaftar::query()
-                ->with('gelombang')
+                ->with(['gelombang', 'nilaiSeleksi', 'prodi1', 'prodi2'])
                 ->where('no_daftar', $request->string('no_daftar')->toString())
                 ->first();
         }

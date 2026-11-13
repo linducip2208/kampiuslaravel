@@ -5,6 +5,11 @@
 @section('pretitle', 'Publik')
 @section('page-title', 'Program Studi')
 
+@push('styles')
+<meta name="description" content="Daftar program studi, kurikulum, dan pendaftaran mahasiswa baru (PMB) online.">
+<link rel="canonical" href="{{ route('publik.prodi') }}">
+@endpush
+
 @section('content')
 <div class="row row-cards">
     @forelse($prodi as $p)

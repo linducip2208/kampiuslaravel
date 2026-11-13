@@ -88,15 +88,21 @@ class MasterDataSeeder extends Seeder
             ]
         );
 
-        if (app()->environment('local', 'development')) {
-            $dosenUser = User::factory()->create(['email' => 'dosen@kampus.ac.id']);
+        if (app()->environment('local', 'development', 'testing')) {
+            $dosenUser = User::firstOrCreate(
+                ['email' => 'dosen@kampus.ac.id'],
+                collect(User::factory()->raw())->except('email')->put('name', 'Dosen Demo')->all()
+            );
             $dosenUser->assignRole('dosen');
             $dosen = Dosen::factory()->create([
                 'user_id' => $dosenUser->id,
                 'prodi_id' => $prodiTi->id,
             ]);
 
-            $mhsUser = User::factory()->create(['email' => 'mahasiswa@kampus.ac.id']);
+            $mhsUser = User::firstOrCreate(
+                ['email' => 'mahasiswa@kampus.ac.id'],
+                collect(User::factory()->raw())->except('email')->put('name', 'Mahasiswa Demo')->all()
+            );
             $mhsUser->assignRole('mahasiswa');
             Mahasiswa::factory()->create([
                 'user_id' => $mhsUser->id,
@@ -110,6 +116,14 @@ class MasterDataSeeder extends Seeder
                 'dosen_id' => $dosen->id,
                 'ruang_id' => $ruang?->id,
             ]);
+
+            foreach (['keuangan' => 'keuangan', 'pimpinan' => 'pimpinan', 'admin_prodi' => 'admin.prodi'] as $role => $prefix) {
+                $u = User::firstOrCreate(
+                    ['email' => "{$prefix}@kampus.ac.id"],
+                    collect(User::factory()->raw())->except('email')->put('name', ucfirst($role).' Demo')->all()
+                );
+                $u->assignRole($role);
+            }
         }
     }
 }

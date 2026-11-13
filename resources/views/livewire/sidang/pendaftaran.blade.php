@@ -5,6 +5,16 @@
     @if($error)
         <div class="alert alert-danger" role="alert">{{ $error }}</div>
     @endif
+    @if(!empty($syarat))
+        <div class="card mb-3">
+            <div class="card-header"><h3 class="card-title">Syarat Sidang Otomatis</h3></div>
+            <ul class="list-group list-group-flush">
+                @foreach($syarat as $item)
+                    <li class="list-group-item">{{ $item['ok'] ? '✅' : '⚠️' }} {{ $item['label'] }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form wire:submit="save" class="card mb-3">
         <div class="card-body">
             <div class="row">
@@ -60,4 +70,24 @@
             <div class="card-footer">{{ $sidangs->links() }}</div>
         @endif
     </div>
+    @if(!empty($jadwalVisual))
+        <div class="card mt-3">
+            <div class="card-header"><h3 class="card-title">Visual Booking Ruang (7 hari)</h3></div>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead><tr><th>Slot</th>@foreach($ruangs as $ruang)<th>{{ $ruang->nama }}</th>@endforeach</tr></thead>
+                    <tbody>
+                        @foreach($jadwalVisual as $baris)
+                            <tr>
+                                <td>{{ $baris['jam'] }}</td>
+                                @foreach($ruangs as $ruang)
+                                    <td class="{{ ($baris['ruang'][$ruang->id] ?? '') === 'Kosong' ? 'text-success' : 'text-danger' }}">{{ $baris['ruang'][$ruang->id] ?? '-' }}</td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
 </div>

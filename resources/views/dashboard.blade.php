@@ -73,6 +73,13 @@
                 @endforelse
                 <hr>
                 <h4>Agenda Terdekat</h4>
+                @isset($locks)
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                        @foreach($locks as $kunci => $buka)
+                            <span class="badge bg-{{ $buka ? 'success' : 'danger' }}-lt">{{ $kunci }}: {{ $buka ? 'buka' : 'tutup' }}</span>
+                        @endforeach
+                    </div>
+                @endisset
                 @forelse($agenda as $a)
                     <div class="mb-2">
                         <span class="badge bg-blue-lt me-1">{{ $a['tanggal'] }}</span>

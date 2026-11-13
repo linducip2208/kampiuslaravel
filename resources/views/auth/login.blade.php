@@ -48,8 +48,19 @@
                                     </div>
                                 </form>
                                 <div class="text-center text-secondary mt-3">
-                                    Akun demo: superadmin / dosen / mahasiswa@kampus.ac.id — hubungi admin untuk kata sandi.
+                                    <div class="mb-2">Akun demo — klik untuk isi otomatis:</div>
+                                    <div class="d-flex flex-wrap justify-content-center gap-1">
+                                        @foreach(['superadmin' => 'Superadmin', 'admin.prodi' => 'Admin Prodi', 'dosen' => 'Dosen', 'mahasiswa' => 'Mahasiswa', 'keuangan' => 'Keuangan', 'pimpinan' => 'Pimpinan'] as $prefix => $nama)
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="isiDemo('{{ $prefix }}@kampus.ac.id')">{{ $nama }}</button>
+                                        @endforeach
+                                    </div>
                                 </div>
+                                <script>
+                                    function isiDemo(email) {
+                                        document.getElementById('email').value = email;
+                                        document.getElementById('password').value = 'password';
+                                    }
+                                </script>
                                 <div class="text-center text-secondary mt-2"><a href="{{ route('home') }}">Kembali ke beranda</a></div>
                             </div>
                         </div>

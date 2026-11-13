@@ -18,6 +18,8 @@ class Generator extends Component
 
     public string $negative = '';
 
+    public string $preset = 'potret';
+
     public int $steps = 20;
 
     public int $width = 832;
@@ -33,17 +35,25 @@ class Generator extends Component
         $this->validate([
             'prompt' => 'required|string|min:5|max:1000',
             'negative' => 'nullable|string|max:500',
+            'preset' => 'required|in:potret,landskap,persegi,kustom',
             'steps' => 'required|integer|min:1|max:100',
             'width' => 'required|integer|min:256|max:2048',
             'height' => 'required|integer|min:256|max:2048',
             'pengumuman_id' => 'nullable|exists:pengumuman,id',
         ]);
 
+        [$width, $height] = match ($this->preset) {
+            'landskap' => [1216, 832],
+            'persegi' => [1024, 1024],
+            'potret' => [832, 1216],
+            default => [$this->width, $this->height],
+        };
+
         GenerateMediaJob::dispatch($this->prompt, [
             'negative' => $this->negative ?: null,
             'steps' => $this->steps,
-            'width' => $this->width,
-            'height' => $this->height,
+            'width' => $width,
+            'height' => $height,
         ], $this->pengumuman_id);
 
         $this->message = 'Masuk antrean generate. Jalankan php artisan queue:work, hasil otomatis jadi cover bila pengumuman dipilih.';

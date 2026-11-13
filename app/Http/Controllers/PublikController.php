@@ -20,8 +20,28 @@ class PublikController extends Controller
     {
         $prodi = Prodi::with(['fakultas', 'matakuliah'])->where('slug', $slug)->firstOrFail();
 
+        $canonical = route('publik.prodi.detail', $prodi->slug);
+        $seo = [
+            'title' => $prodi->seoTitle(),
+            'description' => $prodi->seoDescription(),
+            'canonical' => $canonical,
+            'jsonLd' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'EducationalOccupationalProgram',
+                'name' => $prodi->nama,
+                'educationalCredentialAwarded' => $prodi->jenjang,
+                'provider' => [
+                    '@type' => 'CollegeOrUniversity',
+                    'name' => $prodi->fakultas->nama ?? config('app.name'),
+                ],
+                'url' => $canonical,
+                'numberOfCredits' => (int) $prodi->matakuliah->sum('sks'),
+            ],
+        ];
+
         return view('publik.prodi-show', [
             'prodi' => $prodi,
+            'seo' => $seo,
             'berita' => Pengumuman::where('prodi_id', $prodi->id)
                 ->whereNotNull('published_at')
                 ->latest('published_at')

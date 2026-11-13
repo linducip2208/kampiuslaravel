@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Absensi;
+use App\Models\Krs;
+use App\Models\Nilai;
+use App\Models\PmbPendaftar;
 use App\Models\Tagihan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -17,11 +20,18 @@ class LaporanController extends Controller
 
     public function templateImpor(string $jenis): StreamedResponse
     {
-        abort_unless(in_array($jenis, ['mahasiswa', 'matakuliah'], true), 404);
+        $map = [
+            'mahasiswa' => ['nim', 'nama', 'email', 'hp', 'prodi_kode', 'angkatan'],
+            'matakuliah' => ['kode', 'nama', 'prodi_kode', 'sks', 'semester'],
+            'dosen' => ['nidn', 'nama', 'email', 'prodi_kode'],
+            'krs' => ['nim', 'tahun', 'semester', 'kelas_id'],
+            'nilai' => ['nim', 'kelas_id', 'tugas', 'uts', 'uas', 'kehadiran'],
+            'tagihan' => ['nim', 'tahun', 'semester', 'jenis', 'nominal'],
+        ];
 
-        $header = $jenis === 'matakuliah'
-            ? ['kode', 'nama', 'prodi_kode', 'sks', 'semester']
-            : ['nim', 'nama', 'email', 'hp', 'prodi_kode', 'angkatan'];
+        abort_unless(isset($map[$jenis]), 404);
+
+        $header = $map[$jenis];
 
         return response()->streamDownload(function () use ($header) {
             $out = fopen('php://output', 'w');
@@ -73,6 +83,111 @@ class LaporanController extends Controller
 
             fclose($out);
         }, 'rekap-absensi-'.now()->format('Ymd-His').'.csv');
+    }
+
+    public function exportTunggakan(): StreamedResponse
+    {
+        return response()->streamDownload(function () {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['nim', 'nama', 'jenis', 'tahun', 'semester', 'nominal', 'terbayar', 'sisa', 'diskon', 'status'], ';');
+
+            Tagihan::with(['mahasiswa.user', 'tahunAkademik'])
+                ->whereIn('status', ['belum_bayar', 'sebagian'])
+                ->chunk(500, function ($chunk) use ($out) {
+                    foreach ($chunk as $t) {
+                        fputcsv($out, [
+                            $t->mahasiswa->nim ?? '',
+                            $t->mahasiswa->user->name ?? '',
+                            $t->jenis,
+                            $t->tahunAkademik->tahun ?? '',
+                            $t->tahunAkademik->semester ?? '',
+                            $t->nominal,
+                            $t->terbayar,
+                            max(0, (int) $t->nominal - (int) $t->terbayar),
+                            $t->diskon,
+                            $t->status,
+                        ], ';');
+                    }
+                });
+
+            fclose($out);
+        }, 'tunggakan-'.now()->format('Ymd-His').'.csv');
+    }
+
+    public function exportPmb(): StreamedResponse
+    {
+        return response()->streamDownload(function () {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['no_daftar', 'nama', 'email', 'hp', 'sekolah_asal', 'prodi1', 'prodi2', 'status'], ';');
+
+            PmbPendaftar::with(['prodi1', 'prodi2'])->chunk(500, function ($chunk) use ($out) {
+                foreach ($chunk as $p) {
+                    fputcsv($out, [
+                        $p->no_daftar,
+                        $p->nama,
+                        $p->email,
+                        $p->hp,
+                        $p->sekolah_asal,
+                        $p->prodi1->kode ?? '',
+                        $p->prodi2->kode ?? '',
+                        $p->status,
+                    ], ';');
+                }
+            });
+
+            fclose($out);
+        }, 'pmb-'.now()->format('Ymd-His').'.csv');
+    }
+
+    public function exportKrs(): StreamedResponse
+    {
+        return response()->streamDownload(function () {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['nim', 'nama', 'tahun', 'semester', 'status', 'total_sks', 'jumlah_mk'], ';');
+
+            Krs::with(['mahasiswa.user', 'tahunAkademik'])->withCount('details')->chunk(500, function ($chunk) use ($out) {
+                foreach ($chunk as $k) {
+                    fputcsv($out, [
+                        $k->mahasiswa->nim ?? '',
+                        $k->mahasiswa->user->name ?? '',
+                        $k->tahunAkademik->tahun ?? '',
+                        $k->tahunAkademik->semester ?? '',
+                        $k->status,
+                        $k->total_sks,
+                        $k->details_count,
+                    ], ';');
+                }
+            });
+
+            fclose($out);
+        }, 'krs-'.now()->format('Ymd-His').'.csv');
+    }
+
+    public function exportNilai(): StreamedResponse
+    {
+        return response()->streamDownload(function () {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['nim', 'nama', 'kelas_id', 'matakuliah', 'tugas', 'uts', 'uas', 'kehadiran', 'na', 'huruf'], ';');
+
+            Nilai::with(['mahasiswa.user', 'kelas.matakuliah'])->chunk(500, function ($chunk) use ($out) {
+                foreach ($chunk as $n) {
+                    fputcsv($out, [
+                        $n->mahasiswa->nim ?? '',
+                        $n->mahasiswa->user->name ?? '',
+                        $n->kelas_id,
+                        $n->kelas->matakuliah->kode ?? $n->kelas->nama ?? '',
+                        $n->tugas,
+                        $n->uts,
+                        $n->uas,
+                        $n->kehadiran,
+                        $n->na,
+                        $n->huruf,
+                    ], ';');
+                }
+            });
+
+            fclose($out);
+        }, 'nilai-'.now()->format('Ymd-His').'.csv');
     }
 
     public function rekapAbsensi(): array

@@ -2,12 +2,12 @@
     @if($message)
         <div class="alert alert-success" role="alert">{{ $message }}</div>
     @endif
-    <form wire:submit="generate" class="card">
+    <form wire:submit="generate" class="card mb-3">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Tahun akademik</label>
-                    <select wire:model="tahun_id" class="form-select">
+                    <select wire:model.live="tahun_id" class="form-select">
                         <option value="">— Pilih tahun akademik —</option>
                         @foreach($tahuns as $tahun)
                             <option value="{{ $tahun->id }}">{{ $tahun->tahun }} {{ $tahun->semester }}</option>
@@ -25,7 +25,7 @@
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Nominal</label>
+                    <label class="form-label">Nominal (0 = pakai template UKT)</label>
                     <input type="number" wire:model="nominal" class="form-control" placeholder="Nominal">
                     @error('nominal')<div class="text-danger">{{ $message }}</div>@enderror
                 </div>
@@ -42,8 +42,46 @@
                     <label class="form-label">Angkatan (opsional)</label>
                     <input type="text" wire:model="angkatan" class="form-control" placeholder="cth. 2024">
                 </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Jalur masuk (opsional)</label>
+                    <input type="text" wire:model="jalur" class="form-control" placeholder="cth. SNBP / SNBT / Mandiri">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Jatuh tempo (opsional)</label>
+                    <input type="date" wire:model="jatuh_tempo" class="form-control">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Cicilan</label>
+                    <input type="number" wire:model="cicilan" class="form-control" min="1" max="12">
+                    @error('cicilan')<div class="text-danger">{{ $message }}</div>@enderror
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">Generate Tagihan</button>
+            <button type="button" wire:click="terapkanDenda" class="btn btn-warning ms-2">Terapkan Denda Otomatis</button>
+            <p class="text-muted mt-2 mb-0">Nominal 0 memakai template UKT per prodi/angkatan/jalur. Potongan beasiswa diterapkan otomatis.</p>
         </div>
     </form>
+
+    <div class="card">
+        <div class="card-header fw-bold">Dashboard Tunggakan</div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-3"><div class="fs-4 fw-bold">{{ $tunggakan['menunggak'] }}</div><div class="text-muted">Tagihan menunggak</div></div>
+                <div class="col-md-3"><div class="fs-4 fw-bold">Rp {{ number_format($tunggakan['total_sisa'], 0, ',', '.') }}</div><div class="text-muted">Total sisa (termasuk denda)</div></div>
+                <div class="col-md-3"><div class="fs-4 fw-bold">Rp {{ number_format($tunggakan['total_denda'], 0, ',', '.') }}</div><div class="text-muted">Total denda</div></div>
+                <div class="col-md-3"><div class="fs-4 fw-bold">Rp {{ number_format($tunggakan['total_terbayar'], 0, ',', '.') }}</div><div class="text-muted">Sudah terbayar</div></div>
+            </div>
+            <hr>
+            <table class="table table-sm">
+                <thead><tr><th>Prodi</th><th class="text-end">Tagihan</th><th class="text-end">Mahasiswa</th><th class="text-end">Sisa</th></tr></thead>
+                <tbody>
+                    @forelse($tunggakan['per_prodi'] as $nama => $row)
+                        <tr><td>{{ $nama }}</td><td class="text-end">{{ $row['tagihan'] }}</td><td class="text-end">{{ $row['mahasiswa'] }}</td><td class="text-end">Rp {{ number_format($row['sisa'], 0, ',', '.') }}</td></tr>
+                    @empty
+                        <tr><td colspan="4" class="text-center text-muted">Tidak ada tunggakan.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

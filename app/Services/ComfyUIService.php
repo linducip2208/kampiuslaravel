@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,7 +14,7 @@ class ComfyUIService
         private ?string $baseUrl = null,
         private ?string $clientId = null,
     ) {
-        $this->baseUrl = $baseUrl ?: rtrim((string) config('comfyui.url'), '/');
+        $this->baseUrl = $baseUrl ?: rtrim((string) (Setting::get('comfyui.url', '') ?: config('comfyui.url')), '/');
         $this->clientId = $clientId ?: (string) (config('comfyui.client_id') ?: Str::uuid()->toString());
     }
 
@@ -134,7 +135,7 @@ class ComfyUIService
 
     private function loadTemplate(): array
     {
-        $file = (string) config('comfyui.workflow_file');
+        $file = (string) (Setting::get('comfyui.workflow_file', '') ?: config('comfyui.workflow_file'));
 
         if ($file !== '' && is_file($file)) {
             $decoded = json_decode((string) file_get_contents($file), true);
@@ -148,7 +149,7 @@ class ComfyUIService
         // Untuk WAN 2.1, export workflow API-format dari ComfyUI lalu isi COMFYUI_WORKFLOW_FILE.
         return [
             '3' => ['class_type' => 'KSampler', 'inputs' => ['seed' => 0, 'steps' => 20, 'cfg' => 7.0, 'sampler_name' => 'euler', 'scheduler' => 'normal', 'denoise' => 1.0, 'model' => ['4', 0], 'positive' => ['6', 0], 'negative' => ['7', 0], 'latent_image' => ['5', 0]]],
-            '4' => ['class_type' => 'CheckpointLoaderSimple', 'inputs' => ['ckpt_name' => (string) config('comfyui.model')]],
+            '4' => ['class_type' => 'CheckpointLoaderSimple', 'inputs' => ['ckpt_name' => (string) (Setting::get('comfyui.model', '') ?: config('comfyui.model'))]],
             '5' => ['class_type' => 'EmptyLatentImage', 'inputs' => ['width' => 832, 'height' => 1216, 'batch_size' => 1]],
             '6' => ['class_type' => 'CLIPTextEncode', 'inputs' => ['text' => '', 'clip' => ['4', 1]]],
             '7' => ['class_type' => 'CLIPTextEncode', 'inputs' => ['text' => '', 'clip' => ['4', 1]]],

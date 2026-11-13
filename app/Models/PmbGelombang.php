@@ -83,4 +83,35 @@ class PmbGelombang extends Model
 
         return true;
     }
+
+    public function terisi(): int
+    {
+        return $this->pendaftars()
+            ->whereNotIn('status', [PmbPendaftar::STATUS_DITOLAK, PmbPendaftar::STATUS_TIDAK])
+            ->count();
+    }
+
+    public function lulusCount(): int
+    {
+        return $this->pendaftars()->where('status', PmbPendaftar::STATUS_LULUS)->count();
+    }
+
+    public function sisaKuota(): ?int
+    {
+        if ($this->kuota <= 0) {
+            return null;
+        }
+
+        return max(0, $this->kuota - $this->terisi());
+    }
+
+    public function kuotaPenuh(): bool
+    {
+        return $this->kuota > 0 && $this->terisi() >= $this->kuota;
+    }
+
+    public function kuotaLulusPenuh(): bool
+    {
+        return $this->kuota > 0 && $this->lulusCount() >= $this->kuota;
+    }
 }

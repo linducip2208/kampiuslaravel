@@ -13,6 +13,15 @@
                 <label class="form-label">Deskripsi</label>
                 <textarea wire:model="deskripsi" class="form-control" rows="2"></textarea>
             </div>
+            <div class="mb-3">
+                <label class="form-label">Ambil dari bank topik (opsional)</label>
+                <select wire:model="topik_id" class="form-select">
+                    <option value="">— Judul mandiri —</option>
+                    @foreach($bankTopik as $topik)
+                        <option value="{{ $topik->id }}">{{ $topik->judul }} (sisa {{ $topik->sisa }})</option>
+                    @endforeach
+                </select>
+            </div>
             <button type="submit" class="btn btn-primary">Ajukan</button>
         </div>
     </form>

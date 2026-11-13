@@ -31,4 +31,7 @@
         </div>
     @endforeach
 </div>
+<div class="mt-3">
+    <a href="{{ route('pmb.funnel') }}" class="btn btn-primary">Lihat Funnel Marketing PMB</a>
+</div>
 @endsection

@@ -2,6 +2,12 @@
     @if($message)
         <div class="alert alert-success" role="alert">{{ $message }}</div>
     @endif
+    @if($rataRata !== null)
+        <div class="alert alert-info" role="alert">Nilai akhir otomatis: {{ $rataRata }} ({{ $hurufMutu }})</div>
+    @endif
+    @if($beritaAcara)
+        <div class="alert alert-success" role="alert">Berita acara: {{ $beritaAcara }}</div>
+    @endif
     <form wire:submit.prevent="addPenguji" class="card mb-3">
         <div class="card-header"><h3 class="card-title">Nilai Penguji</h3></div>
         <div class="card-body">

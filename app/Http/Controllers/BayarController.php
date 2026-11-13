@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Mahasiswa;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
+use App\Services\KalenderService;
 use App\Services\Payment\PaymentService;
+use App\Services\PmbVaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,16 +30,32 @@ class BayarController extends Controller
         return view('keuangan.bayar', compact('tagihan', 'pending'));
     }
 
-    public function createVa(Tagihan $tagihan, PaymentService $pay): JsonResponse
+    public function createVa(Request $request, Tagihan $tagihan, PaymentService $pay): JsonResponse
     {
         $this->authorizeTagihan($tagihan);
 
+        if (! KalenderService::isOpen('pembayaran')) {
+            return response()->json(['message' => KalenderService::closedMessage('pembayaran')], 422);
+        }
+
+        $data = $request->validate([
+            'method' => 'nullable|string|max:30',
+        ]);
+        $channel = strtolower((string) ($data['method'] ?? 'va'));
+
         try {
             $mahasiswa = $tagihan->mahasiswa;
-            $pembayaran = $pay->createVa($tagihan, [
+            $customer = [
                 'nama' => $mahasiswa->user->name ?? 'Mahasiswa',
                 'email' => $mahasiswa->user->email ?? null,
-            ]);
+                'method' => $data['method'] ?? null,
+            ];
+
+            $pembayaran = match (PaymentService::channelGroup($channel)) {
+                'qris' => $pay->createQris($tagihan, $customer),
+                'ewallet' => $pay->createEwallet($tagihan, $customer, $channel),
+                default => $pay->createVa($tagihan, $customer),
+            };
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         } catch (\Throwable) {
@@ -49,6 +67,9 @@ class BayarController extends Controller
         return response()->json([
             'reference' => $pembayaran->reference,
             'va_number' => $pembayaran->va_number,
+            'qr_payload' => $pembayaran->qr_payload,
+            'expires_at' => $pembayaran->expires_at,
+            'metode' => $pembayaran->metode,
             'nominal' => $pembayaran->nominal,
         ]);
     }
@@ -68,8 +89,26 @@ class BayarController extends Controller
 
         $reference = $pay->driver()->verifyCallback($payload);
 
+        if (! $reference && str_starts_with((string) ($payload['reference'] ?? ''), 'PMBVA-')) {
+            $reference = (string) $payload['reference'];
+        }
+
         if (! $reference) {
             return response()->json(['ok' => false], 400);
+        }
+
+        // VA biaya pendaftaran PMB (bukan tagihan mahasiswa): lunasi pendaftar.
+        if (str_starts_with($reference, 'PMBVA-')) {
+            return response()->json(['ok' => app(PmbVaService::class)->settleByReference($reference)]);
+        }
+
+        // Tolak nominal callback yang tidak cocok dengan tagihan (anti manipulasi).
+        $amount = $payload['amount'] ?? $payload['total_amount'] ?? $payload['gross_amount'] ?? $payload['expected_amount'] ?? null;
+        if ($amount !== null) {
+            $pembayaran = Pembayaran::where('reference', $reference)->first();
+            if ($pembayaran && (int) $amount !== (int) $pembayaran->nominal) {
+                return response()->json(['ok' => false, 'message' => 'Nominal tidak cocok.'], 400);
+            }
         }
 
         return response()->json(['ok' => $pay->settleByReference($reference)]);
@@ -83,6 +122,22 @@ class BayarController extends Controller
             'reference' => $pembayaran->reference,
             'status' => $pay->syncStatus($pembayaran),
         ]);
+    }
+
+    /** Refund pembayaran verified (role keuangan). Reversal terbayar + jurnal. */
+    public function refund(Request $request, Pembayaran $pembayaran, PaymentService $pay): JsonResponse
+    {
+        abort_unless(Auth::user()->hasAnyRole(['keuangan', 'superadmin']), 403);
+
+        $data = $request->validate(['reason' => 'nullable|string|max:255']);
+
+        $ok = $pay->refundByReference(
+            (string) $pembayaran->reference,
+            (int) Auth::id(),
+            $data['reason'] ?? null
+        );
+
+        return response()->json(['ok' => $ok], $ok ? 200 : 422);
     }
 
     private function authorizeTagihan(Tagihan $tagihan): void

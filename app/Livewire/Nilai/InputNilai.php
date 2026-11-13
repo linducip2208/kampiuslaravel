@@ -17,6 +17,12 @@ class InputNilai extends Component
     /** @var array<int, array<string, mixed>> */
     public array $rows = [];
 
+    /** @var array{tugas:float,uts:float,uas:float,kehadiran:float} */
+    public array $bobot = ['tugas' => 30, 'uts' => 30, 'uas' => 30, 'kehadiran' => 10];
+
+    /** @var array<int, float|null> */
+    public array $remedial = [];
+
     protected function rules(): array
     {
         return [
@@ -25,6 +31,10 @@ class InputNilai extends Component
             'rows.*.uts' => 'required|numeric|min:0|max:100',
             'rows.*.uas' => 'required|numeric|min:0|max:100',
             'rows.*.kehadiran' => 'required|numeric|min:0|max:100',
+            'bobot.tugas' => 'required|numeric|min:0|max:100',
+            'bobot.uts' => 'required|numeric|min:0|max:100',
+            'bobot.uas' => 'required|numeric|min:0|max:100',
+            'bobot.kehadiran' => 'required|numeric|min:0|max:100',
         ];
     }
 
@@ -46,9 +56,28 @@ class InputNilai extends Component
         $this->rows[] = ['mahasiswa_id' => $mahasiswaId, 'tugas' => 0, 'uts' => 0, 'uas' => 0, 'kehadiran' => 0];
     }
 
+    /**
+     * Daftar mahasiswa dengan kehadiran < 75% (warning).
+     *
+     * @return list<array{mahasiswa_id:int,kehadiran:float}>
+     */
+    public function warningKehadiran(): array
+    {
+        $out = [];
+        foreach ($this->rows as $row) {
+            $hadir = (float) ($row['kehadiran'] ?? 0);
+            if (Nilai::isKehadiranKurang($hadir)) {
+                $out[] = ['mahasiswa_id' => (int) $row['mahasiswa_id'], 'kehadiran' => $hadir];
+            }
+        }
+
+        return $out;
+    }
+
     public function save(): void
     {
         $this->validate();
+        Nilai::normalisasiBobot($this->bobot);
 
         foreach ($this->rows as $row) {
             $locked = Nilai::where('mahasiswa_id', $row['mahasiswa_id'])
@@ -57,7 +86,7 @@ class InputNilai extends Component
                 continue;
             }
 
-            $na = Nilai::hitungNa((float) $row['tugas'], (float) $row['uts'], (float) $row['uas'], (float) $row['kehadiran']);
+            $na = Nilai::hitungNa((float) $row['tugas'], (float) $row['uts'], (float) $row['uas'], (float) $row['kehadiran'], $this->bobot);
             $huruf = Nilai::konversiHuruf($na);
 
             Nilai::updateOrCreate(
@@ -74,11 +103,43 @@ class InputNilai extends Component
             );
         }
 
-        session()->flash('success', 'Nilai tersimpan.');
+        $peringatan = count($this->warningKehadiran());
+        session()->flash('success', $peringatan > 0
+            ? "Nilai tersimpan. Perhatian: {$peringatan} mahasiswa kehadiran < 75%."
+            : 'Nilai tersimpan.');
+    }
+
+    /**
+     * Remedial: hanya untuk huruf D/E, NA dibatasi maksimal 55 (C).
+     */
+    public function simpanRemedial(int $mahasiswaId): void
+    {
+        $this->validate(['remedial.'.$mahasiswaId => 'required|numeric|min:0|max:100']);
+        Nilai::normalisasiBobot($this->bobot);
+
+        $nilai = Nilai::where('mahasiswa_id', $mahasiswaId)->where('kelas_id', $this->kelasId)->firstOrFail();
+
+        if ($nilai->is_locked) {
+            session()->flash('error', 'Nilai terkunci, remedial ditolak.');
+
+            return;
+        }
+
+        if (! $nilai->terapkanRemedial((float) $this->remedial[$mahasiswaId], $this->bobot)) {
+            session()->flash('error', 'Remedial hanya untuk huruf D/E.');
+
+            return;
+        }
+
+        $nilai->save();
+        unset($this->remedial[$mahasiswaId]);
+        session()->flash('success', "Remedial Mhs #{$mahasiswaId} tersimpan (maks C).");
     }
 
     public function render()
     {
-        return view('livewire.nilai.input-nilai');
+        return view('livewire.nilai.input-nilai', [
+            'peringatan' => $this->warningKehadiran(),
+        ]);
     }
 }

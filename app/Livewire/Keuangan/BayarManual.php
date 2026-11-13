@@ -6,6 +6,7 @@ use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Mahasiswa;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
+use App\Services\KalenderService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -45,6 +46,12 @@ class BayarManual extends Component
             403
         );
         abort_if($tagihan->status === 'lunas', 422, 'Tagihan sudah lunas.');
+
+        if (! KalenderService::isOpen('pembayaran')) {
+            $this->addError('tagihan_id', KalenderService::closedMessage('pembayaran'));
+
+            return;
+        }
 
         $path = $this->bukti->store('bukti-bayar', 'public');
 

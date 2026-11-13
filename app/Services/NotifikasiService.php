@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Notifikasi;
+use App\Models\NotifLog;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
@@ -18,7 +19,12 @@ class NotifikasiService
     {
         $notif = Notifikasi::create(['user_id' => $user->id, 'judul' => $judul, 'isi' => $isi]);
 
-        $this->pushFcm($user, $judul, $isi);
+        try {
+            NotifLog::create(['notifikasi_id' => $notif->id, 'user_id' => $user->id, 'channel' => 'db', 'status' => 'terkirim']);
+        } catch (\Throwable) {
+        }
+
+        $this->pushFcm($user, $judul, $isi, $notif->id);
 
         return $notif;
     }
@@ -38,7 +44,7 @@ class NotifikasiService
         return $count;
     }
 
-    private function pushFcm(User $user, string $judul, string $isi): void
+    private function pushFcm(User $user, string $judul, string $isi, ?int $notifikasiId = null): void
     {
         $projectId = Setting::get('fcm.project_id', '');
         $serviceAccount = Setting::get('fcm.service_account_path', '');
@@ -46,6 +52,11 @@ class NotifikasiService
 
         if ($projectId === '' || $serviceAccount === '' || ! is_file($serviceAccount) || ! $deviceToken) {
             Log::info('FCM skipped (belum dikonfigurasi / tanpa device token)', ['user_id' => $user->id]);
+
+            try {
+                NotifLog::create(['notifikasi_id' => $notifikasiId, 'user_id' => $user->id, 'channel' => 'fcm', 'status' => 'dilewati', 'keterangan' => 'tanpa konfigurasi/device token']);
+            } catch (\Throwable) {
+            }
 
             return;
         }
@@ -60,6 +71,11 @@ class NotifikasiService
             "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
             ['message' => ['token' => $deviceToken, 'notification' => ['title' => $judul, 'body' => $isi]]]
         );
+
+        try {
+            NotifLog::create(['notifikasi_id' => $notifikasiId, 'user_id' => $user->id, 'channel' => 'fcm', 'status' => 'terkirim']);
+        } catch (\Throwable) {
+        }
     }
 
     private function googleAccessToken(string $serviceAccountPath): ?string

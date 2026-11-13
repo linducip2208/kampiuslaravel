@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\Dosen;
 use App\Models\Sidang as SidangModel;
 use App\Models\SidangPenguji;
+use App\Services\BeritaAcaraService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -27,6 +28,12 @@ class NilaiSidang extends Component
     public string $status = 'lulus';
 
     public string $message = '';
+
+    public ?float $rataRata = null;
+
+    public string $hurufMutu = '-';
+
+    public ?string $beritaAcara = null;
 
     public function addPenguji(): void
     {
@@ -54,7 +61,10 @@ class NilaiSidang extends Component
         }
         $avg = SidangPenguji::where('sidang_id', $this->sidang_id)->avg('nilai');
         if ($avg !== null) {
-            SidangModel::where('id', $this->sidang_id)->update(['nilai' => round((float) $avg, 2)]);
+            $nilai = round((float) $avg, 2);
+            SidangModel::where('id', $this->sidang_id)->update(['nilai' => $nilai]);
+            $this->rataRata = $nilai;
+            $this->hurufMutu = BeritaAcaraService::hurufMutu($nilai);
         }
     }
 
@@ -67,9 +77,12 @@ class NilaiSidang extends Component
 
         $sidang = SidangModel::findOrFail($this->sidang_id);
         $sidang->update(['status' => $this->status]);
+        $this->recalc();
+        $sidang->refresh();
 
         if ($this->status === 'lulus') {
             $sidang->judul()->update(['status' => 'lulus']);
+            $this->beritaAcara = BeritaAcaraService::generate($sidang->fresh());
         }
 
         AuditLog::create([

@@ -1,8 +1,20 @@
-# Generate Gambar — ComfyUI + WAN 2.1
+# Generate Gambar — ComfyUI (+ WAN 2.1 /Fallback SD)
 
-Semua generate gambar di SIMAK memakai **server ComfyUI eksternal** (default model **WAN 2.1**).
+Semua generate gambar di SIMAK memakai **server ComfyUI eksternal**.
 Laravel hanya mengirim workflow API-format + menyimpan hasilnya. Tidak ada API key/vendor
 yang di-hardcode — semua via `.env` / `config/comfyui.php`.
+
+## Status model di server lokal (D:\ComfyUI, RTX 4060 8GB)
+
+- WAN 2.1 T2V 1.3B + UMT5 fp8 + VAE: terinstal, workflow ada di
+  `storage/app/comfyui/wan21_still_api.json`, TAPI **gagal execution**—
+  `CLIPTextEncode` error `Cannot copy out of meta tensor` (text-encoder fp8
+  tidak termaterialisasi di ComfyUI 0.43 + torch 2.14 env ini). Perlu investigasi
+  versi/comfy-weight-issue sebelum dipakai produksi.
+- Fallback yang dipakai: checkpoint SD1.5 (`checkpoints/v1-5-pruned-emaonly.safetensors`)
+  dengan workflow T2I standar (node ID kompatibel `config/comfyui.php`:
+  prompt=6, negative=7, seed+steps=3, size=5) → hasilkan `public/img/*.png`
+  untuk landing (hero kampus, avatar peran, panel keamanan).
 
 ## 1. Siapkan ComfyUI + WAN 2.1 (sekali saja)
 

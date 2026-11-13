@@ -15,7 +15,31 @@ class Prodi extends Model
 
     protected $table = 'prodi';
 
-    protected $fillable = ['fakultas_id', 'nama', 'jenjang', 'kode', 'slug'];
+    protected $fillable = ['fakultas_id', 'nama', 'jenjang', 'kode', 'slug', 'deskripsi', 'seo_title', 'seo_description'];
+
+    public function seoTitle(): string
+    {
+        if (($this->seo_title ?? '') !== '') {
+            return (string) $this->seo_title;
+        }
+
+        return "Program Studi {$this->nama} ({$this->jenjang}) — PMB Online";
+    }
+
+    public function seoDescription(): string
+    {
+        if (($this->seo_description ?? '') !== '') {
+            return (string) $this->seo_description;
+        }
+
+        $base = trim((string) ($this->deskripsi ?? ''));
+
+        if ($base === '') {
+            $base = "Informasi Program Studi {$this->nama} ({$this->jenjang}): kurikulum, matakuliah, berita prodi, dan pendaftaran mahasiswa baru (PMB) online.";
+        }
+
+        return str()->limit($base, 160);
+    }
 
     /**
      * @return BelongsTo<Fakultas, $this>

@@ -324,4 +324,108 @@ class IntegrasiTest extends TestCase
 
         $this->assertDatabaseHas('ruang', ['nama' => 'R101', 'kapasitas' => 40]);
     }
+
+    public function test_pddikti_status_menunjukkan_flag_live(): void
+    {
+        $this->seed(RolesPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('pimpinan');
+
+        Setting::set('pddikti.live_enabled', '1');
+
+        $this->actingAs($user)->getJson(route('pddikti.status'))
+            ->assertOk()
+            ->assertJson(['live' => true]);
+    }
+
+    public function test_pddikti_sync_meneruskan_ke_feeder(): void
+    {
+        $this->seed(RolesPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('pimpinan');
+
+        Setting::set('pddikti.base_url', 'http://feeder.test/ws/live2.php');
+        Setting::set('pddikti.username', 'u');
+        Setting::set('pddikti.password', 'p');
+
+        Http::fake(['*' => Http::response(['error' => 0, 'data' => ['token' => 'tok123']], 200)]);
+
+        $this->actingAs($user)->postJson(route('pddikti.sync'), [
+            'tabel' => 'mahasiswa',
+            'record' => ['nim' => '20240001'],
+        ])->assertOk()->assertJson(['error' => 0]);
+    }
+
+    public function test_riset_dan_tte_menolak_bila_belum_dikonfigurasi(): void
+    {
+        $this->seed(RolesPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('pimpinan');
+
+        foreach (['pddikti.sinta', 'pddikti.garuda', 'pddikti.tte'] as $route) {
+            $payload = $route === 'pddikti.sinta' ? ['nidn' => '001'] : ($route === 'pddikti.garuda' ? ['query' => 'ai'] : ['dokumen_hash' => 'abc']);
+            $this->actingAs($user)->postJson(route($route), $payload)
+                ->assertStatus(422)
+                ->assertJsonPath('message', fn ($msg) => str_contains($msg, 'Integrasi'));
+        }
+    }
+
+    public function test_sinta_meneruskan_bila_dikonfigurasi(): void
+    {
+        $this->seed(RolesPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('pimpinan');
+
+        Setting::set('sinta.base_url', 'http://sinta.test');
+        Setting::set('sinta.api_key', 'k');
+        Http::fake(['*' => Http::response(['nama' => 'Dr. X'], 200)]);
+
+        $this->actingAs($user)->postJson(route('pddikti.sinta'), ['nidn' => '001'])
+            ->assertOk()->assertJson(['nama' => 'Dr. X']);
+    }
+
+    public function test_v2_publik_read_only(): void
+    {
+        $this->getJson('/api/v2/status')->assertOk()->assertJson(['api' => 'v2']);
+        $this->getJson('/api/v2/prodi')->assertOk();
+        $this->getJson('/api/v2/pengumuman')->assertOk();
+    }
+
+    public function test_v2_webhook_verifikasi_hmac(): void
+    {
+        Setting::set('webhook.secret', null);
+
+        $this->postJson('/api/v2/webhook/terima', ['event' => 'x'])->assertStatus(503);
+
+        Setting::set('webhook.secret', 'rahasia-min-16-karakter');
+
+        $body = json_encode(['event' => 'pmb.baru', 'payload' => []]);
+        $sig = hash_hmac('sha256', $body, 'rahasia-min-16-karakter');
+
+        $this->call('POST', '/api/v2/webhook/terima', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_WEBHOOK_SIGNATURE' => $sig,
+        ], $body)->assertOk()->assertJson(['ok' => true]);
+
+        $this->call('POST', '/api/v2/webhook/terima', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_WEBHOOK_SIGNATURE' => 'salah',
+        ], $body)->assertStatus(400);
+    }
+
+    public function test_tes_koneksi_baru_lapor_belum_dikonfigurasi(): void
+    {
+        $this->seed(RolesPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('superadmin');
+
+        Livewire::actingAs($user)
+            ->test(AdminIntegrasi::class)
+            ->call('test', 'sso_google')
+            ->assertSet('tes.sso_google', fn ($msg) => str_contains($msg, 'Belum dikonfigurasi'))
+            ->call('test', 'webhook')
+            ->assertSet('tes.webhook', fn ($msg) => str_contains($msg, 'Belum dikonfigurasi'))
+            ->call('test', 'storage')
+            ->assertSet('tes.storage', fn ($msg) => str_contains($msg, 'Belum dikonfigurasi'));
+    }
 }

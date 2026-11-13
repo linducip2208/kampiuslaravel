@@ -13,7 +13,12 @@ class Tagihan extends Model
 
     protected $table = 'tagihan';
 
-    protected $fillable = ['mahasiswa_id', 'tahun_akademik_id', 'jenis', 'nominal', 'terbayar', 'status', 'beasiswa_id', 'diskon'];
+    protected $fillable = ['mahasiswa_id', 'tahun_akademik_id', 'jenis', 'nominal', 'terbayar', 'status', 'beasiswa_id', 'diskon', 'jatuh_tempo', 'denda', 'notif_h7_at', 'notif_hp7_at'];
+
+    protected function casts(): array
+    {
+        return ['jatuh_tempo' => 'date', 'notif_h7_at' => 'datetime', 'notif_hp7_at' => 'datetime'];
+    }
 
     public function mahasiswa(): BelongsTo
     {
@@ -36,8 +41,30 @@ class Tagihan extends Model
         return $this->hasMany(Pembayaran::class);
     }
 
+    /** @return HasMany<TagihanCicilan> */
+    public function cicilan(): HasMany
+    {
+        return $this->hasMany(TagihanCicilan::class)->orderBy('urutan');
+    }
+
     public function sisa(): int
     {
-        return max(0, (int) $this->nominal - (int) $this->terbayar);
+        return max(0, $this->totalTagihan() - (int) $this->terbayar);
+    }
+
+    public function totalTagihan(): int
+    {
+        return (int) $this->nominal + (int) $this->denda;
+    }
+
+    public function hariTerlambat(): int
+    {
+        if (! $this->jatuh_tempo) {
+            return 0;
+        }
+
+        $diff = now()->startOfDay()->diffInDays($this->jatuh_tempo->startOfDay(), false);
+
+        return $diff < 0 ? (int) abs($diff) : 0;
     }
 }

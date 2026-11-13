@@ -10,8 +10,9 @@
                 <div class="col-md-6 mb-3"><label class="form-label">Judul</label><input type="text" wire:model="judul" class="form-control">@error('judul')<div class="text-danger">{{ $message }}</div>@enderror</div>
                 <div class="col-md-3 mb-3"><label class="form-label">Jenis</label>
                     <select wire:model="jenis" class="form-select">
-                        @foreach(['kuliah','uts','uas','libur','pembayaran','pmb','wisuda','lain'] as $j)<option value="{{ $j }}">{{ $j }}</option>@endforeach
+                        @foreach(['kuliah','uts','uas','libur','pembayaran','pmb','wisuda','krs','sidang','lain'] as $j)<option value="{{ $j }}">{{ $j }}</option>@endforeach
                     </select>
+                    <div class="form-hint">Jenis <code>krs</code>, <code>pembayaran</code>, dan <code>sidang</code> mengunci layanan di luar rentangnya.</div>
                 </div>
                 <div class="col-md-3 mb-3"><label class="form-label">Tahun akademik</label>
                     <select wire:model="tahun_akademik_id" class="form-select"><option value="">—</option>
@@ -27,6 +28,10 @@
     </form>
     @endif
     <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Agenda</h3>
+            <a href="{{ route('kalender.ics') }}" class="btn btn-sm btn-outline-primary">Export .ics</a>
+        </div>
         <div class="table-responsive">
             <table class="table table-vcenter">
                 <thead><tr><th>Tanggal</th><th>Agenda</th><th>Jenis</th>@if($bisaKelola)<th class="text-end">Aksi</th>@endif</tr></thead>

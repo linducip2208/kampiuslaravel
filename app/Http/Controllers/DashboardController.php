@@ -12,6 +12,7 @@ use App\Models\Pembayaran;
 use App\Models\Pertemuan;
 use App\Models\Prodi;
 use App\Models\Sidang;
+use App\Services\KalenderService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -73,6 +74,7 @@ class DashboardController extends Controller
             'chartNominal' => $pembayaranPerBulan,
             'krsStatus' => $krsStatus,
             'agenda' => $agenda,
+            'locks' => KalenderService::locks(),
             'aktivitas' => $aktivitas,
         ]);
     }

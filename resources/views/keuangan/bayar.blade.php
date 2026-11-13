@@ -22,7 +22,13 @@
                         <td>{{ $t->status }}</td>
                         <td>
                             @if($t->status !== 'lunas')
-                                <button class="btn btn-sm btn-primary" onclick="bayar({{ $t->id }})">Buat VA</button>
+                                <div class="btn-list">
+                                    <button class="btn btn-sm btn-primary" onclick="bayar({{ $t->id }}, 'va')">Buat VA</button>
+                                    <button class="btn btn-sm btn-danger" onclick="bayar({{ $t->id }}, 'qris')">QRIS</button>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="bayar({{ $t->id }}, 'gopay')">GoPay</button>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="bayar({{ $t->id }}, 'ovo')">OVO</button>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="bayar({{ $t->id }}, 'dana')">DANA</button>
+                                </div>
                             @endif
                         </td>
                     </tr>
@@ -59,13 +65,17 @@
 
 @push('scripts')
 <script>
-async function bayar(id) {
-    const res = await fetch(`/keuangan/bayar/${id}/va`, {method: 'POST', headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json'}});
+async function bayar(id, method = 'va') {
+    const body = new FormData();
+    body.append('method', method);
+    const res = await fetch(`/keuangan/bayar/${id}/va`, {method: 'POST', headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json'}, body});
     const data = await res.json();
+    const kode = data.qr_payload ? `<br>QR/deeplink: <code>${data.qr_payload}</code>` : '';
+    const va = data.va_number ? `<b>${data.va_number}</b> — ` : '';
     document.getElementById('va-result').innerHTML = res.ok
-        ? `<div class="alert alert-success">VA: <b>${data.va_number ?? '-'}</b> — Ref: ${data.reference} — Rp ${Number(data.nominal).toLocaleString('id-ID')}</div>`
-        : `<div class="alert alert-warning">${data.message ?? 'Gagal membuat VA.'}</div>`;
-    if (res.ok) setTimeout(() => location.reload(), 1500);
+        ? `<div class="alert alert-success">${va}Ref: ${data.reference} — Rp ${Number(data.nominal).toLocaleString('id-ID')} (${data.metode ?? method})${kode}</div>`
+        : `<div class="alert alert-warning">${data.message ?? 'Gagal membuat pembayaran.'}</div>`;
+    if (res.ok) setTimeout(() => location.reload(), 2500);
 }
 async function cek(id) {
     const res = await fetch(`/keuangan/bayar/status/${id}`, {headers: {'Accept': 'application/json'}});

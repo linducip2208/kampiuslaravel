@@ -2,12 +2,20 @@
 
 namespace App\Services;
 
+use App\Models\KelasWaitlist;
+use App\Models\Krs;
 use App\Models\Nilai;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Perhitungan akademik terpusat (satu sumber kebenaran).
  * IPK = Σ(bobot × SKS) / Σ(SKS). IP = sama per tahun akademik.
+ *
+ * Batas SKS by IPK: >=3.00 → 24, >=2.50 → 22, >=2.00 → 20, <2.00 → 18.
+ * Validasi KRS terpusat: SKS-maks, prasyarat, bentrok jadwal, kuota, tunggakan.
+ * (Cek tunggakan hanya baca tabel `tagihan`; tidak menulis modul keuangan.)
  */
 class AkademikService
 {
@@ -55,9 +63,251 @@ class AkademikService
     {
         return match (true) {
             $ipk >= 3.0 => 24,
-            $ipk >= 2.5 => 21,
-            $ipk >= 2.0 => 18,
-            default => 15,
+            $ipk >= 2.5 => 22,
+            $ipk >= 2.0 => 20,
+            default => 18,
         };
+    }
+
+    /**
+     * Peta kelas_id => sks untuk daftar kelas.
+     *
+     * @param  list<int>  $kelasIds
+     * @return Collection<int, int>
+     */
+    public static function sksPerKelas(array $kelasIds): Collection
+    {
+        $kelasIds = array_values(array_unique(array_map('intval', $kelasIds)));
+
+        if ($kelasIds === [] || ! Schema::hasTable('kelas') || ! Schema::hasTable('matakuliah')) {
+            return collect($kelasIds)->mapWithKeys(fn (int $id): array => [$id => 0]);
+        }
+
+        return DB::table('kelas')
+            ->leftJoin('matakuliah', 'matakuliah.id', '=', 'kelas.matakuliah_id')
+            ->whereIn('kelas.id', $kelasIds)
+            ->pluck('matakuliah.sks', 'kelas.id')
+            ->map(fn ($sks): int => (int) ($sks ?? 0));
+    }
+
+    /**
+     * Cek tunggakan tagihan (read-only modul keuangan).
+     */
+    public static function adaTunggakan(int $mahasiswaId): bool
+    {
+        $tabel = Schema::hasTable('tagihan') ? 'tagihan' : (Schema::hasTable('tagihans') ? 'tagihans' : null);
+
+        if (! $tabel) {
+            return false;
+        }
+
+        try {
+            return DB::table($tabel)
+                ->where('mahasiswa_id', $mahasiswaId)
+                ->where('status', '!=', 'lunas')
+                ->whereColumn('terbayar', '<', 'nominal')
+                ->exists();
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * Jumlah kursi terisi kelas (hanya KRS aktif: draft/diajukan/disetujui).
+     * KRS ditolak tidak memakan kuota sehingga waitlist bisa dipromosikan.
+     *
+     * @param  int|null  $abaikanKrsId  KRS yang dikecualikan (milik pengaju sendiri
+     *                                  saat revisi / milik KRS yang sedang disetujui PA).
+     */
+    public static function kursiTerisi(int $kelasId, ?int $abaikanKrsId = null): int
+    {
+        try {
+            $query = DB::table('krs_detail')
+                ->join('krs', 'krs.id', '=', 'krs_detail.krs_id')
+                ->where('krs_detail.kelas_id', $kelasId)
+                ->whereIn('krs.status', [Krs::STATUS_DRAFT, Krs::STATUS_DIAJUKAN, Krs::STATUS_DISETUJUI]);
+
+            if ($abaikanKrsId !== null) {
+                $query->where('krs.id', '!=', $abaikanKrsId);
+            }
+
+            return (int) $query->count();
+        } catch (\Throwable) {
+            return 0;
+        }
+    }
+
+    public static function kuotaKelas(int $kelasId): int
+    {
+        try {
+            return (int) DB::table('kelas')->where('id', $kelasId)->value('kuota');
+        } catch (\Throwable) {
+            return 0;
+        }
+    }
+
+    public static function kelasPenuh(int $kelasId, ?int $abaikanKrsId = null): bool
+    {
+        $kuota = self::kuotaKelas($kelasId);
+
+        if ($kuota <= 0) {
+            return false;
+        }
+
+        return self::kursiTerisi($kelasId, $abaikanKrsId) >= $kuota;
+    }
+
+    /**
+     * Validasi KRS terpusat. Dipakai saat pengajuan mahasiswa
+     * maupun verifikasi ulang saat persetujuan PA (hardening).
+     *
+     * @param  list<int>  $kelasIds
+     * @param  int|null  $abaikanKrsId  KRS yang dikecualikan dari hitung kuota
+     * @return list<string> daftar pesan kesalahan (kosong = lolos)
+     */
+    public static function validasiKrs(int $mahasiswaId, array $kelasIds, float $ipk, ?int $abaikanKrsId = null): array
+    {
+        $kelasIds = array_values(array_unique(array_map('intval', $kelasIds)));
+        $pesan = [];
+
+        if ($kelasIds === []) {
+            return ['Pilih minimal satu kelas.'];
+        }
+
+        // SKS-maks by IPK.
+        $sksMap = self::sksPerKelas($kelasIds);
+        $totalSks = (int) $sksMap->sum();
+        $batas = self::batasSks($ipk);
+
+        if ($totalSks > $batas) {
+            $pesan[] = "Total SKS ({$totalSks}) melebihi batas maksimal {$batas} SKS untuk IPK {$ipk}.";
+        }
+
+        // Tunggakan (blokir, read-only keuangan).
+        if (self::adaTunggakan($mahasiswaId)) {
+            $pesan[] = 'Pengajuan KRS diblokir: masih ada tagihan menunggak. Lunasi tagihan terlebih dahulu.';
+        }
+
+        // Prasyarat.
+        try {
+            $kelas = DB::table('kelas')
+                ->leftJoin('matakuliah', 'matakuliah.id', '=', 'kelas.matakuliah_id')
+                ->whereIn('kelas.id', $kelasIds)
+                ->select(['matakuliah.kode', 'matakuliah.nama as mk_nama', 'matakuliah.prasyarat_id'])
+                ->get();
+
+            foreach ($kelas as $k) {
+                if (! $k->prasyarat_id) {
+                    continue;
+                }
+
+                $lulus = DB::table('nilai')
+                    ->where('mahasiswa_id', $mahasiswaId)
+                    ->whereIn('kelas_id', function ($q) use ($k): void {
+                        $q->select('id')->from('kelas')->where('matakuliah_id', $k->prasyarat_id);
+                    })
+                    ->where('bobot', '>', 0)
+                    ->exists();
+
+                if (! $lulus) {
+                    $nama = $k->mk_nama ?? $k->kode ?? 'matakuliah';
+                    $pesan[] = "Prasyarat belum lulus untuk mengambil {$nama}.";
+                }
+            }
+        } catch (\Throwable) {
+            // Tabel pendukung belum ada — lewati cek.
+        }
+
+        // Bentrok jadwal.
+        try {
+            $jadwal = DB::table('kelas')->whereIn('id', $kelasIds)
+                ->select(['id', 'nama', 'hari', 'jam_mulai', 'jam_selesai'])->get()
+                ->filter(fn ($k) => $k->hari && $k->jam_mulai && $k->jam_selesai)
+                ->values();
+
+            foreach ($jadwal as $i => $a) {
+                foreach ($jadwal as $j => $b) {
+                    if ($j <= $i || $a->hari !== $b->hari) {
+                        continue;
+                    }
+
+                    if ($a->jam_mulai < $b->jam_selesai && $b->jam_mulai < $a->jam_selesai) {
+                        $pesan[] = "Jadwal bentrok: kelas {$a->nama} dengan {$b->nama} ({$a->hari} {$a->jam_mulai}-{$a->jam_selesai}).";
+                    }
+                }
+            }
+        } catch (\Throwable) {
+            // Kolom jadwal belum ada — lewati cek.
+        }
+
+        // Kuota (hitung KRS aktif saja; KRS ditolak tidak memakan kuota).
+        foreach ($kelasIds as $kelasId) {
+            $kuota = self::kuotaKelas($kelasId);
+
+            if ($kuota <= 0) {
+                continue;
+            }
+
+            $terisi = self::kursiTerisi($kelasId, $abaikanKrsId);
+
+            if ($terisi >= $kuota) {
+                $pesan[] = "Kuota kelas #{$kelasId} penuh ({$terisi}/{$kuota}). Silakan masuk waiting list.";
+            }
+        }
+
+        return $pesan;
+    }
+
+    /**
+     * Posisi antrean waitlist (1-based) untuk mahasiswa pada kelas.
+     */
+    public static function posisiWaitlist(int $kelasId, int $mahasiswaId): ?int
+    {
+        if (! Schema::hasTable('kelas_waitlist')) {
+            return null;
+        }
+
+        $antre = KelasWaitlist::query()
+            ->where('kelas_id', $kelasId)
+            ->where('status', KelasWaitlist::STATUS_MENUNGGU)
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->pluck('mahasiswa_id')
+            ->all();
+
+        $pos = array_search($mahasiswaId, $antre, true);
+
+        return $pos === false ? null : $pos + 1;
+    }
+
+    /**
+     * Promosikan antrean terdepan bila kuota tersedia.
+     *
+     * @return int|null mahasiswa_id yang dipromosikan
+     */
+    public static function promosikanWaitlist(int $kelasId): ?int
+    {
+        if (! Schema::hasTable('kelas_waitlist')) {
+            return null;
+        }
+
+        if (self::kelasPenuh($kelasId)) {
+            return null;
+        }
+
+        $entri = KelasWaitlist::query()
+            ->where('kelas_id', $kelasId)
+            ->where('status', KelasWaitlist::STATUS_MENUNGGU)
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->first();
+
+        if (! $entri) {
+            return null;
+        }
+
+        $entri->update(['status' => KelasWaitlist::STATUS_DIPROMOSIKAN]);
+
+        return (int) $entri->mahasiswa_id;
     }
 }

@@ -15,7 +15,28 @@ class Mahasiswa extends Model
 
     protected $table = 'mahasiswa';
 
-    protected $fillable = ['user_id', 'nim', 'prodi_id', 'angkatan', 'dosen_pa_id', 'status'];
+    protected $fillable = ['user_id', 'nim', 'prodi_id', 'angkatan', 'jalur', 'dosen_pa_id', 'status'];
+
+    public const STATUS_AKTIF = 'aktif';
+
+    public const STATUS_CUTI = 'cuti';
+
+    public const STATUS_NONAKTIF = 'nonaktif';
+
+    public const STATUS_DO = 'do';
+
+    public const STATUS_KELUAR = 'keluar';
+
+    public const STATUS_LULUS = 'lulus';
+
+    public const STATUSES = [
+        self::STATUS_AKTIF,
+        self::STATUS_CUTI,
+        self::STATUS_NONAKTIF,
+        self::STATUS_DO,
+        self::STATUS_KELUAR,
+        self::STATUS_LULUS,
+    ];
 
     /**
      * @return BelongsTo<User, $this>
@@ -47,5 +68,18 @@ class Mahasiswa extends Model
     public function tagihan(): HasMany
     {
         return $this->hasMany(Tagihan::class);
+    }
+
+    /**
+     * @return HasMany<CutiPengajuan, $this>
+     */
+    public function cutiPengajuan(): HasMany
+    {
+        return $this->hasMany(CutiPengajuan::class);
+    }
+
+    public function isAktif(): bool
+    {
+        return $this->status === self::STATUS_AKTIF;
     }
 }

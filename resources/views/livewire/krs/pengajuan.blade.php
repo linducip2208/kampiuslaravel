@@ -42,4 +42,18 @@
 
         <button type="submit">Ajukan KRS</button>
     </form>
+
+    @if (isset($waitlistSaya) && $waitlistSaya->count() > 0)
+        <h3>Waiting list saya</h3>
+        <ul>
+            @foreach ($waitlistSaya as $wl)
+                <li>
+                    Kelas #{{ $wl->kelas_id }} — {{ $wl->status }}
+                    @if ($wl->status === 'menunggu')
+                        <button type="button" wire:click="keluarWaitlist({{ $wl->kelas_id }})">Keluar</button>
+                    @endif
+                </li>
+            @endforeach
+        </ul>
+    @endif
 </div>

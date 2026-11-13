@@ -60,7 +60,32 @@ return [
             'report' => false,
         ],
 
+        'r2' => [
+            'driver' => 's3',
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_DEFAULT_REGION', 'auto'),
+            'bucket' => env('R2_BUCKET'),
+            'url' => env('R2_URL'),
+            'endpoint' => env('R2_ENDPOINT'),
+            'use_path_style_endpoint' => env('R2_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | CDN URL (aset publik: cover, dokumen, avatar)
+    |--------------------------------------------------------------------------
+    |
+    | Diisi dari halaman Integrasi (settings `storage.cdn_url`) dengan
+    | fallback env CDN_URL. Helper: cdn($path) via URL::class di docs.
+    |
+    */
+
+    'cdn_url' => env('CDN_URL'),
 
     /*
     |--------------------------------------------------------------------------

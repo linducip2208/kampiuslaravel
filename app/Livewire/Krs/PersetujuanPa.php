@@ -4,6 +4,7 @@ namespace App\Livewire\Krs;
 
 use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Krs;
+use App\Services\AkademikService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,9 @@ use Livewire\WithPagination;
 
 /**
  * Persetujuan KRS oleh Dosen PA (approve / tolak + catatan).
+ * Hardening: persetujuan memverifikasi ulang SKS-maks by IPK,
+ * prasyarat, bentrok, kuota, dan tunggakan di dalam transaksi.
+ * Penolakan membebaskan kuota dan memicu promosi waiting list.
  */
 class PersetujuanPa extends Component
 {
@@ -33,10 +37,34 @@ class PersetujuanPa extends Component
 
     public function setujui(int $id): void
     {
-        $krs = $this->krsBimbingan()->findOrFail($id);
-        $krs->update(['status' => Krs::STATUS_DISETUJUI, 'catatan' => null]);
+        if ($id <= 0) {
+            return;
+        }
 
-        session()->flash('info', "KRS #{$krs->id} disetujui.");
+        try {
+            DB::transaction(function () use ($id): void {
+                $krs = $this->krsBimbingan()->lockForUpdate()->findOrFail($id);
+
+                if ($krs->status !== Krs::STATUS_DIAJUKAN) {
+                    throw new \RuntimeException("KRS #{$krs->id} sudah diproses (status: {$krs->status}).");
+                }
+
+                $kelasIds = $krs->details()->pluck('kelas_id')->filter()->map(fn ($v): int => (int) $v)->all();
+                $ipk = (float) ($krs->ipk_snapshot ?? 0.0);
+
+                // Verifikasi ulang penuh; KRS yang sedang disetujui
+                // dikecualikan dari hitung kuota (kursinya milik dia).
+                foreach (AkademikService::validasiKrs((int) $krs->mahasiswa_id, $kelasIds, $ipk, (int) $krs->id) as $pesan) {
+                    throw new \RuntimeException("KRS #{$krs->id} gagal verifikasi: {$pesan}");
+                }
+
+                $krs->update(['status' => Krs::STATUS_DISETUJUI, 'catatan' => null]);
+
+                session()->flash('info', "KRS #{$krs->id} disetujui.");
+            });
+        } catch (\RuntimeException $e) {
+            session()->flash('error', $e->getMessage());
+        }
     }
 
     public function tolak(int $id): void
@@ -45,11 +73,59 @@ class PersetujuanPa extends Component
             'catatan' => ['required', 'string', 'min:3', 'max:1000'],
         ], [], ['catatan' => 'alasan penolakan']);
 
-        $krs = $this->krsBimbingan()->findOrFail($id);
-        $krs->update(['status' => Krs::STATUS_DITOLAK, 'catatan' => $this->catatan]);
+        if ($id <= 0) {
+            return;
+        }
+
+        $dipromosikan = [];
+
+        DB::transaction(function () use ($id, &$dipromosikan): void {
+            $krs = $this->krsBimbingan()->lockForUpdate()->findOrFail($id);
+
+            if ($krs->status !== Krs::STATUS_DIAJUKAN) {
+                throw new \RuntimeException("KRS #{$krs->id} sudah diproses (status: {$krs->status}).");
+            }
+
+            $kelasIds = $krs->details()->pluck('kelas_id')->filter()->map(fn ($v): int => (int) $v)->all();
+
+            $krs->update(['status' => Krs::STATUS_DITOLAK, 'catatan' => $this->catatan]);
+
+            // KRS ditolak tidak memakan kuota → promosikan antrean terdepan.
+            foreach ($kelasIds as $kelasId) {
+                $mhs = AkademikService::promosikanWaitlist($kelasId);
+
+                if ($mhs !== null) {
+                    $dipromosikan[] = $kelasId;
+                }
+            }
+        });
 
         $this->reset('catatan');
-        session()->flash('info', "KRS #{$krs->id} ditolak.");
+
+        $info = "KRS #{$id} ditolak.";
+        if ($dipromosikan !== []) {
+            $info .= ' Waitlist dipromosikan untuk kelas: '.implode(', ', $dipromosikan).'.';
+        }
+
+        session()->flash('info', $info);
+    }
+
+    /**
+     * Promosikan antrean terdepan satu kelas bila kuota tersedia.
+     */
+    public function promosikanWaitlist(int $kelasId): void
+    {
+        if ($kelasId <= 0) {
+            return;
+        }
+
+        $mhs = DB::transaction(fn (): ?int => AkademikService::promosikanWaitlist($kelasId));
+
+        if ($mhs === null) {
+            session()->flash('error', "Tidak ada waitlist yang bisa dipromosikan untuk kelas #{$kelasId}.");
+        } else {
+            session()->flash('info', "Waitlist kelas #{$kelasId} dipromosikan (mahasiswa #{$mhs}).");
+        }
     }
 
     /**

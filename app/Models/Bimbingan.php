@@ -12,11 +12,11 @@ class Bimbingan extends Model
 
     protected $table = 'bimbingan';
 
-    protected $fillable = ['judul_id', 'dosen_id', 'catatan', 'file_path', 'status', 'tanggal'];
+    protected $fillable = ['judul_id', 'dosen_id', 'catatan', 'file_path', 'versi', 'parent_id', 'status', 'tanggal'];
 
     protected function casts(): array
     {
-        return ['tanggal' => 'date'];
+        return ['tanggal' => 'date', 'versi' => 'integer'];
     }
 
     public function judul(): BelongsTo
@@ -27,5 +27,10 @@ class Bimbingan extends Model
     public function dosen(): BelongsTo
     {
         return $this->belongsTo(Dosen::class);
+    }
+
+    public function induk(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
     }
 }

@@ -16,6 +16,10 @@
                     <select wire:model.live="jenis" class="form-select">
                         <option value="mahasiswa">Mahasiswa (nim;nama;email;hp;prodi_kode;angkatan)</option>
                         <option value="matakuliah">Matakuliah (kode;nama;prodi_kode;sks;semester)</option>
+                        <option value="dosen">Dosen (nidn;nama;email;prodi_kode)</option>
+                        <option value="krs">KRS (nim;tahun;semester;kelas_id)</option>
+                        <option value="nilai">Nilai (nim;kelas_id;tugas;uts;uas;kehadiran)</option>
+                        <option value="tagihan">Tagihan (nim;tahun;semester;jenis;nominal)</option>
                     </select>
                 </div>
                 <div class="col-md-5 mb-3">

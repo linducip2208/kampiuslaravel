@@ -2,7 +2,16 @@
 
 Stack: **Laravel 13 + MySQL 8 + Blade/Livewire 3/Alpine + Tabler UI + Sanctum API + Flutter**
 
-## Milestone — Update 12 Nov 2026: SEMUA SELESAI, migrate OK, 46 test passed / 153 assertions, pint clean, smoke test OK
+## Milestone — Update 13 Nov 2026: R2.1–R2.7 SELESAI, 164 test passed / 1038 assertions, pint clean
+- [x] **R2.1 Stabilisasi:** CRUD Dosen/Tendik, User/Role, profil, cuti/pindah, KTM QR, TTE, kalender lock + audit + /health
+- [x] **R2.2 Akademik:** kurikulum versi, jadwal anti-bentrok, EDOM rekap, bobot custom, remedial, wali list
+- [x] **R2.3 PMB v2:** CBT/wawancara, VA PMB, CRM WA, SEO, referral, funnel
+- [x] **R2.4 Keuangan:** UKT template + cicilan + denda + jurnal, QRIS/e-wallet, rekonsiliasi, WA H-7/H+7
+- [x] **R2.5 Skripsi/MBKM/Wisuda:** bank topik, plagiarisme, versioning, syarat otomatis, MBKM, wisuda batch, alumni portal
+- [x] **R2.6 Mobile v2:** device-token, QR offline, KTM offline, IPK predictor, FCM topik, EN/ID
+- [x] **R2.7 AI + Platform:** chatbot/at-risk/rekomendasi/grading/anomali, API v2 + webhook, SSO, R2/CDN
+
+## Milestone lama — 12 Nov 2026: SEMUA SELESAI, migrate OK, 46 test passed / 153 assertions, pint clean, smoke test OK
 
 - [x] **P0:** Laravel 13.42 + Livewire + Spatie + Sanctum, MySQL `kuliah`, Tabler layout + sidebar real
 - [x] **Auth web:** login/logout session + halaman login Tabler (demo: superadmin/dosen/mahasiswa@kampus.ac.id / password)

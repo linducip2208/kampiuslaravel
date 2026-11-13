@@ -4,17 +4,19 @@ namespace App\Livewire\Pmb;
 
 use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Mahasiswa;
+use App\Models\PmbNilaiSeleksi;
 use App\Models\PmbPendaftar;
 use App\Models\Tagihan;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 /**
- * Verifikasi berkas pendaftar PMB oleh admin.
+ * Verifikasi berkas pendaftar PMB oleh admin + scoring CBT/wawancara.
  */
 class Verifikasi extends Component
 {
@@ -31,6 +33,12 @@ class Verifikasi extends Component
     public ?int $selectedId = null;
 
     public string $catatan = '';
+
+    public ?float $nilaiCbt = null;
+
+    public ?float $nilaiWawancara = null;
+
+    public string $catatanNilai = '';
 
     public function updatingSearch(): void
     {
@@ -57,7 +65,14 @@ class Verifikasi extends Component
             ],
         ]);
 
-        $pendaftar = PmbPendaftar::query()->findOrFail($id);
+        $pendaftar = PmbPendaftar::query()->with('gelombang')->findOrFail($id);
+
+        if ($status === PmbPendaftar::STATUS_LULUS && $pendaftar->gelombang && $pendaftar->gelombang->kuotaLulusPenuh() && $pendaftar->status !== PmbPendaftar::STATUS_LULUS) {
+            $this->addError('selectedId', 'Kuota kelulusan gelombang ini sudah penuh.');
+
+            return;
+        }
+
         $pendaftar->update([
             'status' => $status,
             'catatan_verifikasi' => $this->catatan ?: $pendaftar->catatan_verifikasi,
@@ -69,9 +84,71 @@ class Verifikasi extends Component
 
     public function pilih(int $id): void
     {
-        $pendaftar = PmbPendaftar::query()->findOrFail($id);
+        $pendaftar = PmbPendaftar::query()->with('nilaiSeleksi')->findOrFail($id);
         $this->selectedId = $pendaftar->id;
         $this->catatan = (string) ($pendaftar->catatan_verifikasi ?? '');
+        $this->nilaiCbt = $pendaftar->nilaiSeleksi->firstWhere('jenis', PmbNilaiSeleksi::JENIS_CBT)?->nilai;
+        $this->nilaiWawancara = $pendaftar->nilaiSeleksi->firstWhere('jenis', PmbNilaiSeleksi::JENIS_WAWANCARA)?->nilai;
+        $this->catatanNilai = '';
+    }
+
+    /**
+     * Simpan skor CBT / wawancara (0-100). Upsert per (pendaftar, jenis).
+     */
+    public function simpanNilai(int $id, string $jenis): void
+    {
+        if (! in_array($jenis, PmbNilaiSeleksi::JENIS, true)) {
+            return;
+        }
+
+        $field = $jenis === PmbNilaiSeleksi::JENIS_CBT ? 'nilaiCbt' : 'nilaiWawancara';
+
+        $this->validate([
+            $field => ['required', 'numeric', 'min:0', 'max:100'],
+            'catatanNilai' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $pendaftar = PmbPendaftar::query()->findOrFail($id);
+
+        PmbNilaiSeleksi::query()->updateOrCreate(
+            ['pendaftar_id' => $pendaftar->id, 'jenis' => $jenis],
+            [
+                'nilai' => (float) $this->{$field},
+                'catatan' => $this->catatanNilai ?: null,
+                'penilai_id' => Auth::id(),
+            ]
+        );
+
+        session()->flash('info', "Nilai {$jenis} {$pendaftar->no_daftar} disimpan: {$this->{$field}}.");
+    }
+
+    /**
+     * Tentukan kelulusan dari rata-rata CBT+wawancara (ambang 60).
+     */
+    public function tentukanKelulusan(int $id, float $ambang = 60.0): void
+    {
+        $pendaftar = PmbPendaftar::query()->with(['gelombang', 'nilaiSeleksi'])->findOrFail($id);
+
+        $rata = $pendaftar->nilaiAkhir();
+
+        if ($rata === null) {
+            $this->addError('selectedId', 'Belum ada nilai seleksi untuk pendaftar ini.');
+
+            return;
+        }
+
+        if ($rata >= $ambang && $pendaftar->gelombang && $pendaftar->gelombang->kuotaLulusPenuh() && $pendaftar->status !== PmbPendaftar::STATUS_LULUS) {
+            $this->addError('selectedId', 'Kuota kelulusan gelombang ini sudah penuh.');
+
+            return;
+        }
+
+        $pendaftar->update([
+            'status' => $rata >= $ambang ? PmbPendaftar::STATUS_LULUS : PmbPendaftar::STATUS_TIDAK,
+            'catatan_verifikasi' => "Rata-rata seleksi: {$rata} (ambang {$ambang}).",
+        ]);
+
+        session()->flash('info', "Kelulusan {$pendaftar->no_daftar} ditentukan: {$pendaftar->status} (rata-rata {$rata}).");
     }
 
     /**
@@ -140,7 +217,7 @@ class Verifikasi extends Component
             return compact('user', 'mahasiswa', 'tagihan');
         });
 
-        $this->reset(['selectedId', 'catatan']);
+        $this->reset(['selectedId', 'catatan', 'nilaiCbt', 'nilaiWawancara', 'catatanNilai']);
         session()->flash('info', "Daftar ulang OK: NIM {$result['mahasiswa']->nim} ({$result['user']->email}).".
             ($result['tagihan'] ? ' Tagihan awal Rp '.number_format($result['tagihan']->nominal, 0, ',', '.') : ''));
     }
@@ -148,7 +225,7 @@ class Verifikasi extends Component
     public function render(): View
     {
         $pendaftars = PmbPendaftar::query()
-            ->with('gelombang')
+            ->with(['gelombang', 'nilaiSeleksi', 'prodi1'])
             ->when($this->search !== '', function ($query): void {
                 $query->where(function ($sub): void {
                     $sub->where('nama', 'like', "%{$this->search}%")

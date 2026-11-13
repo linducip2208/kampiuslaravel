@@ -3,6 +3,7 @@
 namespace App\Livewire\Kalender;
 
 use App\Livewire\Concerns\RequiresRoles;
+use App\Models\AuditLog;
 use App\Models\KalenderEvent;
 use App\Models\TahunAkademik;
 use Illuminate\Support\Facades\Auth;
@@ -35,19 +36,21 @@ class Kelola extends Component
         return (bool) Auth::user()?->hasAnyRole(['superadmin', 'admin_prodi', 'pimpinan']);
     }
 
+    public const JENIS = ['kuliah', 'uts', 'uas', 'libur', 'pembayaran', 'pmb', 'wisuda', 'krs', 'sidang', 'lain'];
+
     public function simpan(): void
     {
         abort_unless($this->bisaKelola(), 403);
 
         $this->validate([
             'judul' => 'required|string|max:150',
-            'jenis' => 'required|in:kuliah,uts,uas,libur,pembayaran,pmb,wisuda,lain',
+            'jenis' => 'required|in:kuliah,uts,uas,libur,pembayaran,pmb,wisuda,krs,sidang,lain',
             'tgl_mulai' => 'required|date',
             'tgl_selesai' => 'nullable|date|after_or_equal:tgl_mulai',
             'tahun_akademik_id' => 'nullable|exists:tahun_akademik,id',
         ]);
 
-        KalenderEvent::updateOrCreate(['id' => $this->editId ?? 0], [
+        $event = KalenderEvent::updateOrCreate(['id' => $this->editId ?? 0], [
             'judul' => $this->judul,
             'jenis' => $this->jenis,
             'tgl_mulai' => $this->tgl_mulai,
@@ -56,6 +59,13 @@ class Kelola extends Component
             'deskripsi' => $this->deskripsi ?: null,
         ]);
 
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => $this->editId ? 'kalender.diubah' : 'kalender.dibuat',
+            'model' => KalenderEvent::class,
+            'model_id' => $event->id,
+            'created_at' => now(),
+        ]);
         $this->reset(['editId', 'judul', 'jenis', 'tgl_mulai', 'tgl_selesai', 'tahun_akademik_id', 'deskripsi']);
         $this->message = 'Agenda tersimpan.';
     }
@@ -78,7 +88,17 @@ class Kelola extends Component
     {
         abort_unless($this->bisaKelola(), 403);
 
-        KalenderEvent::findOrFail($id)->delete();
+        $event = KalenderEvent::findOrFail($id);
+        $event->delete();
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'kalender.dihapus',
+            'model' => KalenderEvent::class,
+            'model_id' => $id,
+            'created_at' => now(),
+        ]);
+
         $this->message = 'Agenda dihapus.';
     }
 

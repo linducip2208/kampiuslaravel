@@ -13,7 +13,12 @@ class SkripsiJudul extends Model
 
     protected $table = 'skripsi_judul';
 
-    protected $fillable = ['mahasiswa_id', 'judul', 'deskripsi', 'status', 'pembimbing1_id', 'pembimbing2_id'];
+    protected $fillable = ['mahasiswa_id', 'judul', 'deskripsi', 'status', 'pembimbing1_id', 'pembimbing2_id', 'topik_id', 'similarity', 'plagiarisme_status', 'plagiarisme_laporan'];
+
+    protected function casts(): array
+    {
+        return ['similarity' => 'float'];
+    }
 
     public function mahasiswa(): BelongsTo
     {
@@ -28,6 +33,11 @@ class SkripsiJudul extends Model
     public function pembimbing2(): BelongsTo
     {
         return $this->belongsTo(Dosen::class, 'pembimbing2_id');
+    }
+
+    public function topik(): BelongsTo
+    {
+        return $this->belongsTo(SkripsiTopik::class, 'topik_id');
     }
 
     /** @return HasMany<Bimbingan> */

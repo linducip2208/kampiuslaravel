@@ -26,6 +26,8 @@ class Log extends Component
 
     public string $tanggal = '';
 
+    public string $file_path = '';
+
     public string $message = '';
 
     public function save(): void
@@ -35,6 +37,7 @@ class Log extends Component
             'dosen_id' => 'nullable|exists:dosen,id',
             'catatan' => 'required|string',
             'tanggal' => 'nullable|date',
+            'file_path' => 'nullable|string|max:255',
         ]);
 
         // Hanya pemilik judul, pembimbingnya, atau staf yang boleh menulis log.
@@ -50,10 +53,16 @@ class Log extends Component
             403
         );
 
+        $versiTerakhir = BimbinganModel::where('judul_id', $this->judul_id)->max('versi') ?? 0;
+        $indukTerakhir = BimbinganModel::where('judul_id', $this->judul_id)->latest('id')->value('id');
+
         $log = BimbinganModel::create([
             'judul_id' => $this->judul_id,
             'dosen_id' => $this->dosen_id,
             'catatan' => $this->catatan,
+            'file_path' => $this->file_path ?: null,
+            'versi' => ((int) $versiTerakhir) + 1,
+            'parent_id' => $indukTerakhir,
             'tanggal' => $this->tanggal ?: now()->toDateString(),
             'status' => 'pending',
         ]);
@@ -66,8 +75,8 @@ class Log extends Component
             'created_at' => now(),
         ]);
 
-        $this->reset(['catatan', 'tanggal']);
-        $this->message = 'Log bimbingan tersimpan.';
+        $this->reset(['catatan', 'tanggal', 'file_path']);
+        $this->message = 'Log bimbingan tersimpan sebagai versi '.$log->versi.'.';
     }
 
     public function setujui(int $id): void
@@ -94,7 +103,7 @@ class Log extends Component
     {
         $logs = BimbinganModel::with(['judul', 'dosen'])
             ->when($this->judul_id, fn ($q) => $q->where('judul_id', $this->judul_id))
-            ->latest()->paginate(10);
+            ->orderByDesc('versi')->orderByDesc('id')->paginate(10);
 
         return view('livewire.bimbingan.log', [
             'logs' => $logs,

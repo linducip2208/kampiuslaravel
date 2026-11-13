@@ -24,16 +24,21 @@
                 <input type="date" wire:model="tanggal" class="form-control">
                 @error('tanggal')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
+            <div class="mb-3">
+                <label class="form-label">Lampiran (path file, opsional)</label>
+                <input type="text" wire:model="file_path" class="form-control" placeholder="draf/v1.pdf">
+            </div>
             <button type="submit" class="btn btn-primary">Simpan Log</button>
         </div>
     </form>
     <div class="card">
         <div class="table-responsive">
             <table class="table table-vcenter">
-                <thead><tr><th>Catatan</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>Versi</th><th>Catatan</th><th>Status</th><th></th></tr></thead>
                 <tbody>
                     @forelse($logs as $log)
                         <tr>
+                            <td><span class="badge bg-info">v{{ $log->versi }}</span></td>
                             <td>{{ $log->catatan }}</td>
                             <td><span class="badge bg-{{ $log->status === 'disetujui' ? 'success' : ($log->status === 'revisi' ? 'warning' : 'secondary') }}">{{ $log->status }}</span></td>
                             <td class="text-end">
@@ -42,7 +47,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="3" class="text-secondary">Belum ada log bimbingan.</td></tr>
+                        <tr><td colspan="4" class="text-secondary">Belum ada log bimbingan.</td></tr>
                     @endforelse
                 </tbody>
             </table>

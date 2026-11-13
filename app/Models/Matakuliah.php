@@ -6,6 +6,7 @@ use Database\Factories\MatakuliahFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Matakuliah extends Model
@@ -50,5 +51,34 @@ class Matakuliah extends Model
     public function kelas(): HasMany
     {
         return $this->hasMany(Kelas::class);
+    }
+
+    /**
+     * Graf prasyarat baru (banyak-ke-banyak, berjenis).
+     *
+     * @return HasMany<MkPrasyarat, $this>
+     */
+    public function syarat(): HasMany
+    {
+        return $this->hasMany(MkPrasyarat::class);
+    }
+
+    /**
+     * @return BelongsToMany<Matakuliah, $this>
+     */
+    public function prasyaratBanyak(): BelongsToMany
+    {
+        return $this->belongsToMany(Matakuliah::class, 'mk_prasyarat', 'matakuliah_id', 'prasyarat_id')
+            ->withPivot(['jenis', 'keterangan']);
+    }
+
+    /**
+     * @return BelongsToMany<Kurikulum, $this>
+     */
+    public function kurikulums(): BelongsToMany
+    {
+        return $this->belongsToMany(Kurikulum::class, 'kurikulum_mk')
+            ->withPivot(['semester', 'sifat'])
+            ->withTimestamps();
     }
 }

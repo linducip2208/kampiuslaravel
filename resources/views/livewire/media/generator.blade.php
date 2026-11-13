@@ -15,9 +15,17 @@
                 <input type="text" wire:model="negative" class="form-control" placeholder="blurry, watermark">
             </div>
             <div class="row">
-                <div class="col-4 mb-3"><label class="form-label">Steps</label><input type="number" wire:model="steps" class="form-control"></div>
-                <div class="col-4 mb-3"><label class="form-label">Lebar</label><input type="number" wire:model="width" class="form-control" step="64"></div>
-                <div class="col-4 mb-3"><label class="form-label">Tinggi</label><input type="number" wire:model="height" class="form-control" step="64"></div>
+                <div class="col-3 mb-3"><label class="form-label">Preset</label>
+                    <select wire:model="preset" class="form-select">
+                        <option value="potret">Potret 832×1216</option>
+                        <option value="landskap">Landskap 1216×832</option>
+                        <option value="persegi">Persegi 1024×1024</option>
+                        <option value="kustom">Kustom</option>
+                    </select>
+                </div>
+                <div class="col-3 mb-3"><label class="form-label">Steps</label><input type="number" wire:model="steps" class="form-control"></div>
+                <div class="col-3 mb-3"><label class="form-label">Lebar</label><input type="number" wire:model="width" class="form-control" step="64"></div>
+                <div class="col-3 mb-3"><label class="form-label">Tinggi</label><input type="number" wire:model="height" class="form-control" step="64"></div>
             </div>
             <div class="mb-3">
                 <label class="form-label">Jadikan cover pengumuman (opsional)</label>

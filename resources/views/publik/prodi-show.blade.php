@@ -5,10 +5,23 @@
 @section('pretitle', 'Program Studi')
 @section('page-title', $prodi->nama)
 
+@push('styles')
+<meta name="description" content="{{ $seo['description'] ?? '' }}">
+<link rel="canonical" href="{{ $seo['canonical'] ?? url()->current() }}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ $seo['title'] ?? $prodi->nama }}">
+<meta property="og:description" content="{{ $seo['description'] ?? '' }}">
+<meta property="og:url" content="{{ $seo['canonical'] ?? url()->current() }}">
+<script type="application/ld+json">{!! json_encode($seo['jsonLd'] ?? [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+@endpush
+
 @section('content')
 <div class="card mb-3">
     <div class="card-body">
         <p class="text-secondary mb-1">{{ $prodi->jenjang }} &middot; {{ $prodi->fakultas->nama ?? '-' }} &middot; Kode: {{ $prodi->kode }}</p>
+        @if(! empty($prodi->deskripsi))
+            <p>{{ $prodi->deskripsi }}</p>
+        @endif
         <p>Program studi {{ $prodi->nama }} dengan {{ $prodi->matakuliah->count() }} matakuliah terdaftar di kurikulum aktif.</p>
         <a href="{{ route('pmb.create') }}" class="btn btn-primary">Daftar via PMB</a>
     </div>

@@ -18,25 +18,42 @@ class MidtransAdapter implements PaymentGatewayInterface
     {
         $serverKey = (string) Setting::get('pay.server_key', '');
         $base = rtrim((string) Setting::get('pay.base_url', (string) config('payment.defaults.midtrans_base_url')), '/');
-        $bank = strtolower((string) Setting::get('pay.bank', (string) config('payment.defaults.bank')));
         $orderId = 'SIMAK-'.$tagihan->id.'-'.Str::upper(Str::random(6));
+        $gross = (int) $tagihan->nominal;
+        $channel = strtolower((string) ($customer['method'] ?? 'va'));
 
-        $response = Http::withBasicAuth($serverKey, '')->timeout(30)->post($base.'/v2/charge', [
-            'payment_type' => 'bank_transfer',
-            'transaction_details' => ['order_id' => $orderId, 'gross_amount' => (int) $tagihan->nominal],
+        $body = [
+            'transaction_details' => ['order_id' => $orderId, 'gross_amount' => $gross],
             'customer_details' => [
                 'first_name' => $customer['nama'] ?? 'Mahasiswa',
                 'email' => $customer['email'] ?? null,
                 'phone' => $customer['hp'] ?? null,
             ],
-            'bank_transfer' => ['bank' => $bank],
-        ])->throw()->json();
+        ];
+
+        if ($channel === 'qris') {
+            // QRIS statis/dinamis: respons berisi actions[] (generate-qr-code / deeplink).
+            $body['payment_type'] = 'qris';
+        } elseif (in_array($channel, ['gopay', 'shopeepay'], true)) {
+            $body['payment_type'] = $channel;
+            $body[$channel] = ['enable_callback' => true, 'callback_url' => (string) config('app.url').'/payment/callback'];
+        } elseif ($channel === 'va' || str_starts_with($channel, 'bri') || str_starts_with($channel, 'bni') || str_starts_with($channel, 'bca') || str_starts_with($channel, 'mandiri') || str_starts_with($channel, 'permata')) {
+            $bank = strtolower((string) Setting::get('pay.bank', (string) config('payment.defaults.bank')));
+            $body['payment_type'] = 'bank_transfer';
+            $body['bank_transfer'] = ['bank' => $bank];
+        } else {
+            throw new \RuntimeException("Kanal [{$channel}] belum didukung driver Midtrans — gunakan QRIS, GoPay/ShopeePay, VA, atau driver Tripay/Xendit.");
+        }
+
+        $response = Http::withBasicAuth($serverKey, '')->timeout(30)->post($base.'/v2/charge', $body)->throw()->json();
 
         $va = $response['va_numbers'][0] ?? [];
+        $actions = collect($response['actions'] ?? [])->keyBy('name');
 
         return [
             'reference' => $orderId,
-            'va_number' => $va['va_number'] ?? null,
+            'va_number' => $va['va_number'] ?? $actions->get('generate-qr-code')['url'] ?? $actions->get('deeplink-redirect')['url'] ?? null,
+            'qr_payload' => $actions->get('generate-qr-code')['url'] ?? $actions->get('qr-code')['url'] ?? null,
             'expires_at' => now()->addHours((int) config('payment.defaults.expiry_hours', 24))->toDateTimeString(),
             'raw' => $response,
         ];

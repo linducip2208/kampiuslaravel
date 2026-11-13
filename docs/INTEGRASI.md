@@ -56,3 +56,120 @@ Halaman **PDDikti** (`/pddikti`): download CSV `mahasiswa | nilai | kelulusan`
 Isi base URL + username + password Feeder kampus di halaman Integrasi.
 Perintah terkait: tidak ada cron bawaan — jalankan export berkala sesuai
 jadwal pelaporan (disarankan tiap akhir semester + setelah yudisium).
+
+### 3a. Feeder live-sync (per-record)
+
+Aktifkan di halaman Integrasi → Feeder PDDikti → Live-sync = Aktif.
+Endpoint (role `pimpinan|superadmin`):
+
+- `GET /pddikti/status` → `{live, base_url_set, acts}` (tanpa panggil jaringan).
+- `POST /pddikti/sync {tabel: mahasiswa|nilai|kelulusan, record: {...}}`
+  (throttle 30/menit) → map ke act (`InsertMhs|InsertNilai|InsertKelulusan`)
+  lalu push via token `GetToken`. Gagal login = cek kredensial di Integrasi.
+
+Pola produksi: panggil `/pddikti/sync` dari observer/job setelah KRS
+disetujui / nilai dikunci / yudisium (queue `database`, retry 3x), export CSV
+tetap sebagai fallback rekonsiliasi.
+
+## 4. SSO Google & Microsoft
+
+Kredensial diisi di halaman **Integrasi → SSO** (settings
+`sso.google_client_id/secret`, `sso.microsoft_client_id/secret`);
+fallback env `GOOGLE_*` / `MICROSOFT_*` via `config/services.php`.
+Tombol "Tes" menampilkan redirect URI yang wajib didaftarkan di konsol
+provider (`{APP_URL}/auth/{google,microsoft}/callback`).
+
+Aktivasi penuh (1x, sentuh modul auth saja):
+
+1. `composer require laravel/socialite`
+2. Route `GET /auth/{provider}` + `/callback`: cari user by email,
+   buat/link akun, `Auth::login()` (tolak bila email tak dikenal bila
+   kampus menerapkan allowlist).
+3. Daftarkan Client ID/Secret + redirect URI di Google Cloud Console
+   (OAuth client) dan Entra ID (App registration).
+
+Tanpa Socialite terpasang, login password tetap berfungsi — halaman
+Integrasi hanya menyimpan & memvalidasi kredensial.
+
+## 5. Sinta & Garuda (sinkron riset)
+
+Kredensial di halaman **Integrasi → Riset** (`sinta.base_url/api_key`,
+`garuda.base_url/api_key`). Endpoint (role `pimpinan|superadmin`,
+throttle 30/menit):
+
+- `POST /pddikti/sinta {nidn}` → forward ke `{sinta.base_url}/profil`
+  (bearer `sinta.api_key`).
+- `POST /pddikti/garuda {query}` → forward ke `{garuda.base_url}/publikasi`.
+
+Belum dikonfigurasi → `422` dengan pesan "Integrasi … belum
+dikonfigurasi". Semua forward memakai `Http::timeout(30)` sehingga
+mudah di-fake di test.
+
+## 6. API publik v2 + webhook
+
+Read-only publik (tanpa token, `throttle:60,1`):
+
+- `GET /api/v2/status` — health versi API.
+- `GET /api/v2/prodi` — paginasi `kode,nama,jenjang,slug`.
+- `GET /api/v2/pengumuman` — hanya yang `published_at` terisi.
+
+Autentikasi mobile tetap di `v1` (Sanctum `abilities:mobile`) — v2 tidak
+mengubah kontrak mobile yang sudah berjalan.
+
+Webhook masuk: `POST /api/v2/webhook/terima` (`throttle:30,1`).
+Verifikasi `X-Webhook-Signature = HMAC-SHA256(raw_body, settings
+webhook.secret)`; secret min. 16 karakter, diisi di halaman Integrasi.
+Belum diisi → `503`; signature salah → `400`; event valid dicatat di log
+(`webhook.v2.received`). Contoh kirim:
+
+```bash
+SIG=$(printf '{"event":"pmb.baru","payload":{}}' | openssl dgst -sha256 -hmac "$SECRET")
+curl -X POST /api/v2/webhook/terima -H "X-Webhook-Signature: $SIG" \
+  -H 'Content-Type: application/json' -d '{"event":"pmb.baru","payload":{}}'
+```
+
+## 7. TTE BSrE
+
+Kredensial di halaman **Integrasi → TTE BSrE** (`tte.base_url/username/
+password`). Endpoint `POST /pddikti/tte {dokumen_hash}` (role
+`pimpinan|superadmin`) → forward basic-auth ke `{tte.base_url}/sign`.
+Alur dokumen: surat disetujui → hash (SHA-256 PDF final) → `/pddikti/tte`
+→ simpan token/serial balikan ke nomor surat. Belum dikonfigurasi → `422`.
+
+## 8. Storage S3/R2 + CDN
+
+Disk di `config/filesystems.php`: `local` (default), `public`,
+`s3` (AWS, env `AWS_*`), **`r2`** (Cloudflare R2, S3-compatible, env
+`R2_*`), plus `cdn_url` (env `CDN_URL`, override via settings
+`storage.cdn_url`).
+
+- Key/secret **tetap di `.env`** (`R2_ACCESS_KEY_ID` dkk) — tidak masuk DB.
+- Endpoint+bucket+CDN URL di halaman **Integrasi → Storage**.
+- Pakai: `FILESYSTEM_DISK=r2` (atau `s3`) untuk upload dokumen/cover;
+  sajikan via CDN: `rtrim(config('filesystems.cdn_url') ?? config('app.url'), '/').'/storage/'.$path`.
+- Tes koneksi di halaman Integrasi memvalidasi kehadiran konfigurasi
+  (tidak mengunggah file).
+
+## 9. Halaman Integrasi — kartu baru
+
+Selain Payment/FCM/Feeder/ComfyUI: **SSO**, **Sinta & Garuda**,
+**TTE BSrE**, **Storage R2/S3+CDN**, **API Publik v2 & Webhook**,
+**Multi-tenant (sketsa)** — masing-masing dengan tombol tes yang memberi
+pesan OK vs "belum dikonfigurasi" (tidak throw). Semua tersimpan di tabel
+`settings` via `Setting::set`, tidak ada hardcode.
+
+## 10. Multi-tenant (sketsa — BELUM aktif)
+
+Mode di halaman Integrasi → `tenant.mode`: `single` (saat ini) atau
+`sketsa_multi`. Sketsa bila kampus membuka cabang:
+
+1. Tambah `tenant_id` (FK `tenants`) ke tabel transaksional + global scope
+   `TenantScope` per model (bypass untuk `superadmin` lintas-tenant).
+2. Middleware pemilih tenant dari subdomain/domain (`kampusA.ac.id`),
+   simpan di `app()->instance('tenant')` + `config(['database...'])` bila
+   database-per-tenant (atau satu DB + scope bila shared-schema).
+3. Seeder per-tenant untuk roles/permissions (spatie) + user admin tenant.
+4. JANGAN aktifkan sebelum migrasi data + audit `AuditLog` per-tenant.
+
+Sampai disetujui, biarkan `tenant.mode = single` — tidak ada kode bisnis
+yang membaca mode ini hari ini.

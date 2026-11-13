@@ -8,6 +8,7 @@ use App\Models\Mahasiswa;
 use App\Models\Pertemuan;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class AbsensiController extends Controller
 {
@@ -15,7 +16,20 @@ class AbsensiController extends Controller
     {
         $validated = $request->validate([
             'qr_token' => ['required', 'string', 'max:255'],
+            'idempotency_key' => ['nullable', 'string', 'max:64'],
         ]);
+
+        // Kunci idempotensi: body > header Idempotency-Key. Retry aman.
+        $key = $validated['idempotency_key'] ?? $request->header('Idempotency-Key');
+        $hasKeyColumn = Schema::hasColumn('absensi', 'idempotency_key');
+
+        if ($key && $hasKeyColumn && class_exists(Absensi::class)) {
+            $seen = Absensi::where('idempotency_key', $key)->first();
+
+            if ($seen) {
+                return response()->json(['message' => 'Absensi sudah tercatat.', 'data' => $seen, 'duplicate' => true]);
+            }
+        }
 
         if (! class_exists(Pertemuan::class)) {
             return response()->json(['message' => 'QR tidak valid atau kedaluwarsa.'], 404);
@@ -38,10 +52,17 @@ class AbsensiController extends Controller
                 if ($mhs) {
                     $absensi = Absensi::updateOrCreate(
                         ['pertemuan_id' => $pertemuan->id, 'mahasiswa_id' => $mhs->id],
-                        ['status' => 'hadir', 'scanned_at' => now()]
+                        array_merge(
+                            ['status' => 'hadir', 'scanned_at' => now()],
+                            $key && $hasKeyColumn ? ['idempotency_key' => $key] : []
+                        )
                     );
 
-                    return response()->json(['message' => 'Absensi tercatat.', 'data' => $absensi], 201);
+                    return response()->json([
+                        'message' => $absensi->wasRecentlyCreated ? 'Absensi tercatat.' : 'Absensi sudah tercatat.',
+                        'data' => $absensi,
+                        'duplicate' => ! $absensi->wasRecentlyCreated,
+                    ], $absensi->wasRecentlyCreated ? 201 : 200);
                 }
             }
 

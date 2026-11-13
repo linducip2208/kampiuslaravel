@@ -58,11 +58,21 @@ class TagihanController extends Controller
 
         abort_unless($mhs && $tagihan->mahasiswa_id === $mhs->id, 403);
 
+        $data = $request->validate(['method' => 'nullable|string|max:30']);
+        $channel = strtolower((string) ($data['method'] ?? 'va'));
+
         try {
-            $pembayaran = $pay->createVa($tagihan, [
+            $customer = [
                 'nama' => $request->user()->name,
                 'email' => $request->user()->email,
-            ]);
+                'method' => $data['method'] ?? null,
+            ];
+
+            $pembayaran = match (PaymentService::channelGroup($channel)) {
+                'qris' => $pay->createQris($tagihan, $customer),
+                'ewallet' => $pay->createEwallet($tagihan, $customer, $channel),
+                default => $pay->createVa($tagihan, $customer),
+            };
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
@@ -70,6 +80,9 @@ class TagihanController extends Controller
         return response()->json([
             'reference' => $pembayaran->reference,
             'va_number' => $pembayaran->va_number,
+            'qr_payload' => $pembayaran->qr_payload,
+            'expires_at' => $pembayaran->expires_at,
+            'metode' => $pembayaran->metode,
             'nominal' => $pembayaran->nominal,
         ], 201);
     }

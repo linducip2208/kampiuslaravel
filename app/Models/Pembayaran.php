@@ -12,11 +12,11 @@ class Pembayaran extends Model
 
     protected $table = 'pembayaran';
 
-    protected $fillable = ['tagihan_id', 'reference', 'va_number', 'metode', 'nominal', 'bukti_path', 'status', 'verified_by', 'verified_at'];
+    protected $fillable = ['tagihan_id', 'reference', 'va_number', 'qr_payload', 'expires_at', 'metode', 'nominal', 'bukti_path', 'status', 'verified_by', 'verified_at', 'refunded_at', 'refund_reason', 'reconciled_at'];
 
     protected function casts(): array
     {
-        return ['verified_at' => 'datetime'];
+        return ['verified_at' => 'datetime', 'expires_at' => 'datetime', 'refunded_at' => 'datetime', 'reconciled_at' => 'datetime'];
     }
 
     public function tagihan(): BelongsTo

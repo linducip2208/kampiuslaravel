@@ -5,6 +5,7 @@ namespace App\Livewire\Helpdesk;
 use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Tiket as TiketModel;
 use App\Models\TiketBalasan;
+use App\Services\HelpdeskSlaService;
 use App\Services\NotifikasiService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -20,6 +21,10 @@ class Tiket extends Component
     public string $subjek = '';
 
     public string $isi = '';
+
+    public string $kategori = 'umum';
+
+    public string $prioritas = 'normal';
 
     public ?int $bukaId = null;
 
@@ -37,12 +42,25 @@ class Tiket extends Component
         $this->validate([
             'subjek' => 'required|string|max:150',
             'isi' => 'required|string|max:2000',
+            'kategori' => 'required|string|max:50',
+            'prioritas' => 'required|in:rendah,normal,tinggi,kritis',
         ]);
 
-        TiketModel::create(['user_id' => Auth::id(), 'subjek' => $this->subjek, 'isi' => $this->isi, 'status' => 'terbuka']);
+        $tiket = TiketModel::create([
+            'user_id' => Auth::id(),
+            'subjek' => $this->subjek,
+            'isi' => $this->isi,
+            'kategori' => $this->kategori,
+            'prioritas' => $this->prioritas,
+            'status' => 'terbuka',
+        ]);
 
-        $this->reset(['subjek', 'isi']);
-        $this->message = 'Tiket terkirim. Pantau balasan di sini.';
+        HelpdeskSlaService::apply($tiket);
+
+        $this->reset(['subjek', 'isi', 'kategori', 'prioritas']);
+        $this->prioritas = 'normal';
+        $this->kategori = 'umum';
+        $this->message = 'Tiket terkirim. SLA dihitung otomatis.';
     }
 
     public function buka(int $id): void
@@ -82,6 +100,20 @@ class Tiket extends Component
         $this->message = 'Tiket ditutup.';
     }
 
+    public function eskalasi(int $id): void
+    {
+        abort_unless($this->isStaff(), 403);
+
+        $tiket = TiketModel::findOrFail($id);
+
+        if (HelpdeskSlaService::cekEskalasi($tiket)) {
+            $this->message = 'Tiket dieskalasi ke atasan.';
+        } else {
+            $tiket->forceFill(['dieskalasi' => true])->save();
+            $this->message = 'Tiket ditandai eskalasi manual.';
+        }
+    }
+
     public function render()
     {
         $query = TiketModel::with(['user', 'balasan.user'])->latest('id');
@@ -90,8 +122,14 @@ class Tiket extends Component
             $query->where('user_id', Auth::id());
         }
 
+        $tikets = $query->paginate(10);
+
+        foreach ($tikets as $t) {
+            HelpdeskSlaService::cekEskalasi($t);
+        }
+
         return view('livewire.helpdesk.tiket', [
-            'tikets' => $query->paginate(10),
+            'tikets' => $tikets,
             'detail' => $this->bukaId ? TiketModel::with(['user', 'balasan.user'])->find($this->bukaId) : null,
             'isStaff' => $this->isStaff(),
         ]);

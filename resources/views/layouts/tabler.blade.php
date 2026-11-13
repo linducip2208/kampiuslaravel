@@ -48,29 +48,34 @@
                 <div class="collapse navbar-collapse" id="sidebar-menu">
                     <ul class="navbar-nav pt-lg-3">
                         @php
+                            $keuanganRoute = auth()->user()->hasAnyRole(['keuangan', 'superadmin', 'admin_prodi']) ? 'keuangan.tagihan' : 'keuangan.bayar';
+                            $suratRoute = auth()->user()->hasAnyRole(['keuangan', 'superadmin', 'admin_prodi']) ? 'surat.nomor' : 'surat.pengajuan';
                             $menu = [
-                                ['route' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'M3 12l9-9 9 9M9 21V12h6v9', 'pattern' => 'dashboard'],
-                                ['route' => 'admin.pmb.verifikasi', 'label' => 'PMB', 'icon' => 'M8 7V3m8 4V3M3 11h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2', 'pattern' => 'admin.pmb*|pmb.*'],
-                                ['route' => 'mahasiswa.krs.pengajuan', 'label' => 'KRS', 'icon' => 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4', 'pattern' => 'mahasiswa.krs*|dosen.krs*|krs.*'],
-                                ['route' => 'lms.materi', 'label' => 'LMS', 'icon' => 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 1 4 4.5v15zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5', 'pattern' => 'lms.*|absensi.*'],
-                                ['route' => 'nilai.input', 'label' => 'Nilai', 'icon' => 'M3 17l6-6 4 4 8-8M14 7h7v7', 'pattern' => 'nilai.*|khs.*|transkrip.*'],
-                                ['route' => 'skripsi.pengajuan', 'label' => 'Skripsi', 'icon' => 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z', 'pattern' => 'skripsi.*|bimbingan.*|sidang.*'],
-                                ['route' => 'keuangan.tagihan', 'label' => 'Keuangan', 'icon' => 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zm0 3h18M7 15h.01', 'pattern' => 'keuangan.*|kwitansi.*'],
-                                ['route' => 'surat.pengajuan', 'label' => 'Surat', 'icon' => 'M22 12h-6l-2 3h-4l-2-3H2M5.5 5.1L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1z', 'pattern' => 'surat.*'],
-                                ['route' => 'media.generate', 'label' => 'Generate Gambar', 'icon' => 'M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z', 'pattern' => 'media.*'],
-                                ['route' => 'publik.pengumuman', 'label' => 'Pengumuman', 'icon' => 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M10.3 21a1.9 1.9 0 0 0 3.4 0', 'pattern' => 'notifikasi.*|publik.pengumuman*'],
-                                ['route' => 'dashboard.pimpinan', 'label' => 'Laporan', 'icon' => 'M3 3v18h18M7 15l4-4 3 3 5-6', 'pattern' => 'dashboard.pimpinan|pddikti.*'],
+                                ['route' => 'dashboard', 'label' => 'Dashboard', 'roles' => null, 'icon' => 'M3 12l9-9 9 9M9 21V12h6v9', 'pattern' => 'dashboard'],
+                                ['route' => 'admin.pmb.verifikasi', 'label' => 'PMB', 'roles' => ['superadmin', 'admin_prodi'], 'icon' => 'M8 7V3m8 4V3M3 11h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2', 'pattern' => 'admin.pmb*'],
+                                ['route' => 'mahasiswa.krs.pengajuan', 'label' => 'KRS', 'roles' => ['mahasiswa', 'dosen', 'superadmin', 'admin_prodi'], 'icon' => 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0 2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9l2 2 4-4', 'pattern' => 'mahasiswa.krs*|dosen.krs*|krs.*'],
+                                ['route' => 'lms.materi', 'label' => 'LMS', 'roles' => ['dosen', 'mahasiswa', 'superadmin', 'admin_prodi'], 'icon' => 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 1 4 4.5v15zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5', 'pattern' => 'lms.*|absensi.*'],
+                                ['route' => 'nilai.input', 'label' => 'Nilai', 'roles' => ['dosen', 'superadmin', 'admin_prodi'], 'icon' => 'M3 17l6-6 4 4 8-8M14 7h7v7', 'pattern' => 'nilai.*|khs.*|transkrip.*'],
+                                ['route' => 'skripsi.pengajuan', 'label' => 'Skripsi', 'roles' => ['mahasiswa', 'dosen', 'superadmin', 'admin_prodi'], 'icon' => 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z', 'pattern' => 'skripsi.*|bimbingan.*|sidang.*'],
+                                ['route' => $keuanganRoute, 'label' => 'Keuangan', 'roles' => ['mahasiswa', 'keuangan', 'superadmin', 'admin_prodi'], 'icon' => 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zm0 3h18M7 15h.01', 'pattern' => 'keuangan.*|kwitansi.*'],
+                                ['route' => $suratRoute, 'label' => 'Surat', 'roles' => ['mahasiswa', 'keuangan', 'superadmin', 'admin_prodi'], 'icon' => 'M22 12h-6l-2 3h-4l-2-3H2M5.5 5.1L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1z', 'pattern' => 'surat.*'],
+                                ['route' => 'media.generate', 'label' => 'Generate Gambar', 'roles' => ['superadmin', 'admin_prodi', 'keuangan', 'pimpinan'], 'icon' => 'M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z', 'pattern' => 'media.*'],
+                                ['route' => 'publik.pengumuman', 'label' => 'Pengumuman', 'roles' => null, 'icon' => 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M10.3 21a1.9 1.9 0 0 0 3.4 0', 'pattern' => 'notifikasi.*|publik.pengumuman*'],
+                                ['route' => 'dashboard.pimpinan', 'label' => 'Laporan', 'roles' => ['pimpinan', 'superadmin'], 'icon' => 'M3 3v18h18M7 15l-4-4 3 3 5-6', 'pattern' => 'dashboard.pimpinan|pddikti.*'],
                                 ['route' => 'admin.impor', 'label' => 'Impor CSV', 'roles' => ['superadmin', 'admin_prodi'], 'icon' => 'M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2', 'pattern' => 'admin.impor*'],
                                 ['route' => 'admin.master', 'label' => 'Data Master', 'roles' => ['superadmin', 'admin_prodi'], 'icon' => 'M4 4h16v12H4zM4 16l2-2m14 2l-2-2M8 9h8M8 12h5', 'pattern' => 'admin.master'],
                                 ['route' => 'kalender.index', 'label' => 'Kalender', 'roles' => null, 'icon' => 'M8 7V3m8 4V3M3 11h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2', 'pattern' => 'kalender.*'],
                                 ['route' => 'helpdesk.index', 'label' => 'Helpdesk', 'roles' => null, 'icon' => 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M10.3 21a1.9 1.9 0 0 0 3.4 0', 'pattern' => 'helpdesk.*'],
                                 ['route' => 'skripsi.yudisium', 'label' => 'Yudisium', 'roles' => ['pimpinan', 'superadmin'], 'icon' => 'M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z', 'pattern' => 'skripsi.yudisium'],
                                 ['route' => 'keuangan.beasiswa', 'label' => 'Beasiswa', 'roles' => ['keuangan', 'superadmin', 'admin_prodi'], 'icon' => 'M12 2l2.5 5.5L20 8l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 2z', 'pattern' => 'keuangan.beasiswa'],
-                                ['route' => 'laporan.index', 'label' => 'Laporan', 'roles' => ['pimpinan', 'superadmin', 'keuangan'], 'icon' => 'M3 3v18h18M7 15l-4-4 3 3 5-6', 'pattern' => 'laporan.*'],
-                                ['route' => 'admin.integrasi', 'label' => 'Integrasi', 'icon' => 'M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6', 'pattern' => 'admin.integrasi'],
+                                ['route' => 'laporan.index', 'label' => 'Rekap', 'roles' => ['pimpinan', 'superadmin', 'keuangan'], 'icon' => 'M3 3v18h18M7 15l-4-4 3 3 5-6', 'pattern' => 'laporan.*'],
+                                ['route' => 'pmb.funnel', 'label' => 'Funnel PMB', 'roles' => ['pimpinan', 'superadmin'], 'icon' => 'M4 4h16v12H4zM4 12h16M12 4v12', 'pattern' => 'pmb.funnel'],
+                                ['route' => 'admin.integrasi', 'label' => 'Integrasi', 'roles' => ['superadmin', 'admin_prodi'], 'icon' => 'M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6', 'pattern' => 'admin.integrasi'],
                             ];
                         @endphp
+                        @auth
                         @foreach($menu as $item)
+                            @if($item['roles'] === null || auth()->user()->hasAnyRole($item['roles']))
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs($item['pattern']) ? 'active' : '' }}" href="{{ route($item['route']) }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -79,7 +84,9 @@
                                     <span class="nav-link-title">{{ $item['label'] }}</span>
                                 </a>
                             </li>
+                            @endif
                         @endforeach
+                        @endauth
                     </ul>
                 </div>
             </div>

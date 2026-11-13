@@ -62,7 +62,7 @@ class KrsFlowTest extends TestCase
             'status' => 'aktif',
         ]);
 
-        foreach ([['IF101', 3], ['IF102', 3], ['IF103', 2], ['IF104', 3], ['IF105', 3], ['IF106', 4]] as [$kode, $sks]) {
+        foreach ([['IF101', 3], ['IF102', 3], ['IF103', 2], ['IF104', 3], ['IF105', 3], ['IF106', 4], ['IF107', 3]] as [$kode, $sks]) {
             $mkId = DB::table('matakuliah')->insertGetId([
                 'prodi_id' => $prodiId,
                 'kode' => $kode,
@@ -102,9 +102,9 @@ class KrsFlowTest extends TestCase
 
     public function test_krs_melebihi_sks_maks_ditolak(): void
     {
-        // Total 6 kelas = 18 SKS > batas 15 SKS untuk IPK 1.50.
+        // Total 7 kelas = 21 SKS > batas 18 SKS untuk IPK 1.50.
         Livewire::test(Pengajuan::class, ['tahunId' => $this->tahunId])
-            ->set('ipk', 1.50) // batas 15 SKS
+            ->set('ipk', 1.50) // batas 18 SKS
             ->set('kelasDipilih', $this->kelasIds)
             ->call('ajukan')
             ->assertHasErrors(['kelasDipilih']);
@@ -112,6 +112,132 @@ class KrsFlowTest extends TestCase
         $this->assertNull(
             Krs::query()->where('mahasiswa_id', $this->mahasiswaId)->first()
         );
+    }
+
+    public function test_batas_sks_by_ipk_24_22_20_18(): void
+    {
+        $this->assertSame(24, Krs::sksMaksByIpk(4.00));
+        $this->assertSame(24, Krs::sksMaksByIpk(3.00));
+        $this->assertSame(22, Krs::sksMaksByIpk(2.99));
+        $this->assertSame(22, Krs::sksMaksByIpk(2.50));
+        $this->assertSame(20, Krs::sksMaksByIpk(2.49));
+        $this->assertSame(20, Krs::sksMaksByIpk(2.00));
+        $this->assertSame(18, Krs::sksMaksByIpk(1.99));
+        $this->assertSame(18, Krs::sksMaksByIpk(0.00));
+    }
+
+    public function test_kelas_penuh_diarahkan_ke_waitlist(): void
+    {
+        // Kelas kuota 1 yang sudah ditempati KRS mahasiswa lain.
+        $kelasId = $this->kelasIds[0];
+        DB::table('kelas')->where('id', $kelasId)->update(['kuota' => 1]);
+
+        $penghuni = $this->buatMahasiswaLain();
+        Krs::factory()->create([
+            'mahasiswa_id' => $penghuni,
+            'tahun_akademik_id' => $this->tahunId,
+            'status' => Krs::STATUS_DIAJUKAN,
+            'total_sks' => 3,
+            'ipk_snapshot' => 3.50,
+        ])->details()->create(['kelas_id' => $kelasId, 'sks' => 3, 'status' => 'aktif']);
+
+        // Pengajuan langsung ditolak kuota + disarankan waitlist.
+        Livewire::test(Pengajuan::class, ['tahunId' => $this->tahunId])
+            ->set('ipk', 3.50)
+            ->set('kelasDipilih', [$kelasId])
+            ->call('ajukan')
+            ->assertHasErrors(['kelasDipilih']);
+
+        // Masuk waitlist berhasil dan idempoten (tidak ganda).
+        $komponen = Livewire::test(Pengajuan::class, ['tahunId' => $this->tahunId])
+            ->set('ipk', 3.50)
+            ->call('masukWaitlist', $kelasId);
+        $komponen->assertHasNoErrors();
+
+        $this->assertSame(1, DB::table('kelas_waitlist')
+            ->where('kelas_id', $kelasId)
+            ->where('mahasiswa_id', $this->mahasiswaId)
+            ->where('status', 'menunggu')
+            ->count());
+
+        Livewire::test(Pengajuan::class, ['tahunId' => $this->tahunId])
+            ->set('ipk', 3.50)
+            ->call('masukWaitlist', $kelasId);
+
+        $this->assertSame(1, DB::table('kelas_waitlist')
+            ->where('kelas_id', $kelasId)
+            ->where('mahasiswa_id', $this->mahasiswaId)
+            ->count());
+    }
+
+    public function test_pa_tidak_bisa_menyetujui_krs_melanggar_batas_sks(): void
+    {
+        // KRS 21 SKS dengan snapshot IPK 1.00 (batas 18) — mis. diubah manual.
+        $krs = Krs::factory()->create([
+            'mahasiswa_id' => $this->mahasiswaId,
+            'tahun_akademik_id' => $this->tahunId,
+            'status' => Krs::STATUS_DIAJUKAN,
+            'total_sks' => 21,
+            'ipk_snapshot' => 1.00,
+        ]);
+
+        foreach ($this->kelasIds as $kelasId) {
+            $krs->details()->create(['kelas_id' => $kelasId, 'sks' => 3, 'status' => 'aktif']);
+        }
+
+        Livewire::test(PersetujuanPa::class)->call('setujui', $krs->id);
+
+        $this->assertSame(Krs::STATUS_DIAJUKAN, $krs->fresh()->status);
+    }
+
+    public function test_penolakan_pa_mempromosikan_waitlist(): void
+    {
+        $kelasId = $this->kelasIds[0];
+        DB::table('kelas')->where('id', $kelasId)->update(['kuota' => 1]);
+
+        $krs = Krs::factory()->create([
+            'mahasiswa_id' => $this->mahasiswaId,
+            'tahun_akademik_id' => $this->tahunId,
+            'status' => Krs::STATUS_DIAJUKAN,
+            'total_sks' => 3,
+            'ipk_snapshot' => 3.50,
+        ]);
+        $krs->details()->create(['kelas_id' => $kelasId, 'sks' => 3, 'status' => 'aktif']);
+
+        $penunggu = $this->buatMahasiswaLain();
+        DB::table('kelas_waitlist')->insert([
+            'kelas_id' => $kelasId,
+            'mahasiswa_id' => $penunggu,
+            'status' => 'menunggu',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Livewire::test(PersetujuanPa::class)
+            ->set('catatan', 'Jadwal tidak disarankan, silakan revisi.')
+            ->call('tolak', $krs->id);
+
+        $this->assertSame(Krs::STATUS_DITOLAK, $krs->fresh()->status);
+        $this->assertSame('dipromosikan', DB::table('kelas_waitlist')
+            ->where('kelas_id', $kelasId)
+            ->where('mahasiswa_id', $penunggu)
+            ->value('status'));
+    }
+
+    /**
+     * Buat mahasiswa kedua (penghuni kuota / penunggu waitlist).
+     */
+    private function buatMahasiswaLain(): int
+    {
+        $user = User::factory()->create();
+
+        return DB::table('mahasiswa')->insertGetId([
+            'user_id' => $user->id,
+            'nim' => '2026'.random_int(1002, 9999),
+            'prodi_id' => DB::table('mahasiswa')->where('id', $this->mahasiswaId)->value('prodi_id'),
+            'angkatan' => 2026,
+            'status' => 'aktif',
+        ]);
     }
 
     public function test_krs_diblokir_saat_ada_tunggakan(): void
