@@ -73,26 +73,54 @@
     @endforeach
 </div>
 
-{{-- Operational strip: outstanding, verifikasi, PMB --}}
+{{-- Operational strip: outstanding, verifikasi, PMB (role-aware) --}}
 <div class="row row-cards mb-3">
+    @if(auth()->user()->hasAnyRole(['keuangan', 'superadmin', 'admin_prodi', 'pimpinan']))
     <div class="col-md-4">
         <div class="card kampius-card"><div class="card-body d-flex justify-content-between align-items-center">
             <div><div class="subheader">Outstanding Tagihan</div><div class="h2 mb-0">Rp {{ number_format($stats['outstanding'] ?? 0, 0, ',', '.') }}</div></div>
             <a href="{{ route('keuangan.verifikasi') }}" class="btn btn-sm btn-outline-primary">Verifikasi ({{ $stats['verifikasi_pending'] ?? 0 }})</a>
         </div></div>
     </div>
+    @endif
+    @if(auth()->user()->hasAnyRole(['dosen', 'superadmin', 'admin_prodi']))
     <div class="col-md-4">
         <div class="card kampius-card"><div class="card-body d-flex justify-content-between align-items-center">
             <div><div class="subheader">KRS Menunggu</div><div class="h2 mb-0">{{ $stats['krs_pending'] ?? 0 }} pengajuan</div></div>
             <a href="{{ route('dosen.krs.persetujuan') }}" class="btn btn-sm btn-outline-primary">Persetujuan</a>
         </div></div>
     </div>
+    @endif
+    @if(auth()->user()->hasAnyRole(['superadmin', 'admin_prodi']))
     <div class="col-md-4">
         <div class="card kampius-card"><div class="card-body d-flex justify-content-between align-items-center">
             <div><div class="subheader">PMB Menunggu</div><div class="h2 mb-0">{{ $stats['pmb_pending'] ?? 0 }} pendaftar</div></div>
             <a href="{{ route('admin.pmb.verifikasi') }}" class="btn btn-sm btn-outline-primary">Verifikasi PMB</a>
         </div></div>
     </div>
+    @endif
+    @if(auth()->user()->hasRole('mahasiswa'))
+    <div class="col-md-4">
+        <div class="card kampius-card"><div class="card-body d-flex justify-content-between align-items-center">
+            <div><div class="subheader">KRS Saya</div><div class="h2 mb-0">{{ $stats['krs_pending'] ?? 0 }} menunggu</div></div>
+            <a href="{{ route('mahasiswa.krs.pengajuan') }}" class="btn btn-sm btn-outline-primary">Pengajuan KRS</a>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card kampius-card"><div class="card-body d-flex justify-content-between align-items-center">
+            <div><div class="subheader">Tagihan Saya</div><div class="h2 mb-0">Rp {{ number_format($stats['outstanding'] ?? 0, 0, ',', '.') }}</div></div>
+            <a href="{{ route('keuangan.bayar') }}" class="btn btn-sm btn-outline-primary">Bayar</a>
+        </div></div>
+    </div>
+    @endif
+    @if(auth()->user()->hasAnyRole(['pimpinan', 'superadmin']))
+    <div class="col-md-4">
+        <div class="card kampius-card"><div class="card-body d-flex justify-content-between align-items-center">
+            <div><div class="subheader">Eksekutif</div><div class="h2 mb-0">Laporan</div></div>
+            <a href="{{ route('dashboard.pimpinan') }}" class="btn btn-sm btn-outline-primary">Dashboard Pimpinan</a>
+        </div></div>
+    </div>
+    @endif
 </div>
 
 {{-- CHARTS ROW --}}
