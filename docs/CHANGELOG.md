@@ -34,6 +34,9 @@
 - DendaRuleTest (4 tes): simpan, tolak persen >100, mahasiswa 403, hapus.
 ## 2026-11-13 (ronde 12) — bukti benchmark performa
 - DashboardPerfTest: dashboard = 79 query (ambang regresi 90), index MySQL terverifikasi live.
+## 2026-11-13 (ronde 13) — denda benar-benar otomatis
+- Command denda:terapkan [--tahun] + jadwal harian 01:00 (tanpa overlap) + audit scheduler.
+- DendaOtomatisTest: terapkan 50rb, catat audit, idempoten di jalan kedua.
 ## 2026-11-13 (ronde 5) — tes kalkulasi + SEO/API + aksesibilitas + audit link
 - CalculationTest (4 tes): hitungNa/bobot, konversi huruf, batas SKS IPK, sisa/total tagihan, remedial D/E maks 55.
 - Aksesibilitas: skip-link + #main-content di layout.
