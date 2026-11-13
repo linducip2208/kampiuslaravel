@@ -151,6 +151,28 @@ class DashboardController extends Controller
             ? AuditLog::with('user')->latest('id')->take(6)->get()
             : collect();
 
+        // --- Scope pribadi mahasiswa: jangan tampilkan angka global sebagai miliknya ---
+        $saya = ['outstanding' => 0, 'tagihan_aktif' => 0, 'krs_status' => null];
+        if ($has('mahasiswa')) {
+            $user = auth()->user();
+            $isMhs = $user && $user->hasRole('mahasiswa') && ! $user->hasAnyRole(['superadmin', 'admin_prodi', 'keuangan', 'dosen', 'pimpinan']);
+            if ($isMhs && $has('tagihan')) {
+                $mhsId = Mahasiswa::where('user_id', $user->id)->value('id');
+                if ($mhsId) {
+                    $saya['outstanding'] = (int) Tagihan::where('mahasiswa_id', $mhsId)
+                        ->whereIn('status', ['belum_bayar', 'sebagian'])
+                        ->selectRaw('COALESCE(SUM(nominal + COALESCE(denda,0) - COALESCE(terbayar,0)),0) as total')
+                        ->value('total');
+                    $saya['tagihan_aktif'] = Tagihan::where('mahasiswa_id', $mhsId)
+                        ->whereIn('status', ['belum_bayar', 'sebagian'])->count();
+                    if ($has('krs')) {
+                        $saya['krs_status'] = Krs::where('mahasiswa_id', $mhsId)
+                            ->latest('id')->value('status');
+                    }
+                }
+            }
+        }
+
         return view('dashboard', [
             'stats' => [
                 'mahasiswa' => $totalMahasiswa,
@@ -180,6 +202,7 @@ class DashboardController extends Controller
             'agenda' => $agenda,
             'locks' => KalenderService::locks(),
             'aktivitas' => $aktivitas,
+            'saya' => $saya,
         ]);
     }
 

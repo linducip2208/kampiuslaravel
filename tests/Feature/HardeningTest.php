@@ -139,4 +139,22 @@ class HardeningTest extends TestCase
         $this->assertSame(3, $flaky->calls);
         $this->assertSame('FLAKY-'.$tagihan->id, $bayar->reference);
     }
+
+    public function test_mahasiswa_melihat_tagihan_miliknya_sendiri(): void
+    {
+        $a = User::factory()->create();
+        $a->assignRole('mahasiswa');
+        $mhsA = Mahasiswa::factory()->create(['user_id' => $a->id]);
+        Tagihan::create([
+            'mahasiswa_id' => $mhsA->id,
+            'jenis' => 'UKT',
+            'nominal' => 1500000,
+            'terbayar' => 200000,
+            'status' => 'sebagian',
+        ]);
+
+        $this->actingAs($a)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('1.300.000');
+    }
 }

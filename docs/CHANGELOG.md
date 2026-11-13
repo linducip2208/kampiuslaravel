@@ -47,6 +47,9 @@
 - KrsFlowTest +1: KRS DITOLAK bisa diajukan ulang (kembali DIAJUKAN, detail diperbarui); DISETUJUI tetap terkunci.
 ## 2026-11-13 (ronde 17) — bug dokumen 404 + guard traversal
 - PublikController: kunci ARSITEKTUR tidak cocok nama file (ARCHITECTURE.md) — semua link arsitektur 404. Perbaiki + DokumenTraversalTest (valid 200, traversal 404).
+## 2026-11-13 (ronde 18) — scope pribadi dashboard mahasiswa
+- DashboardController: hitung outstanding/tagihan/KRS milik sendiri (owner-scope); sebelumnya kartu "Tagihan Saya" menampilkan angka global.
+- Blade + HardeningTest: mahasiswa melihat 1.300.000 miliknya.
 ## 2026-11-13 (ronde 5) — tes kalkulasi + SEO/API + aksesibilitas + audit link
 - CalculationTest (4 tes): hitungNa/bobot, konversi huruf, batas SKS IPK, sisa/total tagihan, remedial D/E maks 55.
 - Aksesibilitas: skip-link + #main-content di layout.
