@@ -6,6 +6,7 @@ use App\Livewire\Nilai\InputNilai;
 use App\Livewire\Nilai\KunciNilai;
 use App\Models\Dosen;
 use App\Models\Kelas;
+use App\Models\Krs;
 use App\Models\Mahasiswa;
 use App\Models\Setting;
 use App\Models\Tagihan;
@@ -156,5 +157,22 @@ class HardeningTest extends TestCase
         $this->actingAs($a)->get(route('dashboard'))
             ->assertOk()
             ->assertSee('1.300.000');
+    }
+
+    public function test_dosen_melihat_krs_menunggu_bimbingannya_saja(): void
+    {
+        $dosenUser = User::factory()->create();
+        $dosenUser->assignRole('dosen');
+        $dosen = Dosen::factory()->create(['user_id' => $dosenUser->id]);
+
+        $bimbingan = Mahasiswa::factory()->create(['dosen_pa_id' => $dosen->id]);
+        $lain = Mahasiswa::factory()->create(['dosen_pa_id' => null]);
+        Krs::factory()->create(['mahasiswa_id' => $bimbingan->id, 'status' => 'diajukan']);
+        Krs::factory()->create(['mahasiswa_id' => $lain->id, 'status' => 'diajukan']);
+
+        $this->actingAs($dosenUser)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Bimbingan Anda')
+            ->assertSee('1 pengajuan');
     }
 }

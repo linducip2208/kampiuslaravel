@@ -86,7 +86,7 @@
     @if(auth()->user()->hasAnyRole(['dosen', 'superadmin', 'admin_prodi']))
     <div class="col-md-4">
         <div class="card kampius-card"><div class="card-body d-flex justify-content-between align-items-center">
-            <div><div class="subheader">KRS Menunggu</div><div class="h2 mb-0">{{ $stats['krs_pending'] ?? 0 }} pengajuan</div></div>
+            <div><div class="subheader">KRS Menunggu</div><div class="h2 mb-0">{{ $saya['krs_pending'] ?? $stats['krs_pending'] ?? 0 }} pengajuan</div>@if(($saya['krs_pending'] ?? null) !== null)<div class="small kampius-muted">Bimbingan Anda</div>@endif</div>
             <a href="{{ route('dosen.krs.persetujuan') }}" class="btn btn-sm btn-outline-primary">Persetujuan</a>
         </div></div>
     </div>

@@ -21,6 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
+use Throwable;
 
 class DashboardController extends Controller
 {
@@ -159,7 +160,7 @@ class DashboardController extends Controller
             : collect();
 
         // --- Scope pribadi mahasiswa: jangan tampilkan angka global sebagai miliknya ---
-        $saya = ['outstanding' => 0, 'tagihan_aktif' => 0, 'krs_status' => null];
+        $saya = ['outstanding' => 0, 'tagihan_aktif' => 0, 'krs_status' => null, 'krs_pending' => null];
         if ($has('mahasiswa')) {
             $user = auth()->user();
             $isMhs = $user && $user->hasRole('mahasiswa') && ! $user->hasAnyRole(['superadmin', 'admin_prodi', 'keuangan', 'dosen', 'pimpinan']);
@@ -176,6 +177,24 @@ class DashboardController extends Controller
                         $saya['krs_status'] = Krs::where('mahasiswa_id', $mhsId)
                             ->latest('id')->value('status');
                     }
+                }
+            }
+        }
+
+        // --- Scope dosen: KRS menunggu khusus bimbingannya (selaras PersetujuanPa) ---
+        if ($has('krs') && $has('mahasiswa')) {
+            $user = auth()->user();
+            $isDosenOnly = $user && $user->hasRole('dosen') && ! $user->hasAnyRole(['mahasiswa', 'superadmin', 'admin_prodi']);
+            if ($isDosenOnly && Schema::hasTable('dosen')) {
+                try {
+                    $dosenId = DB::table('dosen')->where('user_id', $user->id)->value('id');
+                    if ($dosenId && Schema::hasColumn('mahasiswa', 'dosen_pa_id')) {
+                        $bimbinganIds = DB::table('mahasiswa')->where('dosen_pa_id', $dosenId)->pluck('id')->all();
+                        $saya['krs_pending'] = Krs::where('status', Krs::STATUS_DIAJUKAN)
+                            ->whereIn('mahasiswa_id', $bimbinganIds ?: [0])->count();
+                    }
+                } catch (Throwable) {
+                    // abaikan, fallback ke angka global
                 }
             }
         }
