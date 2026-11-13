@@ -70,7 +70,7 @@ class PublikController extends Controller
     public function dokumen(?string $file = null): View
     {
         $dokumen = [
-            'ARSITEKTUR' => 'Arsitektur sistem',
+            'ARCHITECTURE' => 'Arsitektur sistem',
             'ERP_MODULES' => 'Modul ERP',
             'ROLES_PERMISSIONS' => 'Role & permission',
             'INSTALLATION' => 'Instalasi',
