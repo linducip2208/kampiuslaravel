@@ -2,7 +2,7 @@
 1. UI/UX 12/15 — dashboard+sidebar+pimpinan+SEO selesai; landing & modul lain belum overhaul.
 2. Akademik 10/15 — flows + lock/transaction; sisa kuota edge & prasyarat kompleks.
 3. Keuangan 8/10 — idempotency+jurnal+soft delete+retry; sisa denda tuning.
-4. CRUD 8/10 — semua aksi destruktif/irreversibel kini berkonfirmasi (audit 18 tombol); sisa loading/empty state modul minor.
+4. CRUD 8/10 — destruktif berkonfirmasi + loading anti double-submit; sisa empty state modul minor.
 5. Security/RBAC 12/15 — 9 fix server-side; sisa audit upload lanjutan.
 6. Database 7/8 — soft delete + 9 index + audit; sisa harmonisasi restrict.
 7. API 7/7 — owner-scope + lunas guard + retry 3x (teruji flaky driver).

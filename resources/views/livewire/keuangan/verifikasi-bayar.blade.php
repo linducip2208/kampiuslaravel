@@ -8,7 +8,10 @@
             <p class="text-secondary">Format: <code>reference,nominal</code> per baris (header opsional). Nominal cocok persis → ditandai rekonsiliasi.</p>
             <form wire:submit="imporRekonsiliasi" class="d-flex gap-2">
                 <input type="file" wire:model="fileCsv" class="form-control" accept=".csv,.txt">
-                <button type="submit" class="btn btn-outline-primary">Rekonsiliasi</button>
+                <button type="submit" class="btn btn-outline-primary" wire:loading.attr="disabled" wire:target="imporRekonsiliasi,fileCsv">
+                    <span wire:loading.remove wire:target="imporRekonsiliasi,fileCsv">Rekonsiliasi</span>
+                    <span wire:loading wire:target="imporRekonsiliasi,fileCsv"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Memproses…</span>
+                </button>
             </form>
             @error('fileCsv')<div class="text-danger mt-1">{{ $message }}</div>@enderror
             @if(!empty($rekonsiliasi))
@@ -56,9 +59,9 @@
                                 @if($bayar->refunded_at)<br><span class="badge bg-dark">refunded</span>@endif
                             </td>
                             <td>@if($bayar->reconciled_at)<span class="badge bg-info">rekonsiliasi</span>@else<span class="text-secondary">-</span>@endif</td>
-                            <td class="text-end">
-                                <button wire:click="verify({{ $bayar->id }})" wire:confirm="Verifikasi pembayaran #{{ $bayar->id }} Rp {{ number_format($bayar->nominal, 0, ',', '.') }}?" class="btn btn-sm btn-outline-success">Verifikasi</button>
-                                <button wire:click="reject({{ $bayar->id }})" wire:confirm="Tolak pembayaran #{{ $bayar->id }}?" class="btn btn-sm btn-outline-danger">Tolak</button>
+                            <td class="text-end" wire:loading.class="opacity-50" wire:target="verify,reject,refund">
+                                <button wire:click="verify({{ $bayar->id }})" wire:confirm="Verifikasi pembayaran #{{ $bayar->id }} Rp {{ number_format($bayar->nominal, 0, ',', '.') }}?" class="btn btn-sm btn-outline-success" wire:loading.attr="disabled" wire:target="verify">Verifikasi</button>
+                                <button wire:click="reject({{ $bayar->id }})" wire:confirm="Tolak pembayaran #{{ $bayar->id }}?" class="btn btn-sm btn-outline-danger" wire:loading.attr="disabled" wire:target="reject">Tolak</button>
                                 @if($bayar->status === 'verified' && !$bayar->refunded_at)
                                     <button wire:click="refund({{ $bayar->id }})" wire:confirm="Refund pembayaran #{{ $bayar->id }}?" class="btn btn-sm btn-outline-warning">Refund</button>
                                 @endif

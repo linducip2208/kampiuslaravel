@@ -61,7 +61,10 @@
             </table>
         </div>
         <div class="card-footer">
-            <button type="submit" class="btn btn-primary">Simpan Nilai</button>
+            <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="save">
+                <span wire:loading.remove wire:target="save">Simpan Nilai</span>
+                <span wire:loading wire:target="save"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Menyimpan…</span>
+            </button>
         </div>
     </form>
 </div>

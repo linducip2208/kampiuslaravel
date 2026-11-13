@@ -56,8 +56,14 @@
                     @error('cicilan')<div class="text-danger">{{ $message }}</div>@enderror
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Generate Tagihan</button>
-            <button type="button" wire:click="terapkanDenda" class="btn btn-warning ms-2">Terapkan Denda Otomatis</button>
+            <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="generate">
+                <span wire:loading.remove wire:target="generate">Generate Tagihan</span>
+                <span wire:loading wire:target="generate"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Memproses…</span>
+            </button>
+            <button type="button" wire:click="terapkanDenda" class="btn btn-warning ms-2" wire:loading.attr="disabled" wire:target="terapkanDenda">
+                <span wire:loading.remove wire:target="terapkanDenda">Terapkan Denda Otomatis</span>
+                <span wire:loading wire:target="terapkanDenda"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Memproses…</span>
+            </button>
             <p class="text-muted mt-2 mb-0">Nominal 0 memakai template UKT per prodi/angkatan/jalur. Potongan beasiswa diterapkan otomatis.</p>
         </div>
     </form>

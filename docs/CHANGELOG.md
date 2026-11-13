@@ -23,6 +23,9 @@
 - PaymentService: callDriverWithRetry 3x (200ms jeda) untuk createTransaction & checkStatus; gagal permanen -> RuntimeException (422/502 konsisten).
 - HardeningTest +1: driver flaky gagal 2x lalu sukses (3 calls, reference benar).
 - Dashboard strip kini role-aware (keuangan/KRS/PMB/mahasiswa/pimpinan).
+## 2026-11-13 (ronde 9) — loading state aksi async
+- Spinner + disable pada: generate tagihan, terapkan denda, rekonsiliasi CSV, verifikasi/tolak bayar, impor CSV, simpan nilai, setujui/tolak KRS.
+- Cegah double-submit saat request Livewire berjalan.
 ## 2026-11-13 (ronde 5) — tes kalkulasi + SEO/API + aksesibilitas + audit link
 - CalculationTest (4 tes): hitungNa/bobot, konversi huruf, batas SKS IPK, sisa/total tagihan, remedial D/E maks 55.
 - Aksesibilitas: skip-link + #main-content di layout.

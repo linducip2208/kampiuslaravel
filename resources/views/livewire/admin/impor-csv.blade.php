@@ -28,7 +28,10 @@
                     @error('file')<div class="text-danger">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-md-3 mb-3 d-flex align-items-end gap-2">
-                    <button wire:click="impor" class="btn btn-primary">Impor</button>
+                    <button wire:click="impor" class="btn btn-primary" wire:loading.attr="disabled" wire:target="impor">
+                        <span wire:loading.remove wire:target="impor">Impor</span>
+                        <span wire:loading wire:target="impor"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Mengimpor…</span>
+                    </button>
                     <a href="{{ route('admin.impor.template', ['jenis' => $jenis]) }}" class="btn btn-outline-secondary">Template</a>
                 </div>
             </div>
