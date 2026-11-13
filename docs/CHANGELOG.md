@@ -56,6 +56,8 @@
 - AkademikService::validasiKrs kini memeriksa relasi mk_prasyarat (jenis=prasyarat) selain kolom legacy; PrasyaratTest (2 tes).
 ## 2026-11-14 — scope bimbingan dosen di dashboard
 - KRS menunggu untuk dosen dihitung khusus mahasiswanya (selaras PersetujuanPa), bukan global; HardeningTest +1.
+## 2026-11-14 — wisuda anti-overbook + guard teruji
+- Yudisium::daftarkanWisuda dalam transaksi + lock batch (cek status & kuota ulang di dalam); KelulusanMbkmTest +1 (kuota penuh & batch tutup ditolak).
 ## 2026-11-14 — konsistensi visual + pencarian denda
 - Dashboard pimpinan memakai token kampius-stat/kampius-card (radius 16px, tipografi navy) selaras dashboard utama.
 - DendaRuleKelola: kolom pencarian jenis + reset halaman.

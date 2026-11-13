@@ -7,6 +7,6 @@
 6. Database 7/8 — soft delete + 9 index + audit; sisa harmonisasi restrict.
 7. API 7/7 — owner-scope + lunas guard + retry 3x (teruji flaky driver).
 8. Performance 6/7 — 5 N+1 fix + 9 index + benchmark 79 query; belum cache.
-9. Testing 8/8 — 192 hijau; belum browser/responsive.
+9. Testing 8/8 — 193 hijau; belum browser/responsive.
 10. Docs 5/5 — 18 file cocok implementasi.
 TOTAL: 92/100.

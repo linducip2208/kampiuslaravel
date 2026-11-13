@@ -140,33 +140,45 @@ class Yudisium extends Component
             return;
         }
 
-        if ($batch->peserta()->count() >= (int) $batch->kuota) {
-            $this->addError('yudisium', "Kuota batch {$batch->nama} penuh.");
+        try {
+            $hasil = DB::transaction(function () use ($mhs) {
+                $batch = WisudaBatch::whereKey($this->batchId)->lockForUpdate()->firstOrFail();
+                if ($batch->status !== 'dibuka') {
+                    throw new \RuntimeException("Batch {$batch->nama} sudah {$batch->status}.");
+                }
+                if ($batch->peserta()->count() >= (int) $batch->kuota) {
+                    throw new \RuntimeException("Kuota batch {$batch->nama} penuh.");
+                }
+
+                $noKursi = 'K-'.str_pad((string) ($batch->peserta()->count() + 1), 3, '0', STR_PAD_LEFT);
+
+                $peserta = WisudaPeserta::firstOrCreate(
+                    ['batch_id' => $batch->id, 'mahasiswa_id' => $mhs->id],
+                    [
+                        'no_kursi' => $noKursi,
+                        'status_toga' => 'belum',
+                        'no_ijazah' => 'IJZ/'.now()->year.'/'.str_pad((string) $mhs->id, 6, '0', STR_PAD_LEFT),
+                        'pin_ijazah' => strtoupper(Str::random(8)),
+                        'status_skl' => 'selesai',
+                    ]
+                );
+
+                AuditLog::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'wisuda.daftar',
+                    'model' => WisudaPeserta::class,
+                    'model_id' => $mhs->id,
+                ]);
+
+                return ['batch' => $batch->nama, 'kursi' => $peserta->no_kursi ?? $noKursi, 'nim' => $mhs->nim];
+            });
+        } catch (\RuntimeException $e) {
+            $this->addError('yudisium', $e->getMessage());
 
             return;
         }
 
-        $noKursi = 'K-'.str_pad((string) ($batch->peserta()->count() + 1), 3, '0', STR_PAD_LEFT);
-
-        WisudaPeserta::firstOrCreate(
-            ['batch_id' => $batch->id, 'mahasiswa_id' => $mhs->id],
-            [
-                'no_kursi' => $noKursi,
-                'status_toga' => 'belum',
-                'no_ijazah' => 'IJZ/'.now()->year.'/'.str_pad((string) $mhs->id, 6, '0', STR_PAD_LEFT),
-                'pin_ijazah' => strtoupper(Str::random(8)),
-                'status_skl' => 'selesai',
-            ]
-        );
-
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'wisuda.daftar',
-            'model' => WisudaPeserta::class,
-            'model_id' => $mhs->id,
-        ]);
-
-        $this->message = "NIM {$mhs->nim} masuk batch {$batch->nama} kursi {$noKursi}. PIN ijazah diterbitkan.";
+        $this->message = "NIM {$hasil['nim']} masuk batch {$hasil['batch']} kursi {$hasil['kursi']}. PIN ijazah diterbitkan.";
     }
 
     public function updateToga(int $pesertaId, string $status): void

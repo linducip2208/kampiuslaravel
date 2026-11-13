@@ -136,4 +136,26 @@ class KelulusanMbkmTest extends TestCase
         $this->get(route('publik.lowongan'))->assertOk();
         $this->assertTrue(Alumni::where('mahasiswa_id', $mhs->id)->exists());
     }
+
+    public function test_wisuda_ditolak_bila_kuota_penuh_atau_batch_tutup(): void
+    {
+        $mhs = $this->lulusanSiap();
+        $mhs->update(['status' => 'lulus']);
+
+        $penuh = WisudaBatch::create(['nama' => 'Penuh', 'periode' => '2026/2027', 'kuota' => 0, 'status' => 'dibuka']);
+        Livewire::actingAs($this->admin())
+            ->test(Yudisium::class)
+            ->set('batchId', $penuh->id)
+            ->call('daftarkanWisuda', $mhs->id)
+            ->assertHasErrors(['yudisium']);
+        $this->assertFalse(WisudaPeserta::where('batch_id', $penuh->id)->exists());
+
+        $tutup = WisudaBatch::create(['nama' => 'Tutup', 'periode' => '2026/2027', 'kuota' => 500, 'status' => 'ditutup']);
+        Livewire::actingAs($this->admin())
+            ->test(Yudisium::class)
+            ->set('batchId', $tutup->id)
+            ->call('daftarkanWisuda', $mhs->id)
+            ->assertHasErrors(['yudisium']);
+        $this->assertFalse(WisudaPeserta::where('batch_id', $tutup->id)->exists());
+    }
 }
