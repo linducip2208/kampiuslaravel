@@ -1,6 +1,6 @@
 # FINAL SCORECARD — KAMPIUS MEGA COMMAND (2026-11-14)
 
-Riwayat: 42 → 92/100 (rubrik lama, 9 kategori; 204 tes hijau).
+Riwayat: 42 → 92/100 (rubrik lama, 9 kategori; 207 tes hijau).
 Di bawah ini penilaian rubrik mega-command 12 kategori / 100 poin,
 evidence-based, tanpa inflasi.
 
@@ -16,7 +16,7 @@ evidence-based, tanpa inflasi.
 | 8 | Keamanan | 9/10 | RBAC+IDOR+upload+HMAC+sesi teruji (SecurityConfig/RouteGuard/Hardening); tanpa MFA/pentest/WAF |
 | 9 | API & integrasi | 4/5 | v1/v2 + retry + HMAC; tanpa SSO/gateway prod/kredensial |
 | 10 | DB & performa | 4/5 | Index live + N+1 + benchmark 93<100; tanpa cache (ditolak berdasar bukti) |
-| 11 | Testing | 4/5 | 204/204 hijau + guard regresi; tanpa browser/responsif/beban |
+| 11 | Testing | 4/5 | 207/207 hijau + guard regresi; tanpa browser/responsif/beban |
 | 12 | Dokumentasi & operasi | 4/5 | 25+ dokumen nyata + backup/restore + deploy terverifikasi; tanpa rehearsal restore & pipeline staging |
 
 **TOTAL: 79/100.**
@@ -25,4 +25,4 @@ Bukan 100/100 — dan tidak diklaim. Peta jujur menuju 100 ada di
 docs/ROADMAP.md (butuh: kredensial, repo Flutter, SOP kampus, browser QA,
 keputusan produk, migrasi berisiko yang disetujui pemilik).
 Bukti mentah: docs/FEATURE_MATRIX.md (status per fitur),
-docs/TESTING_REPORT.md (204 hijau), docs/UI_UX_BEFORE_AFTER.md.
+docs/TESTING_REPORT.md (207 hijau), docs/UI_UX_BEFORE_AFTER.md.

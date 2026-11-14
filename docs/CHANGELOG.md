@@ -73,8 +73,9 @@
 ## 2026-11-14 (mega command) — neraca saldo + linimasa + dokumen bukti
 - Keuangan: ekspor neraca saldo per akun (guard pimpinan, teruji 2 arah + 403).
 - Profil mahasiswa: linimasa siklus (akun→KRS→tagihan→bayar), owner-scope, teruji ada/tidak.
-- RouteGuardTest mencakup neraca + pencarian; skor mega 79/100 terdokumentasi jujur.
-- Docs baru: MODULE_INVENTORY, FEATURE_MATRIX, SECURITY_AUDIT, BACKUP_RESTORE, TESTING_REPORT, ROADMAP, API_DOCUMENTATION, INTEGRATION_GUIDE, DEPLOYMENT_GUIDE, MASTER_ARCHITECTURE; FINAL_SCORECARD ditulis ulang per rubrik mega.
+- RouteGuardTest mencakup neraca + pencarian + referensi nama rute di semua Blade; skor mega 79/100 terdokumentasi jujur.
+- Docs: MODULE/ FEATURE_MATRIX, SECURITY_AUDIT, PERFORMANCE_AUDIT, TESTING_REPORT, ROADMAP, API_DOCUMENTATION, INTEGRATION_GUIDE, DEPLOYMENT_GUIDE, BACKUP_RESTORE, DEVELOPMENT_MASTER_1130 (+BACKLOG/PRIORITY/SCORE/DEPENDENCIES), MASTER_ARCHITECTURE; FINAL_SCORECARD ditulis ulang per rubrik mega (79/100).
+- Halaman error 403/404/500 bermerek + ErrorPageTest; timezone Asia/Jakarta (suite tetap hijau).
 ## 2026-11-14 — konsistensi tombol alur KRS
 - 4 tombol tanpa kelas Tabler (ajukan, keluar waitlist, setujui/tolak PA) kini ber-style + loading; KrsFlowTest tetap hijau.
 ## 2026-11-14 — hardening konfigurasi produksi
