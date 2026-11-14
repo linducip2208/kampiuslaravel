@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class QuizJawaban extends Model
 {
@@ -13,5 +14,10 @@ class QuizJawaban extends Model
     protected function casts(): array
     {
         return ['skor' => 'decimal:2'];
+    }
+
+    public function soal(): BelongsTo
+    {
+        return $this->belongsTo(QuizSoal::class, 'quiz_soal_id');
     }
 }

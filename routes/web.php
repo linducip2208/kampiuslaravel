@@ -223,6 +223,9 @@ Route::middleware('auth')->group(function () {
             'kelasId' => $r->integer('kelas') ?: Kelas::latest('id')->value('id'),
         ]))->name('lms.tugas');
         Route::get('/lms/bank-soal', fn () => view('pages.livewire-page', ['component' => 'lms.bank-soal', 'title' => 'Bank Soal']))->name('lms.bank');
+        Route::get('/lms/kuis', fn (Request $r) => view('lms.kuis', [
+            'kelasId' => $r->integer('kelas') ?: Kelas::latest('id')->value('id'),
+        ]))->name('lms.kuis');
         Route::get('/nilai/input', fn (Request $r) => view('nilai.input', [
             'kelasId' => $r->integer('kelas') ?: Kelas::latest('id')->value('id'),
         ]))->name('nilai.input');
@@ -245,6 +248,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/keuangan/refund/{pembayaran}', [BayarController::class, 'refund'])->middleware('throttle:30,1')->name('keuangan.refund');
         Route::get('/keuangan/tutup-buku', fn () => view('pages.livewire-page', ['component' => 'keuangan.tutup-buku', 'title' => 'Tutup Buku']))->name('keuangan.tutup-buku');
         Route::get('/keuangan/hutang', fn () => view('pages.livewire-page', ['component' => 'keuangan.hutang', 'title' => 'Utang Usaha']))->name('keuangan.hutang');
+        Route::get('/keuangan/payroll', fn () => view('pages.livewire-page', ['component' => 'keuangan.payroll', 'title' => 'Penggajian']))->name('keuangan.payroll');
         Route::get('/keuangan/anggaran', fn () => view('pages.livewire-page', ['component' => 'keuangan.anggaran', 'title' => 'Anggaran']))->name('keuangan.anggaran');
         Route::get('/surat/nomor', fn () => view('pages.livewire-page', ['component' => 'surat.nomor-otomatis', 'title' => 'Nomor Surat']))->name('surat.nomor');
     });
@@ -290,6 +294,7 @@ Route::middleware('auth')->group(function () {
     // Kalender & helpdesk: semua user login (kepemilikan dicek di komponen)
     Route::get('/profil', fn () => view('pages.livewire-page', ['component' => 'profil', 'title' => 'Profil Saya']))->name('profil');
     Route::get('/lms/forum', fn (Request $r) => view('lms.forum', ['kelasId' => $r->integer('kelas') ?: null]))->name('lms.forum');
+    Route::get('/lms/kuis-kerjakan', fn (Request $r) => view('lms.kuis-kerjakan', ['quizId' => $r->integer('quiz') ?: null]))->name('lms.kuis.kerjakan');
     Route::get('/cari', [PencarianController::class, 'index'])->name('pencarian');
     Route::get('/kalender', fn () => view('pages.livewire-page', ['component' => 'kalender.kelola', 'title' => 'Kalender Akademik']))->name('kalender.index');
     Route::get('/kalender.ics', [KalenderController::class, 'ics'])->name('kalender.ics');

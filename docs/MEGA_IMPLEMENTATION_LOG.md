@@ -158,7 +158,22 @@ Kode (vertical slice: migrasi + model + service/Livewire + blade + rute + tes):
   pola ini dikoreksi dari asumsi awal soal DaftarPublik) di `/karier`.
 - Tes: `tests/Feature/WaveBBatch4Test.php` (5 tes).
 
-## Berikutnya (Wave B batch 5 + Wave C, belum dieksekusi)
+## 2026-11-15 — WAVE B batch 5: 2 item XL selesai, 272/272 hijau
+
+Kode:
+- M-028 migrasi `quiz_attempt` + kolom `opsi` di `quiz_soal`; model
+  `QuizAttempt` + relasi `Quiz::{kelas,soal,attempt}`, `QuizJawaban::soal`;
+  `QuizService::{mulai,resume-idempoten,sisaDetik,simpanJawaban-autosave,
+  selesai-nilai-PG-otomatis,koreksi-manual,imporDariBank}`; Livewire
+  `Lms/KuisKelola` (buat, impor bank, hasil, koreksi esai) +
+  `Lms/KuisKerjakan` (mulai/autosave/submit, owner strict dari akun sendiri);
+  rute `/lms/kuis` (dosen) + `/lms/kuis-kerjakan` (semua login).
+- M-038 migrasi `payroll_periode` (unik) + `payroll_slip` (unik periode+user);
+  `PayrollService::{total,simpanSlip,kunciPeriode,totalPeriode}` (final
+  terkunci); Livewire `Keuangan/Payroll` di `/keuangan/payroll`.
+- Tes: `tests/Feature/WaveBBatch5Test.php` (7 tes).
+
+## Berikutnya (SCORM + Wave C, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

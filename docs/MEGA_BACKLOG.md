@@ -81,7 +81,7 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=45 (2026-11-14, suite 265 hijau):
+Selesai=47 (2026-11-14, suite 272 hijau):
 Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
 `tests/Feature/WaveABatch2Test.php` 8 tes): M-001..M-020 — detail di bawah.
 Wave B Batch 1: 8 item (bukti: `tests/Feature/WaveBBatch1Test.php` 13 tes):
@@ -104,9 +104,19 @@ M-036 (kolom penyusutan di `aset` + `AsetService` garis lurus idempoten/bulan
 + `aset:susutkan` terjadwal bulanan), M-039 (`lowongan_kerja` +
 `lamaran_kerja` unik per email + Livewire admin `Rekrutmen/Kelola` + publik
 `Rekrutmen/Lamar` di `/karier`).
-Sisa Wave B: M-028 (mesin kuis XL), M-030/031 (SCORM/offline), M-038 (payroll XL).
+Sisa Wave B: M-030/031 (SCORM/offline).
 Catatan P5–P8 performance report tetap utang teknis di luar M-025.
-Wave C/D: belum dimulai (D semua BLOCKED).
+Wave B Batch 5: 2 item XL terakhir Wave B (bukti:
+`tests/Feature/WaveBBatch5Test.php` 7 tes):
+M-028 (mesin kuis: `quiz_attempt` + `QuizService` mulai/resume/autosave/
+selesai-nilai-PG-otomatis/koreksi-esai + `imporDariBank` + kolom `opsi`
+di `quiz_soal`; Livewire `Lms/KuisKelola` + `Lms/KuisKerjakan` owner-scope;
+rute `/lms/kuis` + `/lms/kuis-kerjakan`), M-038 (`payroll_periode` +
+`payroll_slip` + `PayrollService` total/kunci-final + Livewire
+`Keuangan/Payroll` di `/keuangan/payroll`).
+Sisa Wave B+C: SCORM/offline (M-030/031), lalu Wave C M-049..M-060
+(prasyarat CBT M-051 kini terpenuhi oleh mesin kuis; M-054 tetap BLOCKED).
+Wave D: 6 item BLOCKED (butuh konektivitas nyata).
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →
 recheck-tx di PaymentService), M-005 (allowlist act PddiktiController::ALLOWED_ACTS,
