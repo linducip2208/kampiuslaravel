@@ -10,6 +10,7 @@ use App\Services\Ai\ChatbotService;
 use App\Services\Ai\EssayGradingService;
 use App\Services\Ai\MateriAiService;
 use App\Services\Ai\NotulenService;
+use App\Services\Ai\RagService;
 use App\Services\Ai\RekomendasiMkService;
 use App\Services\AiKuotaService;
 use Illuminate\Http\JsonResponse;
@@ -68,6 +69,20 @@ class AiController extends Controller
         ]);
 
         return response()->json(['data' => $svc->nilai($data['jawaban'], $data['kunci'], $request->user()?->id)]);
+    }
+
+    /**
+     * M-057: tanya jawab RAG knowledge-base (kuota + guardrail di service).
+     */
+    public function rag(Request $request, RagService $svc): JsonResponse
+    {
+        $data = $request->validate(['pertanyaan' => 'required|string|min:3|max:2000']);
+
+        if (! AiKuotaService::boleh($request->user()?->id, 'rag')) {
+            return response()->json(['ok' => false, 'message' => 'Kuota AI harian habis. Coba lagi besok.'], 429);
+        }
+
+        return response()->json(['data' => $svc->jawab($data['pertanyaan'], $request->user()?->id)]);
     }
 
     public function ringkas(Request $request, MateriAiService $svc): JsonResponse

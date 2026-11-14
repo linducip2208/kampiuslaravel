@@ -52,6 +52,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/ai/rekomendasi', [AiController::class, 'rekomendasi']);
         Route::post('/ai/grade', [AiController::class, 'grade'])->middleware('throttle:30,1');
         Route::post('/ai/ringkas', [AiController::class, 'ringkas'])->middleware('throttle:30,1');
+        Route::post('/ai/rag', [AiController::class, 'rag'])->middleware('throttle:30,1');
         Route::post('/ai/notulen', [AiController::class, 'notulen'])->middleware('throttle:30,1');
         Route::get('/analitik/anomali', [AiController::class, 'anomali']);
         Route::post('/device-token', [DeviceTokenController::class, 'store']);

@@ -36,6 +36,7 @@ return [
     'tarif' => [
         'default' => 0,
         'chat' => 0,
+        'rag' => 0,
         'ringkas' => 0,
         'grade' => 0,
         'notulen' => 0,

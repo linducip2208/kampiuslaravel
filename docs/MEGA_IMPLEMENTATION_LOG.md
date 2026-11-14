@@ -228,7 +228,27 @@ Kode:
   dinamis + neraca + buku besar) di `/keuangan/gl`.
 - Tes: `tests/Feature/WaveCBatch3Test.php` (4 tes).
 
-## Berikutnya (RAG + SCORM, belum dieksekusi)
+## 2026-11-15 — WAVE C batch 4: RAG + SCORM selesai, 289/289 hijau.
+Wave B 28/28 SELESAI. Tersisa hanya item BLOCKED (M-054 + Wave D).
+
+Kode:
+- M-057 migrasi `knowledge_base` + `knowledge_chunk`; `RagService::{ingest
+  (chunking ±800 char), jawab (retrieval skor kata kunci + driver AI +
+  redaksi PII + catat AiJob + kuota rag)}`; `RagGuardrail::{saringMasukan
+  (blocklist injeksi), redaksiPii (NIK/HP/email), skor, relevan}`;
+  `POST /api/v1/ai/rag` (throttle 30,1 + kuota 429); tarif rag di config.
+  Temuan: `where('tanggal',...)` gagal di SQLite (kolom date tersimpan
+  'Y-m-d H:i:s') — wajib `whereDate` (portabel MySQL+SQLite).
+  Temuan 2: skor retrieval wajib strip tanda baca (`dilaksanakan?`).
+- M-030/031 `ScormService::paket()` — ZIP per pertemuan berisi berkas materi
+  + `imsmanifest.xml` (SCORM 1.2) + `metadata.json`; rute
+  `GET /lms/paket/{pertemuan}` (semua login, throttle 10,1).
+- Tes: `tests/Feature/WaveCBatch4Test.php` (4 tes).
+
+## Status akhir: 59/66 — 7 tersisa semuanya BLOCKED
+- M-054 multi-kampus: butuh DESAIN isolasi yang disahkan.
+- M-061..066 (Wave D): butuh konektivitas nyata (Feeder, gateway prod,
+  WA, Email/FCM penuh, SSO, TTE) — nol kredensial di repo.
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

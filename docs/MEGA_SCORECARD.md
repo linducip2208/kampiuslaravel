@@ -9,7 +9,7 @@ kategori — TIDAK tercapai ronde ini, dan itu dinyatakan eksplisit.
 | Academic ERP | 10 | 10 | +OBE CPL/CPMK + ketercapaian asesmen |
 | PMB & lifecycle | 8 | 5 | alur + VA jalan + tes; minus S1/S2, tanpa CRM/lead |
 | KRS/KHS/transkrip | 8 | 6 | terkunci + QR signed; minus IPS, unbounded, tanpa rekomendasi |
-| LMS & ujian | 8 | 8 | mesin kuis + CBT + forum + tugas/materi teruji; minus SCORM |
+| LMS & ujian | 8 | 8 | mesin kuis + CBT + forum + paket SCORM teruji |
 | Finance & accounting | 10 | 10 | GL penuh + tutup-buku + anggaran + rekon + AP + aset |
 | HR & operasional | 7 | 7 | payroll + rekrutmen + org + reservasi + BKD lanjut selesai |
 | Research & graduation | 7 | 8 | +alumni karier & tracer; tanpa HKI filing |
@@ -17,7 +17,7 @@ kategori — TIDAK tercapai ronde ini, dan itu dinyatakan eksplisit.
 | Security | 10 | 8 | M-001..006 + M-015/016/017 selesai (allowlist, audit, Policy, permission, idempotency); sisa S8–S10 |
 | API & integrasi | 5 | 5 | +kuota AI (429 + estimasi biaya); D BLOCKED |
 | Database & performance | 5 | 5 | overlap DB-side + batch prasyarat/kuota (P1/P3); ringkasan locked-only |
-| Testing & reliability | 4 | 4 | 285/285 + WaveA (19) + WaveB (41) + WaveC (13); tanpa E2E/beban |
+| Testing & reliability | 4 | 4 | 289/289 + WaveA (19) + WaveB (41) + WaveC (17); tanpa E2E/beban |
 | Docs & ops | 3 | 3 | backup teruji (create/verify) + akreditasi; tanpa E2E/beban |
 
 **TOTAL = 90/100** (naik dari 89: +Research).

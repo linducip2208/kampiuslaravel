@@ -34,6 +34,7 @@ use App\Models\PmbPendaftar;
 use App\Models\Prodi;
 use App\Models\Tagihan;
 use App\Models\Tugas;
+use App\Services\ScormService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -307,6 +308,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profil', fn () => view('pages.livewire-page', ['component' => 'profil', 'title' => 'Profil Saya']))->name('profil');
     Route::get('/lms/forum', fn (Request $r) => view('lms.forum', ['kelasId' => $r->integer('kelas') ?: null]))->name('lms.forum');
     Route::get('/lms/kuis-kerjakan', fn (Request $r) => view('lms.kuis-kerjakan', ['quizId' => $r->integer('quiz') ?: null]))->name('lms.kuis.kerjakan');
+    // M-030/031: paket offline SCORM per pertemuan (semua login).
+    Route::get('/lms/paket/{pertemuan}', function (int $pertemuan) {
+        $path = ScormService::paket($pertemuan);
+
+        return response()->download($path, basename($path))->deleteFileAfterSend(true);
+    })->name('lms.paket')->middleware('throttle:10,1');
     Route::get('/cari', [PencarianController::class, 'index'])->name('pencarian');
     Route::get('/kalender', fn () => view('pages.livewire-page', ['component' => 'kalender.kelola', 'title' => 'Kalender Akademik']))->name('kalender.index');
     Route::get('/kalender.ics', [KalenderController::class, 'ics'])->name('kalender.ics');
