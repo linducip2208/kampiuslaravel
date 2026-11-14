@@ -11,6 +11,7 @@ use App\Services\QuizService;
 use DomainException;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * M-028: kerjakan kuis (mahasiswa) — mulai/resume, autosave, submit.
@@ -23,6 +24,8 @@ class KuisKerjakan extends Component
     public array $allowedRoles = [];
 
     public ?int $quizId = null;
+
+    public string $tokenCbt = '';
 
     public array $jawaban = [];
 
@@ -44,7 +47,7 @@ class KuisKerjakan extends Component
         abort_unless($this->quizId, 422);
 
         try {
-            QuizService::mulai($this->quizId, $this->mahasiswaId());
+            QuizService::mulai($this->quizId, $this->mahasiswaId(), $this->tokenCbt !== '' ? $this->tokenCbt : null);
             $this->error = '';
         } catch (DomainException $e) {
             $this->error = $e->getMessage();
@@ -61,10 +64,12 @@ class KuisKerjakan extends Component
         abort_unless($this->quizId, 422);
 
         try {
-            $attempt = QuizService::mulai($this->quizId, $this->mahasiswaId());
+            $attempt = QuizService::mulai($this->quizId, $this->mahasiswaId(), $this->tokenCbt !== '' ? $this->tokenCbt : null);
             QuizService::simpanJawaban($attempt->id, $this->mahasiswaId(), $soalId, $isi);
             $this->error = '';
         } catch (DomainException $e) {
+            $this->error = $e->getMessage();
+        } catch (HttpException $e) {
             $this->error = $e->getMessage();
         }
     }
@@ -98,6 +103,12 @@ class KuisKerjakan extends Component
                 $tersimpan = QuizJawaban::where('mahasiswa_id', $mhs)
                     ->whereIn('quiz_soal_id', $quiz->soal->pluck('id'))
                     ->pluck('jawaban', 'quiz_soal_id');
+
+                // M-051: hormati urutan acak attempt (recovery konsisten).
+                if ($attempt && is_array($attempt->urutan_soal) && $attempt->urutan_soal !== []) {
+                    $byId = $quiz->soal->keyBy('id');
+                    $quiz->setRelation('soal', collect($attempt->urutan_soal)->map(fn ($id) => $byId->get($id))->filter()->values());
+                }
             }
         }
 

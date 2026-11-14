@@ -162,6 +162,9 @@ Route::get('/lowongan', function () {
 
 // Karier publik (M-039): daftar lowongan + lamaran tanpa login.
 Route::get('/karier', fn () => view('pages.livewire-page', ['component' => 'rekrutmen.lamar', 'title' => 'Karier']))->middleware('throttle:public')->name('publik.karier');
+
+// M-060: PWA portal mahasiswa — halaman fallback offline (di-cache service worker).
+Route::get('/offline', fn () => view('publik.offline'))->name('publik.offline');
 // PMB publik
 Route::get('/pmb', [PmbController::class, 'create'])->middleware('throttle:public')->name('pmb.create');
 Route::post('/pmb', [PmbController::class, 'store'])->middleware('throttle:public')->name('pmb.store');
@@ -285,6 +288,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/dosen', fn () => view('pages.livewire-page', ['component' => 'admin.dosen-data', 'title' => 'Data Dosen & Tendik']))->name('admin.dosen');
         Route::get('/admin/kurikulum', fn () => view('pages.livewire-page', ['component' => 'master.kurikulum', 'title' => 'Kurikulum']))->name('admin.kurikulum');
         Route::get('/admin/impor', fn () => view('pages.livewire-page', ['component' => 'admin.impor-csv', 'title' => 'Impor CSV']))->name('admin.impor');
+        Route::get('/admin/akreditasi', fn () => view('pages.livewire-page', ['component' => 'admin.akreditasi', 'title' => 'Akreditasi']))->name('admin.akreditasi');
         Route::get('/admin/organisasi', fn () => view('pages.livewire-page', ['component' => 'organisasi.kelola', 'title' => 'Organisasi Kemahasiswaan']))->name('admin.organisasi');
         Route::get('/admin/rekrutmen', fn () => view('pages.livewire-page', ['component' => 'rekrutmen.kelola', 'title' => 'Rekrutmen']))->name('admin.rekrutmen');
         Route::get('/admin/jadwal', fn () => view('pages.livewire-page', ['component' => 'jadwal.generate', 'title' => 'Jadwal Kuliah']))->name('admin.jadwal');

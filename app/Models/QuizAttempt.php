@@ -9,7 +9,7 @@ class QuizAttempt extends Model
 {
     protected $table = 'quiz_attempt';
 
-    protected $fillable = ['quiz_id', 'mahasiswa_id', 'mulai_at', 'selesai_at', 'status', 'total_skor'];
+    protected $fillable = ['quiz_id', 'mahasiswa_id', 'urutan_soal', 'mulai_at', 'selesai_at', 'status', 'total_skor'];
 
     public const STATUS_BERJALAN = 'berjalan';
 
@@ -21,6 +21,7 @@ class QuizAttempt extends Model
             'mulai_at' => 'datetime',
             'selesai_at' => 'datetime',
             'total_skor' => 'decimal:2',
+            'urutan_soal' => 'array',
         ];
     }
 

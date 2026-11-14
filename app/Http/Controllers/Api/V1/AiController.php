@@ -11,6 +11,7 @@ use App\Services\Ai\EssayGradingService;
 use App\Services\Ai\MateriAiService;
 use App\Services\Ai\NotulenService;
 use App\Services\Ai\RekomendasiMkService;
+use App\Services\AiKuotaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -20,7 +21,15 @@ class AiController extends Controller
     {
         $data = $request->validate(['pesan' => 'required|string|min:2|max:2000']);
 
-        return response()->json(['data' => ['jawaban' => $bot->ask($request->user()?->id, $data['pesan'])]]);
+        // M-058: kuota harian per user (429 bila habis; pola untuk jenis lain).
+        if (! AiKuotaService::boleh($request->user()?->id, 'chat')) {
+            return response()->json(['ok' => false, 'message' => 'Kuota AI harian habis. Coba lagi besok.'], 429);
+        }
+
+        $jawaban = $bot->ask($request->user()?->id, $data['pesan']);
+        AiKuotaService::catat($request->user()?->id, 'chat');
+
+        return response()->json(['data' => ['jawaban' => $jawaban]]);
     }
 
     public function atRisk(Request $request, AtRiskService $svc): JsonResponse

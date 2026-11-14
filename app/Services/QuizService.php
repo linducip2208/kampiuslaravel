@@ -17,8 +17,8 @@ use Illuminate\Support\Facades\DB;
  */
 class QuizService
 {
-    /** Mulai/resume attempt (idempoten per quiz+mhs). */
-    public static function mulai(int $quizId, int $mahasiswaId): QuizAttempt
+    /** Mulai/resume attempt (idempoten per quiz+mhs). CBT: verifikasi token + kunci urutan acak. */
+    public static function mulai(int $quizId, int $mahasiswaId, ?string $token = null): QuizAttempt
     {
         $quiz = Quiz::findOrFail($quizId);
 
@@ -26,10 +26,23 @@ class QuizService
             throw new DomainException('Deadline kuis sudah lewat.');
         }
 
-        return QuizAttempt::firstOrCreate(
+        if ($quiz->token !== null && $quiz->token !== '' && $token !== $quiz->token) {
+            throw new DomainException('Token CBT salah.');
+        }
+
+        $attempt = QuizAttempt::firstOrCreate(
             ['quiz_id' => $quiz->id, 'mahasiswa_id' => $mahasiswaId],
             ['mulai_at' => now(), 'status' => QuizAttempt::STATUS_BERJALAN]
         );
+
+        // M-051: kunci urutan soal acak saat attempt dibuat (recovery pakai urutan sama).
+        if ($attempt->urutan_soal === null && $quiz->acak_soal) {
+            $ids = QuizSoal::where('quiz_id', $quiz->id)->orderBy('id')->pluck('id')->all();
+            shuffle($ids);
+            $attempt->update(['urutan_soal' => $ids]);
+        }
+
+        return $attempt->fresh();
     }
 
     /** Sisa waktu detik (0 bila habis). */
@@ -169,6 +182,40 @@ class QuizService
         }
 
         return $count;
+    }
+
+    /** M-051: segel otomatis attempt kedaluwarsa (durasi habis / deadline lewat). */
+    public static function sealKedaluwarsa(int $limit = 200): int
+    {
+        $disegel = 0;
+
+        $kandidat = QuizAttempt::with('quiz')
+            ->where('status', QuizAttempt::STATUS_BERJALAN)
+            ->orderBy('id')
+            ->limit($limit)
+            ->get();
+
+        foreach ($kandidat as $attempt) {
+            $quiz = $attempt->quiz;
+
+            if (! $quiz) {
+                continue;
+            }
+
+            $habisDurasi = (int) ($quiz->durasi_menit ?? 0) > 0 && self::sisaDetik($attempt) <= 0;
+            $lewatDeadline = $quiz->deadline && now()->greaterThan($quiz->deadline);
+
+            if ($habisDurasi || $lewatDeadline) {
+                try {
+                    self::selesai($attempt->id, $attempt->mahasiswa_id);
+                    $disegel++;
+                } catch (\Throwable) {
+                    continue;
+                }
+            }
+        }
+
+        return $disegel;
     }
 
     public static function normalisasi(?string $jawaban): string

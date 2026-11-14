@@ -1,0 +1,31 @@
+{
+  "name": "KAMPUS — Portal Mahasiswa",
+  "short_name": "KAMPUS",
+  "description": "Portal mahasiswa: KRS, KHS, pembayaran, dan LMS.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F7FB",
+  "theme_color": "#1769F5",
+  "icons": [
+    {
+      "src": "/img/logo-kampus-mark.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/logo-kampus.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

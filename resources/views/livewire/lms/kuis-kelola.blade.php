@@ -19,7 +19,21 @@
                         <label class="form-label">Deadline</label>
                         <input type="datetime-local" class="form-control" wire:model="deadline">
                     </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Mode</label>
+                        <select class="form-select" wire:model="mode">
+                            <option value="latihan">Latihan</option>
+                            <option value="cbt">CBT</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Token CBT</label>
+                        <input type="text" class="form-control" wire:model="token" maxlength="12" placeholder="opsional">
+                    </div>
                     <div class="col-md-2 d-flex align-items-end">
+                        <label class="form-check"><input type="checkbox" class="form-check-input" wire:model="acak_soal"> Acak soal</label>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
                         <button class="btn btn-primary" wire:click="simpan">Buat</button>
                     </div>
                     @error('judul')<div class="col-12 text-danger">{{ $message }}</div>@enderror
@@ -45,11 +59,12 @@
     <div class="card">
         <div class="table-responsive">
             <table class="table table-vcenter">
-                <thead><tr><th>Judul</th><th>Soal</th><th>Durasi</th><th>Deadline</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>Judul</th><th>Mode</th><th>Soal</th><th>Durasi</th><th>Deadline</th><th>Aksi</th></tr></thead>
                 <tbody>
                     @foreach($daftar as $q)
                         <tr>
                             <td>{{ $q->judul }}</td>
+                            <td>{{ $q->mode ?? 'latihan' }}</td>
                             <td>{{ $q->soal_count }}</td>
                             <td>{{ $q->durasi_menit }} mnt</td>
                             <td>{{ $q->deadline ?? '—' }}</td>

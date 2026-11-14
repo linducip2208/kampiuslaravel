@@ -81,7 +81,7 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=47 (2026-11-14, suite 272 hijau):
+Selesai=51 (2026-11-15, suite 277 hijau):
 Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
 `tests/Feature/WaveABatch2Test.php` 8 tes): M-001..M-020 — detail di bawah.
 Wave B Batch 1: 8 item (bukti: `tests/Feature/WaveBBatch1Test.php` 13 tes):
@@ -114,8 +114,18 @@ di `quiz_soal`; Livewire `Lms/KuisKelola` + `Lms/KuisKerjakan` owner-scope;
 rute `/lms/kuis` + `/lms/kuis-kerjakan`), M-038 (`payroll_periode` +
 `payroll_slip` + `PayrollService` total/kunci-final + Livewire
 `Keuangan/Payroll` di `/keuangan/payroll`).
-Sisa Wave B+C: SCORM/offline (M-030/031), lalu Wave C M-049..M-060
-(prasyarat CBT M-051 kini terpenuhi oleh mesin kuis; M-054 tetap BLOCKED).
+Wave C Batch 1: 4 item (bukti: `tests/Feature/WaveCBatch1Test.php` 5 tes):
+M-050 (`akreditasi_dokumen` + Livewire `Admin/Akreditasi` verifikasi di
+`/admin/akreditasi`), M-051 (lapisan CBT di atas mesin kuis: kolom
+`mode/token/acak_soal` di quiz + `urutan_soal` di attempt, token wajib,
+urutan acak dikunci per attempt, `kuis:seal-kedaluwarsa` terjadwal per jam;
+form kelola + input token peserta), M-058 (`ai_kuota` + `AiKuotaService`
+kuota harian + tarif estimasi + hook 429 di `AiController@chat`, tarif di
+`config/ai.php`), M-060 (PWA: `manifest.webmanifest`, `sw.js` cache+offline,
+meta theme-color + registrasi SW, rute `/offline`).
+Sisa: M-030/031 (SCORM/offline), Wave C M-049 (OBE), M-052 (GL), M-053
+(BKD lanjut), M-054 (multi-kampus BLOCKED), M-055 (alumni+karier),
+M-056 (analitik eksekutif), M-057 (RAG), M-059 (kontrak Flutter).
 Wave D: 6 item BLOCKED (butuh konektivitas nyata).
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →

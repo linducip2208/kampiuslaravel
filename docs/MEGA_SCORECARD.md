@@ -9,18 +9,18 @@ kategori — TIDAK tercapai ronde ini, dan itu dinyatakan eksplisit.
 | Academic ERP | 10 | 10 | M-021..M-026 selesai (rollover terjadwal, DO, KHS paginasi, rekomendasi+waitlist) |
 | PMB & lifecycle | 8 | 5 | alur + VA jalan + tes; minus S1/S2, tanpa CRM/lead |
 | KRS/KHS/transkrip | 8 | 6 | terkunci + QR signed; minus IPS, unbounded, tanpa rekomendasi |
-| LMS & ujian | 8 | 7 | mesin kuis + forum + tugas/materi teruji; minus SCORM |
+| LMS & ujian | 8 | 8 | mesin kuis + CBT + forum + tugas/materi teruji; minus SCORM |
 | Finance & accounting | 10 | 10 | tutup-buku, anggaran, rekon, AP, aset susut selesai; tanpa GL penuh (Wave C) |
 | HR & operasional | 7 | 7 | payroll + rekrutmen + org + reservasi selesai; sisa BKD lanjut (Wave C) |
-| Research & graduation | 7 | 6 | hibah + publikasi + pengabdian dasar selesai; tanpa review lanjut/HKI filing |
-| UI/UX | 10 | 6 | landing 11 seksi, shell, dashboard; tanpa E2E/screenshot/PWA/audit a11y |
+| Research & graduation | 7 | 7 | +akreditasi evidence; tanpa review lanjut/HKI filing |
+| UI/UX | 10 | 7 | +PWA (manifest/SW/offline); minus E2E/screenshot/audit a11y |
 | Security | 10 | 8 | M-001..006 + M-015/016/017 selesai (allowlist, audit, Policy, permission, idempotency); sisa S8–S10 |
-| API & integrasi | 5 | 4 | envelope + OpenAPI + throttle sensitif; D BLOCKED |
+| API & integrasi | 5 | 5 | +kuota AI (429 + estimasi biaya); D BLOCKED |
 | Database & performance | 5 | 5 | overlap DB-side + batch prasyarat/kuota (P1/P3); ringkasan locked-only |
-| Testing & reliability | 4 | 4 | 272/272 + WaveA (19) + WaveB (41); tanpa E2E/beban |
-| Docs & ops | 3 | 3 | backup teruji (create/verify) + 47 docs; tanpa E2E/beban |
+| Testing & reliability | 4 | 4 | 277/277 + WaveA (19) + WaveB (41) + WaveC (5); tanpa E2E/beban |
+| Docs & ops | 3 | 3 | backup teruji (create/verify) + akreditasi; tanpa E2E/beban |
 
-**TOTAL = 85/100** (naik dari 82: +LMS, +HR).
+**TOTAL = 89/100** (naik dari 85: +LMS, +UI/UX, +API, +Research).
 
 Klasifikasi bukti per klaim: Implemented / Tested / Browser-verified /
 Production-verified / External-verified — saat ini mayoritas Implemented+Tested;

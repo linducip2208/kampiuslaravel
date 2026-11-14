@@ -173,7 +173,29 @@ Kode:
   terkunci); Livewire `Keuangan/Payroll` di `/keuangan/payroll`.
 - Tes: `tests/Feature/WaveBBatch5Test.php` (7 tes).
 
-## Berikutnya (SCORM + Wave C, belum dieksekusi)
+## 2026-11-15 — WAVE C batch 1: 4 item selesai, 277/277 hijau
+
+Kode:
+- M-050 migrasi `akreditasi_dokumen` (unik? tidak — per prodi+kategori+judul
+  boleh ganda; index prodi+status) + model + Livewire `Admin/Akreditasi`
+  (CRUD + verifikasi + AuditLog implisit via verifikasi timestamp) di
+  `/admin/akreditasi`.
+- M-051 migrasi mode/token/acak di `quiz` + `urutan_soal` di `quiz_attempt`;
+  `QuizService::mulai($quiz,$mhs,$token)` (token wajib bila diset;
+  kunci urutan acak saat attempt dibuat), render `KuisKerjakan` hormati
+  urutan attempt; `sealKedaluwarsa()` + `kuis:seal-kedaluwarsa` (jadwal
+  per jam); form kelola CBT + input token peserta.
+- M-058 migrasi `ai_kuota` (unik user+tanggal+jenis) + `AiKuotaService`
+  (batas config `ai.batas_harian`, tarif `ai.tarif`, `boleh()`/`catat()`
+  dengan `whereDate` — temuan: where exact gagal di SQLite karena kolom
+  date tersimpan 'Y-m-d H:i:s'; diperbaiki + dibuktikan tes) + hook 429 di
+  `AiController@chat`.
+- M-060 `public/manifest.webmanifest` + `public/sw.js` (cache shell +
+  fallback `/offline`) + meta theme-color + registrasi SW di layout Tabler +
+  rute `/offline`.
+- Tes: `tests/Feature/WaveCBatch1Test.php` (5 tes).
+
+## Berikutnya (SCORM + sisa Wave C, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

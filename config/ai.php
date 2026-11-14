@@ -23,4 +23,21 @@ return [
         'timeout' => (int) env('AI_TIMEOUT', 60),
         'max_tokens' => (int) env('AI_MAX_TOKENS', 800),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Kuota & tarif (M-058)
+    |--------------------------------------------------------------------------
+    | Batas pemakaian harian per user per jenis + tarif estimasi Rp/panggilan.
+    | Ubah via .env (AI_BATAS_HARIAN) bila perlu; driver simulated = Rp0.
+    */
+    'batas_harian' => (int) env('AI_BATAS_HARIAN', 100),
+
+    'tarif' => [
+        'default' => 0,
+        'chat' => 0,
+        'ringkas' => 0,
+        'grade' => 0,
+        'notulen' => 0,
+    ],
 ];

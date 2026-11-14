@@ -22,6 +22,12 @@
                     @endif
                 </div>
                 @if(!$attempt)
+                    @if(!empty($quiz->token))
+                        <div class="mt-2" style="max-width:280px">
+                            <label class="form-label">Token CBT</label>
+                            <input type="text" class="form-control" wire:model="tokenCbt" maxlength="12" placeholder="Token dari pengawas">
+                        </div>
+                    @endif
                     <button class="btn btn-primary mt-2" wire:click="mulai">Mulai Kerjakan</button>
                 @endif
             </div>

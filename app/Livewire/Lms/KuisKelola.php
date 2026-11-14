@@ -30,6 +30,12 @@ class KuisKelola extends Component
 
     public string $deadline = '';
 
+    public string $mode = 'latihan';
+
+    public string $token = '';
+
+    public bool $acak_soal = false;
+
     public ?int $imporQuizId = null;
 
     public int $imporLimit = 20;
@@ -48,17 +54,24 @@ class KuisKelola extends Component
             'judul' => 'required|string|max:255',
             'durasi_menit' => 'required|integer|min:0|max:600',
             'deadline' => 'nullable|date|after:now',
+            'mode' => 'required|in:latihan,cbt',
+            'token' => 'nullable|string|max:12',
+            'acak_soal' => 'boolean',
         ]);
 
         Quiz::create([
             'kelas_id' => $this->kelasId,
             'judul' => $this->judul,
+            'mode' => $this->mode,
+            'token' => $this->mode === 'cbt' && $this->token !== '' ? $this->token : null,
+            'acak_soal' => $this->mode === 'cbt' && $this->acak_soal,
             'durasi_menit' => $this->durasi_menit,
             'deadline' => $this->deadline ?: null,
         ]);
 
-        $this->reset(['judul', 'durasi_menit', 'deadline']);
+        $this->reset(['judul', 'durasi_menit', 'deadline', 'mode', 'token', 'acak_soal']);
         $this->durasi_menit = 60;
+        $this->mode = 'latihan';
         $this->message = 'Kuis dibuat. Impor soal dari bank soal untuk mengisi.';
     }
 
