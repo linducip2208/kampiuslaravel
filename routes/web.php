@@ -284,8 +284,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/kalender.ics', [KalenderController::class, 'ics'])->name('kalender.ics');
     Route::get('/helpdesk', fn () => view('pages.livewire-page', ['component' => 'helpdesk.tiket', 'title' => 'Helpdesk']))->name('helpdesk.index');
 
-    // Audit viewer: admin platform + pimpinan
-    Route::middleware('role:superadmin|admin_prodi|pimpinan')->group(function () {
+    // Audit viewer: pola permission Spatie (M-016) — semua pemegang laporan.view.
+    Route::middleware('permission:laporan.view')->group(function () {
         Route::get('/admin/audit', [AuditController::class, 'index'])->name('admin.audit');
     });
 

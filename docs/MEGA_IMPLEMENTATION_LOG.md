@@ -35,7 +35,32 @@ Kode (pola laravel-best-practices: ikuti konvensi repo, tanpa pola baru):
   IPK-wali, callback-PMBVA-403, settle ganda, bayar-manual ganda, piutang,
   jurnal-nol, cicilan restore, policy HTTP + matriks Gate).
 
-## Berikutnya (diusulkan, belum dieksekusi)
+## 2026-11-14 — WAVE A batch 2: 7 item terakhir selesai, WAVE A 20/20, 231/231 hijau
+
+Kode:
+- M-005 `PddiktiController::ALLOWED_ACTS` — `push()` validasi `in:` allowlist
+  (GetToken, Insert/Update/Delete/Get Mhs+Nilai+Kelulusan); act liar → 422.
+- M-006 `PddiktiController::export()` — tulis `AuditLog` (pddikti.export, milik
+  user) tiap export sebelum `Storage::download`.
+- M-010 `AkademikService::ringkasan($id, $hanyaTerkunci = true)` — default
+  hanya `is_locked`; KHS/Transkrip/Yudisium/at-risk otomatis resmi; data lama
+  WaveACriticalTest diberi `is_locked=true` (nilai draft tak masuk IPK resmi).
+- M-016 grup audit viewer `role:...` → `permission:laporan.view` (pola Spatie;
+  superadmin/admin_prodi/pimpinan semua pegang izin ini); `RouteGuardTest`
+  diselaraskan ke ekspektasi permission.
+- M-017 migrasi+model `webhook_events` (sumber/event/idempotency_key unik/
+  payload); `PublikApiController::webhook` dedupe by signature-hash → replay
+  200 `deduped:true` 1 baris; `BayarController::callback` hormati header
+  `Idempotency-Key` (fallback hash konten+reference) + catat event payment.
+- M-018 `Kelola::assign()` tegakkan `kuota` (hitung `mahasiswa_beasiswa`;
+  milik-sendiri dikecualikan; habis → error validasi, tanpa baris baru).
+- M-020 `WaveABatch2Test::test_upload_traversal_dinetralkan` — `.php` traversal
+  ditolak 422 (mimes), PDF valid tersimpan hash tanpa `..`, route dokumentasi
+  traversal tetap 404 (pola DokumenTraversalTest).
+- Tes: `tests/Feature/WaveABatch2Test.php` (8 tes: allowlist, audit-export,
+  locked-only, permission, webhook-replay, payment-idempotency, kuota, traversal).
+
+## Berikutnya (Wave B, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

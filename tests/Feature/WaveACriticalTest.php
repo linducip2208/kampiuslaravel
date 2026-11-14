@@ -75,10 +75,10 @@ class WaveACriticalTest extends TestCase
         [$user, $mhs] = $this->mahasiswaDenganUser('20260001', $prodi);
 
         DB::table('nilai')->insert([
-            'mahasiswa_id' => $mhs, 'kelas_id' => $this->kelas($prodi, $tahun1, 'A1', 3), 'bobot' => 4.0,
+            'mahasiswa_id' => $mhs, 'kelas_id' => $this->kelas($prodi, $tahun1, 'A1', 3), 'bobot' => 4.0, 'is_locked' => true,
         ]);
         DB::table('nilai')->insert([
-            'mahasiswa_id' => $mhs, 'kelas_id' => $this->kelas($prodi, $tahun2, 'A2', 3), 'bobot' => 1.0,
+            'mahasiswa_id' => $mhs, 'kelas_id' => $this->kelas($prodi, $tahun2, 'A2', 3), 'bobot' => 1.0, 'is_locked' => true,
         ]);
 
         $data = $this->actingAs($user)->get(route('khs.show', $mhs))->assertOk()->viewData();
@@ -125,10 +125,10 @@ class WaveACriticalTest extends TestCase
         [, $mhs] = $this->mahasiswaDenganUser('20260003', $prodi);
 
         DB::table('nilai')->insert([
-            'mahasiswa_id' => $mhs, 'kelas_id' => $this->kelas($prodi, $tahun2, 'C1', 4), 'bobot' => 4.0,
+            'mahasiswa_id' => $mhs, 'kelas_id' => $this->kelas($prodi, $tahun2, 'C1', 4), 'bobot' => 4.0, 'is_locked' => true,
         ]);
         DB::table('nilai')->insert([
-            'mahasiswa_id' => $mhs, 'kelas_id' => $this->kelas($prodi, $tahun2, 'C2', 1), 'bobot' => 1.0,
+            'mahasiswa_id' => $mhs, 'kelas_id' => $this->kelas($prodi, $tahun2, 'C2', 1), 'bobot' => 1.0, 'is_locked' => true,
         ]);
 
         $ipk = Livewire::actingAs($admin)->test(WaliList::class)->viewData('ipk');

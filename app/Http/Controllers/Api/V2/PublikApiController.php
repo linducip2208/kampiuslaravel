@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
 use App\Models\Prodi;
 use App\Models\Setting;
+use App\Models\WebhookEvent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -69,11 +70,26 @@ class PublikApiController extends Controller
             'payload' => 'nullable|array',
         ]);
 
+        // M-017: idempotency-key + event-log. Replay signature sama → 200 tanpa efek ganda.
+        $key = 'v2:'.hash('sha256', $signature.'|'.$request->getContent());
+        $existing = WebhookEvent::where('idempotency_key', $key)->first();
+
+        if ($existing) {
+            return response()->json(['ok' => true, 'event' => $existing->event, 'deduped' => true]);
+        }
+
+        $stored = WebhookEvent::create([
+            'sumber' => 'v2',
+            'event' => $validated['event'],
+            'idempotency_key' => $key,
+            'payload_json' => ['payload_keys' => array_keys($validated['payload'] ?? [])],
+        ]);
+
         Log::info('webhook.v2.received', [
             'event' => $validated['event'],
             'payload_keys' => array_keys($validated['payload'] ?? []),
         ]);
 
-        return response()->json(['ok' => true, 'event' => $validated['event']]);
+        return response()->json(['ok' => true, 'event' => $stored->event]);
     }
 }

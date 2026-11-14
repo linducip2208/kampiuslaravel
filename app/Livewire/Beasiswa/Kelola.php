@@ -88,6 +88,23 @@ class Kelola extends Component
 
         $mhs = Mahasiswa::where('nim', trim($this->assignNim))->firstOrFail();
 
+        $beasiswa = Beasiswa::findOrFail($this->assignBeasiswaId);
+
+        // M-018: tegakkan kuota — kuota habis → tolak (bukan diam-diam over-assign).
+        if ($beasiswa->kuota !== null) {
+            $terpakai = MahasiswaBeasiswa::where('beasiswa_id', $beasiswa->id)->count();
+            $sudahPunya = MahasiswaBeasiswa::where('beasiswa_id', $beasiswa->id)
+                ->where('mahasiswa_id', $mhs->id)
+                ->where('tahun_akademik_id', $this->assignTahunId)
+                ->exists();
+            if (! $sudahPunya && $terpakai >= (int) $beasiswa->kuota) {
+                $this->addError('assignBeasiswaId', "Kuota beasiswa {$beasiswa->nama} habis ({$terpakai}/{$beasiswa->kuota}).");
+                $this->message = "Kuota beasiswa {$beasiswa->nama} habis.";
+
+                return;
+            }
+        }
+
         MahasiswaBeasiswa::updateOrCreate(
             ['mahasiswa_id' => $mhs->id, 'beasiswa_id' => $this->assignBeasiswaId, 'tahun_akademik_id' => $this->assignTahunId],
             ['status' => 'aktif']

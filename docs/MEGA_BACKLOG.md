@@ -81,15 +81,23 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=13 (2026-11-14, bukti: `tests/Feature/WaveACriticalTest.php`, 11 tes):
+Selesai=20 (2026-11-14, bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
+`tests/Feature/WaveABatch2Test.php` 8 tes, suite 231 hijau):
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →
-recheck-tx di PaymentService), M-007 (IPS semester berjalan di KhsController),
-M-008 (IPK server-side, input browser diabaikan + readonly), M-009 (IPK wali
-berbobot SKS + fix integer-division SQLite `* 1.0`), M-011 (piutang & lunas_pct
-termasuk denda di 3 titik: DashboardController, pimpinan, landing), M-012
-(jurnal tolak nominal ≤0 + assert seimbang), M-013 (migrasi index wave_a),
-M-014 (soft deletes tagihan_cicilan + model + tes restore), M-015
-(TagihanPolicy/PembayaranPolicy + `bayar` vs `view` + tes matriks), M-019
-(rename ExampleUnitTest). Sisa Wave A: M-005, M-006, M-010, M-016, M-017, M-018, M-020.
-Setiap item selesai → bukti di IMPLEMENTATION_LOG.
+recheck-tx di PaymentService), M-005 (allowlist act PddiktiController::ALLOWED_ACTS,
+act liar → 422), M-006 (AuditLog tiap export PDDikti milik user), M-007
+(IPS semester berjalan di KhsController), M-008 (IPK server-side, input browser
+diabaikan + readonly), M-009 (IPK wali berbobot SKS + fix integer-division
+SQLite `* 1.0`), M-010 (ringkasan() default hanya nilai terkunci; KHS/Transkrip
+ikut; edit terkunci tetap ditolak), M-011 (piutang & lunas_pct termasuk denda
+di 3 titik: DashboardController, pimpinan, landing), M-012 (jurnal tolak
+nominal ≤0 + assert seimbang), M-013 (migrasi index wave_a), M-014 (soft deletes
+tagihan_cicilan + model + tes restore), M-015 (TagihanPolicy/PembayaranPolicy +
+`bayar` vs `view` + tes matriks), M-016 (grup audit viewer migrasi ke
+`permission:laporan.view` sebagai pola Spatie), M-017 (webhook_events +
+idempotency-key + event-log di webhook v2 & callback payment; replay → 200
+deduped), M-018 (kuota beasiswa ditegakkan di Kelola::assign; habis → ditolak),
+M-019 (rename ExampleUnitTest), M-020 (tes traversal upload per modul +
+Laravel store hash aman).
+WAVE A SELESAI 20/20. Berikutnya: Wave B sesuai urutan dependensi di atas.

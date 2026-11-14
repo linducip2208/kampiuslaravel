@@ -32,7 +32,7 @@ class RouteGuardTest extends TestCase
             'admin.master' => ['superadmin'],
             'admin.impor' => ['superadmin'],
             'admin.integrasi' => ['superadmin'],
-            'admin.audit' => ['superadmin'],
+            'admin.audit' => ['permission:laporan.view'],
             'dashboard.pimpinan' => ['pimpinan'],
             'skripsi.yudisium' => ['pimpinan'],
             'dosen.krs.persetujuan' => ['dosen'],

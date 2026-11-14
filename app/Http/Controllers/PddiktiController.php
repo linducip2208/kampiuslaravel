@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\Setting;
 use App\Services\PddiktiService;
 use Illuminate\Http\JsonResponse;
@@ -25,20 +26,40 @@ class PddiktiController extends Controller
         return view('pddikti.index');
     }
 
+    /** Daftar act Feeder yang diizinkan (allowlist — M-005, act liar → 422). */
+    public const ALLOWED_ACTS = [
+        'GetToken',
+        'InsertMhs', 'UpdateMhs', 'DeleteMhs', 'GetMhs',
+        'InsertNilai', 'UpdateNilai', 'DeleteNilai', 'GetNilai',
+        'InsertKelulusan', 'UpdateKelulusan', 'GetKelulusan',
+    ];
+
     public function export(string $jenis, PddiktiService $feeder): StreamedResponse
     {
         abort_unless(in_array($jenis, ['mahasiswa', 'nilai', 'kelulusan'], true), 404);
 
         $path = $feeder->exportCsv($jenis);
 
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'pddikti.export',
+            'model' => 'pddikti',
+            'model_id' => 0,
+            'diff_json' => ['jenis' => $jenis, 'path' => $path],
+            'created_at' => now(),
+        ]);
+
         return Storage::download($path);
     }
 
     public function push(Request $request, PddiktiService $feeder): JsonResponse
     {
-        $request->validate(['act' => 'required|string|max:60', 'record' => 'required|array']);
+        $validated = $request->validate([
+            'act' => ['required', 'string', 'max:60', 'in:'.implode(',', self::ALLOWED_ACTS)],
+            'record' => 'required|array',
+        ]);
 
-        return response()->json($feeder->push($request->act, $request->record));
+        return response()->json($feeder->push($validated['act'], $validated['record']));
     }
 
     /** Status kesiapan Feeder live-sync (tanpa panggil jaringan — murah & cacheable). */

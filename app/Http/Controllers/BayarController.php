@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Mahasiswa;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
+use App\Models\WebhookEvent;
 use App\Services\KalenderService;
 use App\Services\Payment\PaymentService;
 use App\Services\PmbVaService;
@@ -106,9 +107,19 @@ class BayarController extends Controller
             return response()->json(['ok' => false], 400);
         }
 
+        // M-017: idempotency-key + event-log payment. Replay → 200 tanpa efek ganda.
+        $idemKey = (string) ($request->header('Idempotency-Key') ?: 'pay:'.hash('sha256', (string) $request->getContent().'|'.$reference));
+        $duplikat = WebhookEvent::where('idempotency_key', $idemKey)->first();
+        if ($duplikat) {
+            return response()->json(['ok' => true, 'deduped' => true]);
+        }
+
         // VA biaya pendaftaran PMB (bukan tagihan mahasiswa): lunasi pendaftar.
         if (str_starts_with($reference, 'PMBVA-')) {
-            return response()->json(['ok' => app(PmbVaService::class)->settleByReference($reference)]);
+            $ok = (bool) app(PmbVaService::class)->settleByReference($reference);
+            WebhookEvent::create(['sumber' => 'payment', 'event' => 'payment.callback', 'idempotency_key' => $idemKey, 'payload_json' => ['reference' => $reference]]);
+
+            return response()->json(['ok' => $ok]);
         }
 
         // Tolak nominal callback yang tidak cocok dengan tagihan (anti manipulasi).
@@ -120,7 +131,10 @@ class BayarController extends Controller
             }
         }
 
-        return response()->json(['ok' => $pay->settleByReference($reference)]);
+        $ok = (bool) $pay->settleByReference($reference);
+        WebhookEvent::create(['sumber' => 'payment', 'event' => 'payment.callback', 'idempotency_key' => $idemKey, 'payload_json' => ['reference' => $reference]]);
+
+        return response()->json(['ok' => $ok]);
     }
 
     public function status(Pembayaran $pembayaran, PaymentService $pay): JsonResponse

@@ -22,11 +22,16 @@ class AkademikService
     /**
      * @return array{ipk: float, total_sks: int, per_tahun: array<int, array{ip: float, sks: int}>, nilai: Collection}
      */
-    public static function ringkasan(int $mahasiswaId): array
+    public static function ringkasan(int $mahasiswaId, bool $hanyaTerkunci = true): array
     {
-        $nilai = Nilai::with('kelas.matakuliah', 'kelas.tahunAkademik')
-            ->where('mahasiswa_id', $mahasiswaId)
-            ->get();
+        $query = Nilai::with('kelas.matakuliah', 'kelas.tahunAkademik')
+            ->where('mahasiswa_id', $mahasiswaId);
+
+        if ($hanyaTerkunci) {
+            $query->where('is_locked', true);
+        }
+
+        $nilai = $query->get();
 
         $totalBobot = 0.0;
         $totalSks = 0;
