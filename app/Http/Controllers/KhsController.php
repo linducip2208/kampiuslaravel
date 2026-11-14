@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\AuthorizesMahasiswaData;
 use App\Models\Mahasiswa;
+use App\Models\Nilai;
+use App\Models\TahunAkademik;
 use App\Services\AkademikService;
 use App\Support\DokumenTte;
 use App\Support\QrSvg;
@@ -15,12 +17,22 @@ class KhsController extends Controller
 {
     use AuthorizesMahasiswaData;
 
-    public function show(int $mahasiswaId): View
+    public function show(int $mahasiswaId, Request $request): View
     {
         $this->authorizeMahasiswa($mahasiswaId);
 
         $mahasiswa = Mahasiswa::with(['user', 'prodi'])->findOrFail($mahasiswaId);
+        // IPK resmi tetap dari ringkasan penuh (nilai terkunci); tabel
+        // display dipaginasi + bisa difilter per periode (M-024, anti-unbounded).
         $ringkasan = AkademikService::ringkasan($mahasiswaId);
+        $tahunFilter = $request->integer('tahun') ?: null;
+
+        $nilaiQuery = Nilai::with('kelas.matakuliah', 'kelas.tahunAkademik')
+            ->where('mahasiswa_id', $mahasiswaId)
+            ->where('is_locked', true)
+            ->when($tahunFilter, fn ($q) => $q->whereHas('kelas', fn ($k) => $k->where('tahun_akademik_id', $tahunFilter)))
+            ->orderBy('id');
+
         $verifyUrl = route('khs.verify', [
             'mahasiswa' => $mahasiswaId,
             's' => DokumenTte::tanda($this->payload($mahasiswaId)),
@@ -29,11 +41,17 @@ class KhsController extends Controller
         return view('khs.show', [
             'mahasiswa' => $mahasiswa,
             'mahasiswaId' => $mahasiswaId,
-            'nilai' => $ringkasan['nilai'],
+            'nilai' => $nilaiQuery->paginate(25)->withQueryString(),
             'ipk' => $ringkasan['ipk'],
             'ip' => $this->ipSemesterBerjalan($ringkasan),
             'totalSks' => $ringkasan['total_sks'],
             'perTahun' => $ringkasan['per_tahun'],
+            'tahunFilter' => $tahunFilter,
+            'tahunList' => array_keys($ringkasan['per_tahun']),
+            'tahunOptions' => TahunAkademik::whereIn('id', array_keys($ringkasan['per_tahun']))
+                ->get(['id', 'tahun', 'semester'])
+                ->mapWithKeys(fn ($t) => [$t->id => $t->tahun.' · '.ucfirst((string) $t->semester)])
+                ->all(),
             'verifyUrl' => $verifyUrl,
             'qrSvg' => QrSvg::trySvg($verifyUrl),
             'tte' => DokumenTte::stamp('KHS-'.$mahasiswa->nim.'-'.$mahasiswaId),

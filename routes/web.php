@@ -56,7 +56,7 @@ Route::get('/health', function () {
             $pending = -1;
         }
 
-        return response()->json(['ok' => $pending === 0, 'db' => 'up', 'pending_migrations' => $pending, 'time' => now()->toIso8601String()], $pending === 0 ? 200 : 503);
+        return response()->json(['ok' => $pending === 0, 'db' => 'up', 'pending_migrations' => $pending, 'time' => now()->toIso8601String(), 'checks' => ['database' => 'up', 'migrations' => $pending === 0 ? 'ok' : $pending.' pending']], $pending === 0 ? 200 : 503);
     } catch (Throwable $e) {
         return response()->json(['ok' => false, 'db' => 'down'], 503);
     }
@@ -237,7 +237,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/keuangan/verifikasi', fn () => view('pages.livewire-page', ['component' => 'keuangan.verifikasi-bayar', 'title' => 'Verifikasi Pembayaran']))->name('keuangan.verifikasi');
         Route::get('/keuangan/beasiswa', fn () => view('pages.livewire-page', ['component' => 'beasiswa.kelola', 'title' => 'Beasiswa']))->name('keuangan.beasiswa');
         Route::get('/keuangan/denda', fn () => view('pages.livewire-page', ['component' => 'keuangan.denda-rule-kelola', 'title' => 'Aturan Denda']))->name('keuangan.denda');
-        Route::post('/keuangan/refund/{pembayaran}', [BayarController::class, 'refund'])->name('keuangan.refund');
+        Route::post('/keuangan/refund/{pembayaran}', [BayarController::class, 'refund'])->middleware('throttle:30,1')->name('keuangan.refund');
         Route::get('/surat/nomor', fn () => view('pages.livewire-page', ['component' => 'surat.nomor-otomatis', 'title' => 'Nomor Surat']))->name('surat.nomor');
     });
 
@@ -245,8 +245,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:pimpinan|superadmin')->group(function () {
         Route::get('/dashboard/pimpinan', [DashboardController::class, 'pimpinan'])->name('dashboard.pimpinan');
         Route::get('/pddikti', [PddiktiController::class, 'index'])->name('pddikti.index');
-        Route::get('/pddikti/export/{jenis}', [PddiktiController::class, 'export'])->name('pddikti.export');
-        Route::post('/pddikti/push', [PddiktiController::class, 'push'])->name('pddikti.push');
+        Route::get('/pddikti/export/{jenis}', [PddiktiController::class, 'export'])->middleware('throttle:30,1')->name('pddikti.export');
+        Route::post('/pddikti/push', [PddiktiController::class, 'push'])->middleware('throttle:30,1')->name('pddikti.push');
         Route::get('/pddikti/status', [PddiktiController::class, 'status'])->name('pddikti.status');
         Route::post('/pddikti/sync', [PddiktiController::class, 'sync'])->middleware('throttle:30,1')->name('pddikti.sync');
         Route::post('/pddikti/sinta', [PddiktiController::class, 'sinta'])->middleware('throttle:30,1')->name('pddikti.sinta');

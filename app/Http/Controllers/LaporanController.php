@@ -8,12 +8,23 @@ use App\Models\Krs;
 use App\Models\Nilai;
 use App\Models\PmbPendaftar;
 use App\Models\Tagihan;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class LaporanController extends Controller
+class LaporanController extends Controller implements HasMiddleware
 {
+    /**
+     * M-037: otorisasi ekspor di level controller (defense-in-depth di atas
+     * middleware role grup rute). Chunked streaming tetap (export* pakai
+     * chunk(500) + streamDownload).
+     */
+    public static function middleware(): array
+    {
+        return ['can:laporan.view'];
+    }
+
     public function index(): View
     {
         return view('laporan.index');

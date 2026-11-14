@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\AuthorizesMahasiswaData;
 use App\Models\Mahasiswa;
+use App\Models\Nilai;
+use App\Models\TahunAkademik;
 use App\Services\AkademikService;
 use App\Support\DokumenTte;
 use App\Support\QrSvg;
@@ -15,12 +17,20 @@ class TranskripController extends Controller
 {
     use AuthorizesMahasiswaData;
 
-    public function cetak(int $mahasiswaId): View
+    public function cetak(int $mahasiswaId, Request $request): View
     {
         $this->authorizeMahasiswa($mahasiswaId);
 
         $mahasiswa = Mahasiswa::with(['user', 'prodi'])->findOrFail($mahasiswaId);
         $ringkasan = AkademikService::ringkasan($mahasiswaId);
+        $tahunFilter = $request->integer('tahun') ?: null;
+
+        $nilaiQuery = Nilai::with('kelas.matakuliah', 'kelas.tahunAkademik')
+            ->where('mahasiswa_id', $mahasiswaId)
+            ->where('is_locked', true)
+            ->when($tahunFilter, fn ($q) => $q->whereHas('kelas', fn ($k) => $k->where('tahun_akademik_id', $tahunFilter)))
+            ->orderBy('id');
+
         $verifyUrl = route('transkrip.verify', [
             'mahasiswa' => $mahasiswaId,
             's' => DokumenTte::tanda($this->payload($mahasiswaId)),
@@ -29,10 +39,16 @@ class TranskripController extends Controller
         return view('transkrip.cetak', [
             'mahasiswa' => $mahasiswa,
             'mahasiswaId' => $mahasiswaId,
-            'nilai' => $ringkasan['nilai'],
+            'nilai' => $nilaiQuery->paginate(25)->withQueryString(),
             'ipk' => $ringkasan['ipk'],
             'totalSks' => $ringkasan['total_sks'],
             'predikat' => self::predikat((float) $ringkasan['ipk']),
+            'tahunFilter' => $tahunFilter,
+            'tahunList' => array_keys($ringkasan['per_tahun']),
+            'tahunOptions' => TahunAkademik::whereIn('id', array_keys($ringkasan['per_tahun']))
+                ->get(['id', 'tahun', 'semester'])
+                ->mapWithKeys(fn ($t) => [$t->id => $t->tahun.' · '.ucfirst((string) $t->semester)])
+                ->all(),
             'verifyUrl' => $verifyUrl,
             'qrSvg' => QrSvg::trySvg($verifyUrl),
             'tte' => DokumenTte::stamp('TRANSKRIP-'.$mahasiswa->nim.'-'.$mahasiswaId),

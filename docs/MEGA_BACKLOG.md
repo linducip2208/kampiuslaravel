@@ -81,8 +81,22 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=20 (2026-11-14, bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
-`tests/Feature/WaveABatch2Test.php` 8 tes, suite 231 hijau):
+Selesai=28 (2026-11-14, suite 244 hijau):
+Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
+`tests/Feature/WaveABatch2Test.php` 8 tes): M-001..M-020 — detail di bawah.
+Wave B Batch 1: 8 item P0/P1 (bukti: `tests/Feature/WaveBBatch1Test.php`
+13 tes): M-021 (tepat 1 periode aktif: `TahunAkademik::aktifkan()` tx+lock,
+migrasi index+reparasi, `akademik:rollover` idempoten), M-024 (KHS/Transkrip
+dipaginasi 25 + filter `?tahun=`, IPK tetap global dari ringkasan),
+M-027 (tes TugasCrud/KumpulTugas/MateriCrud: role, deadline, anti-spoof,
+mimes), M-037 (otorisasi ekspor `can:laporan.view` di LaporanController +
+chunk/streaming tetap), M-045 (envelope `ApiEnvelope` backward-compat +
+`GET /api/openapi.json` ter-generate), M-046 (throttle rute sensitif:
+payment.callback, pddikti.push/export/sync, keuangan.refund),
+M-047 (`backup:create` JSON-gzip chunked + `backup:verify` teruji),
+M-048 (`/health` + `v2/status` memuat checks db/migrasi).
+Sisa Wave B: M-022, M-023, M-025, M-026, M-028..M-036, M-038..M-044.
+Wave C/D: belum dimulai (D semua BLOCKED).
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →
 recheck-tx di PaymentService), M-005 (allowlist act PddiktiController::ALLOWED_ACTS,

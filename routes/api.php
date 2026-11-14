@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\OpenApiController;
 use App\Http\Controllers\Api\V1\AbsensiController;
 use App\Http\Controllers\Api\V1\AiController;
 use App\Http\Controllers\Api\V1\AuthController;
@@ -14,6 +15,8 @@ use App\Http\Controllers\Api\V1\TagihanController;
 use App\Http\Controllers\Api\V1\TugasController;
 use App\Http\Controllers\Api\V2\PublikApiController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/openapi.json', [OpenApiController::class, 'show'])->middleware('throttle:60,1');
 
 Route::prefix('v1')->group(function (): void {
     Route::post('/login', [AuthController::class, 'login'])

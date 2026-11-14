@@ -60,7 +60,37 @@ Kode:
 - Tes: `tests/Feature/WaveABatch2Test.php` (8 tes: allowlist, audit-export,
   locked-only, permission, webhook-replay, payment-idempotency, kuota, traversal).
 
-## Berikutnya (Wave B, belum dieksekusi)
+## 2026-11-14 — WAVE B batch 1: 8 item P0/P1 selesai, 244/244 hijau
+
+Kode:
+- M-021 `TahunAkademik::aktifkan()` (tx + lockForUpdate, nonaktifkan lain dulu)
+  + `::rollover()`/`::berikutnya()` idempoten (firstOrCreate) + `scopeAktif`;
+  migrasi `2026_11_14_230815` (index `aktif`, reparasi >1 aktif → pertahankan
+  terbaru; tanpa partial-unique — tidak portabel SQLite/MySQL, invarian di
+  transaksi); command `akademik:rollover [--tahun --semester]`.
+- M-024 `KhsController::show` + `TranskripController::cetak` terima `Request`:
+  IPK global dari `ringkasan()`, baris display `Nilai` terkunci dipaginasi 25
+  + filter `?tahun=` (tahun_akademik_id) + `tahunOptions`; Blade `khs/show`,
+  `transkrip/cetak` tambah form filter + `links()` (d-print-none).
+- M-027 tanpa ubah prod (validasi/otorisasi sudah benar) — bukti via
+  `WaveBBatch1Test` (TugasCrud dosen-OK/mahasiswa-403, deadline, anti-spoof
+  owner, mimes materi).
+- M-037 `LaporanController implements HasMiddleware` → `can:laporan.view`
+  (defense-in-depth; chunk(500)+streamDownload tidak berubah).
+- M-045 `App\Support\ApiEnvelope::ok/fail` (kunci lama dipertahankan top-level);
+  v2 `status/prodi/pengumuman/webhook` memakai envelope; baru
+  `App\Http\Controllers\Api\OpenApiController` + `GET /api/openapi.json`
+  (throttle 60,1, ter-generate dari rute `api/*`).
+- M-046 throttle:30,1 di `pddikti.push`, `pddikti.export`, `keuangan.refund`
+  (callback + sync sudah ada).
+- M-047 `backup:create` (semua tabel → JSON-gzip chunked + manifest + latest)
+  + `backup:verify` (gunzip + JSON valid + cocok hitung DB); `BACKUP_RESTORE.md`
+  ditambah §Backup artisan.
+- M-048 `/health` + `v2/status` tambah `checks`/`db`/`pending_migrations`
+  (aditif; asersi lama tetap hijau).
+- Tes: `tests/Feature/WaveBBatch1Test.php` (13 tes).
+
+## Berikutnya (Wave B batch 2, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

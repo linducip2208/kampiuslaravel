@@ -7,9 +7,12 @@ use App\Models\Pengumuman;
 use App\Models\Prodi;
 use App\Models\Setting;
 use App\Models\WebhookEvent;
+use App\Support\ApiEnvelope;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * API publik v2 (read-only, throttle) + webhook masuk terverifikasi HMAC.
@@ -22,11 +25,27 @@ class PublikApiController extends Controller
 {
     public function status(): JsonResponse
     {
-        return response()->json([
+        $pending = -1;
+        $db = 'down';
+
+        try {
+            DB::select('select 1');
+            $db = 'up';
+            $ran = app('migrator')->getRepository()->getRan();
+            $files = collect(glob(database_path('migrations/*.php')) ?: [])
+                ->map(fn ($f) => basename($f, '.php'))->all();
+            $pending = count(array_diff($files, $ran));
+        } catch (Throwable) {
+            // biarkan default down/-1
+        }
+
+        return response()->json(ApiEnvelope::ok([
             'app' => config('app.name'),
             'api' => 'v2',
             'time' => now()->toIso8601String(),
-        ]);
+            'db' => $db,
+            'pending_migrations' => $pending,
+        ]));
     }
 
     public function prodi(): JsonResponse
@@ -36,7 +55,7 @@ class PublikApiController extends Controller
             ->orderBy('nama')
             ->paginate(20);
 
-        return response()->json($data);
+        return response()->json(ApiEnvelope::ok($data->toArray()));
     }
 
     public function pengumuman(): JsonResponse
@@ -47,7 +66,7 @@ class PublikApiController extends Controller
             ->select(['id', 'judul', 'isi', 'published_at'])
             ->paginate(20);
 
-        return response()->json($data);
+        return response()->json(ApiEnvelope::ok($data->toArray()));
     }
 
     public function webhook(Request $request): JsonResponse
@@ -55,14 +74,14 @@ class PublikApiController extends Controller
         $secret = (string) Setting::get('webhook.secret', '');
 
         if (strlen($secret) < 16) {
-            return response()->json(['message' => 'Integrasi webhook belum dikonfigurasi di halaman Integrasi (secret min. 16 karakter).'], 503);
+            return response()->json(ApiEnvelope::fail('Integrasi webhook belum dikonfigurasi di halaman Integrasi (secret min. 16 karakter).'), 503);
         }
 
         $signature = (string) $request->header('X-Webhook-Signature', '');
         $expected = hash_hmac('sha256', $request->getContent(), $secret);
 
         if (! hash_equals($expected, $signature)) {
-            return response()->json(['message' => 'Signature webhook tidak valid.'], 400);
+            return response()->json(ApiEnvelope::fail('Signature webhook tidak valid.'), 400);
         }
 
         $validated = $request->validate([

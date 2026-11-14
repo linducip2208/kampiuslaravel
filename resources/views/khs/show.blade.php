@@ -57,6 +57,23 @@
             </tbody>
         </table>
     </div>
+    <div class="card-body d-print-none">
+        <form method="GET" class="row g-2 align-items-end mb-2">
+            <div class="col-auto">
+                <label class="form-label" for="filter-tahun">Periode</label>
+                <select name="tahun" id="filter-tahun" class="form-select" onchange="this.form.submit()">
+                    <option value="">Semua periode</option>
+                    @foreach(($tahunOptions ?? []) as $id => $label)
+                        <option value="{{ $id }}" @selected(($tahunFilter ?? null) == $id)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @if(!empty($tahunFilter))
+                <div class="col-auto"><a href="{{ url()->current() }}" class="btn btn-outline-secondary">Reset</a></div>
+            @endif
+        </form>
+        {{ $nilai->links() }}
+    </div>
     <div class="card-body">
         <div class="row align-items-center">
             <div class="col-md-7">
