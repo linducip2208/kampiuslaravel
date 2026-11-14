@@ -9,11 +9,11 @@ class Aset extends Model
 {
     protected $table = 'aset';
 
-    protected $fillable = ['kode', 'nama', 'kategori', 'lokasi', 'kondisi', 'tgl_beli', 'nilai'];
+    protected $fillable = ['kode', 'nama', 'kategori', 'lokasi', 'kondisi', 'tgl_beli', 'nilai', 'umur_manfaat_bulan', 'akumulasi_penyusutan', 'terakhir_susut_at'];
 
     protected function casts(): array
     {
-        return ['tgl_beli' => 'date', 'nilai' => 'integer'];
+        return ['tgl_beli' => 'date', 'nilai' => 'integer', 'terakhir_susut_at' => 'date'];
     }
 
     public function maintenance(): HasMany

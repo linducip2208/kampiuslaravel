@@ -140,7 +140,25 @@ Kode (vertical slice: migrasi + model + Livewire + blade + rute + tes):
   (validasi tanggal_selesai ≥ mulai) di grup dosen.
 - Tes: `tests/Feature/WaveBBatch3Test.php` (8 tes).
 
-## Berikutnya (Wave B batch 4 + Wave C, belum dieksekusi)
+## 2026-11-15 — WAVE B batch 4: 5 item selesai, 265/265 hijau
+
+Kode (vertical slice: migrasi + model + service/Livewire + blade + rute + tes):
+- M-025/P4 `WaliList::$krsStatus` → joinSub MAX(id) per mahasiswa (1 query).
+- M-029 migrasi `forum_thread` (+disematkan/terkunci) + `forum_balasan` + model;
+  Livewire `Lms/Forum` (buat thread, balas, kunci/buka dosen; thread terkunci
+  tolak balasan via error validasi); blade + rute `/lms/forum` (semua login).
+- M-034 migrasi `pemasok` + `hutang_dagang` (unik nomor) + model (`sisa()`);
+  `HutangService::bayar()` (lock, cap sisa, status bertahap, lunas idempoten);
+  Livewire `Keuangan/Hutang` (+AuditLog) di grup keuangan.
+- M-036 migrasi kolom penyusutan di `aset` + `AsetService` (garis lurus,
+  idempoten/bulan, nilai buku ≥ 0) + `aset:susutkan` (terjadwal bulanan).
+- M-039 migrasi `lowongan_kerja` + `lamaran_kerja` (unik lowongan+email) +
+  model (`masihBuka()`); Livewire admin `Rekrutmen/Kelola` (grup admin) +
+  publik `Rekrutmen/Lamar` (tanpa RequiresRoles — komponen publik sejati,
+  pola ini dikoreksi dari asumsi awal soal DaftarPublik) di `/karier`.
+- Tes: `tests/Feature/WaveBBatch4Test.php` (5 tes).
+
+## Berikutnya (Wave B batch 5 + Wave C, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

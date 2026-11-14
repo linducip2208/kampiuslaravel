@@ -19,4 +19,6 @@ app()->booted(function () {
     // nonaktifkan manual bila kalender akademik menyimpang.
     $schedule->command('akademik:rollover')->yearlyOn(2, 1, '00:30')->withoutOverlapping();
     $schedule->command('akademik:rollover')->yearlyOn(8, 1, '00:30')->withoutOverlapping();
+    // M-036: penyusutan aset tiap awal bulan (idempoten per bulan).
+    $schedule->command('aset:susutkan')->monthlyOn(1, '02:00')->withoutOverlapping();
 });

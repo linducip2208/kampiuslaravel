@@ -82,10 +82,20 @@ class WaliList extends Component
             ->groupBy('mahasiswa_id')
             ->pluck('total', 'mahasiswa_id');
 
-        $krsStatus = Schema::hasTable('krs') && $mhsIds !== []
-            ? DB::table('krs')->whereIn('mahasiswa_id', $mhsIds)->latest('id')
-                ->get()->groupBy('mahasiswa_id')->map(fn ($rows) => $rows->first()->status)
-            : collect();
+        // M-025/P4: status KRS terbaru per mahasiswa via 1 query
+        // (MAX(id) per mahasiswa) — tanpa muat semua riwayat + groupBy PHP.
+        $krsStatus = collect();
+
+        if (Schema::hasTable('krs') && $mhsIds !== []) {
+            $latestIds = DB::table('krs')
+                ->whereIn('mahasiswa_id', $mhsIds)
+                ->groupBy('mahasiswa_id')
+                ->selectRaw('mahasiswa_id, MAX(id) as id');
+
+            $krsStatus = DB::table('krs')
+                ->joinSub($latestIds, 'terbaru', fn ($j) => $j->on('krs.id', '=', 'terbaru.id'))
+                ->pluck('krs.status', 'krs.mahasiswa_id');
+        }
 
         return view('livewire.dosen.wali-list', [
             'wali' => $wali,

@@ -81,7 +81,7 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=40 (2026-11-14, suite 260 hijau):
+Selesai=45 (2026-11-14, suite 265 hijau):
 Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
 `tests/Feature/WaveABatch2Test.php` 8 tes): M-001..M-020 — detail di bawah.
 Wave B Batch 1: 8 item (bukti: `tests/Feature/WaveBBatch1Test.php` 13 tes):
@@ -95,8 +95,17 @@ M-033 (`anggaran` + `AnggaranService::realisasi` penerimaan−refund),
 M-040 (`organisasi` + `organisasi_anggota` per NIM idempoten),
 M-042 (`hibah_riset` + `hibah_pencairan` bertahap + total cair),
 M-043 (`publikasi` owner-scope dosen), M-044 (`pengabdian` + validasi tanggal).
-Sisa Wave B: M-028..M-031 (mesin kuis XL, forum, SCORM), M-034 (AP/AR),
-M-036 (aset akuntansi), M-038 (payroll XL), M-039 (rekrutmen).
+Wave B Batch 4: 5 item (bukti: `tests/Feature/WaveBBatch4Test.php` 5 tes):
+M-025/P4 (`krsStatus` WaliList via subquery MAX(id), tanpa groupBy PHP),
+M-029 (`forum_thread` + `forum_balasan`, Livewire `Lms/Forum` buat/balas/kunci
+dosen, rute `/lms/forum`), M-034 (`pemasok` + `hutang_dagang` +
+`HutangService::bayar` terkunci + AuditLog, Livewire `Keuangan/Hutang`),
+M-036 (kolom penyusutan di `aset` + `AsetService` garis lurus idempoten/bulan
++ `aset:susutkan` terjadwal bulanan), M-039 (`lowongan_kerja` +
+`lamaran_kerja` unik per email + Livewire admin `Rekrutmen/Kelola` + publik
+`Rekrutmen/Lamar` di `/karier`).
+Sisa Wave B: M-028 (mesin kuis XL), M-030/031 (SCORM/offline), M-038 (payroll XL).
+Catatan P5–P8 performance report tetap utang teknis di luar M-025.
 Wave C/D: belum dimulai (D semua BLOCKED).
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →

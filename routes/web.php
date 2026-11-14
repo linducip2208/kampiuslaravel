@@ -160,6 +160,8 @@ Route::get('/lowongan', function () {
     return view('publik.lowongan', compact('lowongan'));
 })->name('publik.lowongan');
 
+// Karier publik (M-039): daftar lowongan + lamaran tanpa login.
+Route::get('/karier', fn () => view('pages.livewire-page', ['component' => 'rekrutmen.lamar', 'title' => 'Karier']))->middleware('throttle:public')->name('publik.karier');
 // PMB publik
 Route::get('/pmb', [PmbController::class, 'create'])->middleware('throttle:public')->name('pmb.create');
 Route::post('/pmb', [PmbController::class, 'store'])->middleware('throttle:public')->name('pmb.store');
@@ -242,6 +244,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/keuangan/denda', fn () => view('pages.livewire-page', ['component' => 'keuangan.denda-rule-kelola', 'title' => 'Aturan Denda']))->name('keuangan.denda');
         Route::post('/keuangan/refund/{pembayaran}', [BayarController::class, 'refund'])->middleware('throttle:30,1')->name('keuangan.refund');
         Route::get('/keuangan/tutup-buku', fn () => view('pages.livewire-page', ['component' => 'keuangan.tutup-buku', 'title' => 'Tutup Buku']))->name('keuangan.tutup-buku');
+        Route::get('/keuangan/hutang', fn () => view('pages.livewire-page', ['component' => 'keuangan.hutang', 'title' => 'Utang Usaha']))->name('keuangan.hutang');
         Route::get('/keuangan/anggaran', fn () => view('pages.livewire-page', ['component' => 'keuangan.anggaran', 'title' => 'Anggaran']))->name('keuangan.anggaran');
         Route::get('/surat/nomor', fn () => view('pages.livewire-page', ['component' => 'surat.nomor-otomatis', 'title' => 'Nomor Surat']))->name('surat.nomor');
     });
@@ -279,12 +282,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/kurikulum', fn () => view('pages.livewire-page', ['component' => 'master.kurikulum', 'title' => 'Kurikulum']))->name('admin.kurikulum');
         Route::get('/admin/impor', fn () => view('pages.livewire-page', ['component' => 'admin.impor-csv', 'title' => 'Impor CSV']))->name('admin.impor');
         Route::get('/admin/organisasi', fn () => view('pages.livewire-page', ['component' => 'organisasi.kelola', 'title' => 'Organisasi Kemahasiswaan']))->name('admin.organisasi');
+        Route::get('/admin/rekrutmen', fn () => view('pages.livewire-page', ['component' => 'rekrutmen.kelola', 'title' => 'Rekrutmen']))->name('admin.rekrutmen');
         Route::get('/admin/jadwal', fn () => view('pages.livewire-page', ['component' => 'jadwal.generate', 'title' => 'Jadwal Kuliah']))->name('admin.jadwal');
         Route::get('/admin/impor/template/{jenis}', [LaporanController::class, 'templateImpor'])->name('admin.impor.template');
     });
 
     // Kalender & helpdesk: semua user login (kepemilikan dicek di komponen)
     Route::get('/profil', fn () => view('pages.livewire-page', ['component' => 'profil', 'title' => 'Profil Saya']))->name('profil');
+    Route::get('/lms/forum', fn (Request $r) => view('lms.forum', ['kelasId' => $r->integer('kelas') ?: null]))->name('lms.forum');
     Route::get('/cari', [PencarianController::class, 'index'])->name('pencarian');
     Route::get('/kalender', fn () => view('pages.livewire-page', ['component' => 'kalender.kelola', 'title' => 'Kalender Akademik']))->name('kalender.index');
     Route::get('/kalender.ics', [KalenderController::class, 'ics'])->name('kalender.ics');
