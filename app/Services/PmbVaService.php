@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\PmbPendaftar;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -52,20 +53,22 @@ class PmbVaService
         return max(0, $biaya);
     }
 
-    /** Lunasi VA pendaftaran berdasarkan reference (idempotent). */
+    /** Lunasi VA pendaftaran berdasarkan reference (idempotent, anti double-callback). */
     public function settleByReference(string $reference): bool
     {
-        $pendaftar = PmbPendaftar::query()->where('va_reference', $reference)->first();
+        return DB::transaction(function () use ($reference) {
+            $pendaftar = PmbPendaftar::query()->where('va_reference', $reference)->lockForUpdate()->first();
 
-        if (! $pendaftar || $pendaftar->bayar_status === 'lunas') {
-            return false;
-        }
+            if (! $pendaftar || $pendaftar->bayar_status === 'lunas') {
+                return false;
+            }
 
-        $pendaftar->update(['bayar_status' => 'lunas']);
+            $pendaftar->update(['bayar_status' => 'lunas']);
 
-        Log::info('PMB VA lunas', ['no_daftar' => $pendaftar->no_daftar, 'reference' => $reference]);
+            Log::info('PMB VA lunas', ['no_daftar' => $pendaftar->no_daftar, 'reference' => $reference]);
 
-        return true;
+            return true;
+        });
     }
 
     public function markPaid(PmbPendaftar $pendaftar): void

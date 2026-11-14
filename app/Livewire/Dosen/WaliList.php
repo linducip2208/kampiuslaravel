@@ -64,9 +64,13 @@ class WaliList extends Component
 
         $mhsIds = collect($wali->items())->pluck('id')->all();
 
-        $ipk = Nilai::whereIn('mahasiswa_id', $mhsIds)
-            ->selectRaw('mahasiswa_id, AVG(bobot) as ipk, COUNT(*) as total_mk')
-            ->groupBy('mahasiswa_id')
+        // IPK berbobot SKS — konsisten dengan AkademikService::ringkasan()
+        // (AVG(bobot) tanpa bobot SKS terbukti salah untuk SKS bervariasi).
+        $ipk = Nilai::whereIn('nilai.mahasiswa_id', $mhsIds)
+            ->join('kelas', 'kelas.id', '=', 'nilai.kelas_id')
+            ->join('matakuliah', 'matakuliah.id', '=', 'kelas.matakuliah_id')
+            ->selectRaw('nilai.mahasiswa_id, SUM(nilai.bobot * matakuliah.sks) * 1.0 / NULLIF(SUM(matakuliah.sks), 0) as ipk, COUNT(*) as total_mk')
+            ->groupBy('nilai.mahasiswa_id')
             ->pluck('ipk', 'mahasiswa_id');
 
         $bermasalah = Nilai::whereIn('mahasiswa_id', $mhsIds)

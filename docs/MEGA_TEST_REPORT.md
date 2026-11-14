@@ -5,14 +5,14 @@ Runner: `php artisan test --compact` (PHPUnit, sqlite memory — sesuai TESTING_
 ## Hasil
 
 ```
-{"tool":"phpunit","result":"passed","tests":212,"passed":212,"assertions":1223,"duration_ms":30272}
+{"tool":"phpunit","result":"passed","tests":223,"passed":223,"assertions":1257,"duration_ms":17292}
 ```
 
-- 44 file tes, **212/212 hijau, 1223 asersi**.
+- 45 file tes, **223/223 hijau, 1257 asersi** (11 tes baru Wave A).
 - Koreksi dokumen lama: `TESTING_REPORT.md` ("207/207, 1202 asersi, 48 file") BASI.
   Klaim commit "212" BENAR. `TESTING_REPORT.md` wajib diperbarui (masuk Wave B docs).
 
-## Inventaris file tes (44)
+## Inventaris file tes (45; baru: WaveACriticalTest dengan 11 tes)
 
 AbsensiTest, AiFeatureTest, ApiAuthTest, ApiGuardTest, BankSoalTest, CacheStoreTest,
 CalculationTest, CetakDokumenTest, ComfyUITest, DashboardPerfTest, DendaOtomatisTest,

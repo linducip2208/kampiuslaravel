@@ -339,18 +339,31 @@ class KeuanganService
      */
     public static function postPenerimaan(Pembayaran $pembayaran, ?int $createdBy = null): JurnalKeuangan
     {
-        return JurnalKeuangan::firstOrCreate(
+        $nominal = (int) $pembayaran->nominal;
+
+        if ($nominal <= 0) {
+            throw new \InvalidArgumentException('Nominal jurnal penerimaan harus positif.');
+        }
+
+        $jurnal = JurnalKeuangan::firstOrCreate(
             ['pembayaran_id' => $pembayaran->id, 'jenis' => 'penerimaan'],
             [
                 'tanggal' => $pembayaran->verified_at?->toDateString() ?? today()->toDateString(),
                 'tagihan_id' => $pembayaran->tagihan_id,
                 'akun_debet' => 'Kas/Bank',
                 'akun_kredit' => 'Piutang '.($pembayaran->tagihan?->jenis ?? 'lain'),
-                'nominal' => (int) $pembayaran->nominal,
+                'nominal' => $nominal,
                 'keterangan' => 'Penerimaan '.$pembayaran->metode.' ref '.$pembayaran->reference,
                 'created_by' => $createdBy,
             ]
         );
+
+        // Single-row double-entry tetap wajib seimbang: debet ≠ kredit, nominal > 0.
+        if ($jurnal->akun_debet === $jurnal->akun_kredit || (int) $jurnal->nominal <= 0) {
+            throw new \RuntimeException('Jurnal penerimaan tidak seimbang.');
+        }
+
+        return $jurnal;
     }
 
     /**

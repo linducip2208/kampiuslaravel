@@ -55,17 +55,24 @@ class BayarManual extends Component
             return;
         }
 
-        $pendingAda = Pembayaran::where('tagihan_id', $tagihan->id)->where('status', 'pending')->exists();
-        if ($pendingAda) {
-            $this->addError('tagihan_id', 'Tagihan ini sudah memiliki pembayaran menunggu verifikasi.');
-
-            return;
-        }
+        // Cek duplikat pending DI DALAM transaksi dengan kunci baris tagihan —
+        // dua submit bersamaan (TOCTOU) hanya menghasilkan satu baris pending.
+        $duplikat = false;
 
         $path = $this->bukti->store('bukti-bayar', 'public');
 
         try {
-            DB::transaction(function () use ($tagihan, $path): void {
+            DB::transaction(function () use ($tagihan, $path, &$duplikat): void {
+                $locked = Tagihan::whereKey($tagihan->id)->lockForUpdate()->firstOrFail();
+
+                abort_if($locked->status === 'lunas', 422, 'Tagihan sudah lunas.');
+
+                if (Pembayaran::where('tagihan_id', $tagihan->id)->where('status', 'pending')->exists()) {
+                    $duplikat = true;
+
+                    return;
+                }
+
                 Pembayaran::create([
                     'tagihan_id' => $tagihan->id,
                     'metode' => 'manual',
@@ -77,6 +84,13 @@ class BayarManual extends Component
         } catch (\Throwable $e) {
             Storage::disk('public')->delete($path);
             throw $e;
+        }
+
+        if ($duplikat) {
+            Storage::disk('public')->delete($path);
+            $this->addError('tagihan_id', 'Tagihan ini sudah memiliki pembayaran menunggu verifikasi.');
+
+            return;
         }
 
         $this->reset(['tagihan_id', 'bukti']);

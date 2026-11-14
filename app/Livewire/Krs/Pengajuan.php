@@ -39,7 +39,8 @@ class Pengajuan extends Component
     public function mount(?int $tahunId = null): void
     {
         $this->tahunAkademikId = $tahunId ?? $this->tahunAktifId();
-        $this->ipk = (float) ($this->krsBerjalan()?->ipk_snapshot ?? 0.0);
+        // IPK selalu dihitung server-side dari Nilai (tidak dipercaya dari input).
+        $this->ipk = (float) (AkademikService::ringkasan($this->mahasiswaId())['ipk'] ?? 0.0);
         $this->kelasDipilih = $this->krsBerjalan()?->details()->pluck('kelas_id')->filter()->map(fn ($id): int => (int) $id)->all() ?? [];
         $this->kelasDipilih = array_values(array_unique(array_map('intval', $this->kelasDipilih)));
     }
@@ -185,12 +186,16 @@ class Pengajuan extends Component
 
         $this->validate([
             'tahunAkademikId' => ['required', 'integer', 'min:1'],
-            'ipk' => ['required', 'numeric', 'min:0', 'max:4'],
             'kelasDipilih' => ['required', 'array', 'min:1'],
             'kelasDipilih.*' => ['integer', 'min:1'],
         ]);
 
         $mahasiswaId = $this->mahasiswaId();
+
+        // IPK otoritatif dari server — input $this->ipk dari browser TIDAK dipakai
+        // untuk validasi maupun snapshot (mencegah penggelembungan batas SKS).
+        $ipkServer = (float) (AkademikService::ringkasan($mahasiswaId)['ipk'] ?? 0.0);
+        $this->ipk = $ipkServer;
 
         // Revisi KRS yang sudah disetujui tidak boleh menimpa sepihak.
         $berjalan = $this->krsBerjalan();
@@ -212,7 +217,7 @@ class Pengajuan extends Component
         // Dijalankan ulang di dalam transaksi agar lolos dari race condition.
         // KRS berjalan milik sendiri dikecualikan dari hitung kuota (revisi).
         $abaikanKrsId = $berjalan?->id;
-        foreach (AkademikService::validasiKrs($mahasiswaId, $this->kelasDipilih, (float) $this->ipk, $abaikanKrsId) as $pesan) {
+        foreach (AkademikService::validasiKrs($mahasiswaId, $this->kelasDipilih, $ipkServer, $abaikanKrsId) as $pesan) {
             $this->addError('kelasDipilih', $pesan);
         }
 
@@ -232,7 +237,7 @@ class Pengajuan extends Component
         $sksMap = $this->sksPerKelas();
 
         try {
-            DB::transaction(function () use ($sksMap, $mahasiswaId, $abaikanKrsId): void {
+            DB::transaction(function () use ($sksMap, $mahasiswaId, $abaikanKrsId, $ipkServer): void {
                 // Kunci baris kelas agar dua pengaju bersamaan tidak overbook kuota.
                 if (Schema::hasTable('kelas')) {
                     DB::table('kelas')->whereIn('id', $sksMap->keys()->all())->lockForUpdate()->get();
@@ -250,7 +255,7 @@ class Pengajuan extends Component
                     [
                         'status' => Krs::STATUS_DIAJUKAN,
                         'total_sks' => $sksMap->sum(),
-                        'ipk_snapshot' => $this->ipk,
+                        'ipk_snapshot' => $ipkServer,
                         'catatan' => null,
                     ]
                 );

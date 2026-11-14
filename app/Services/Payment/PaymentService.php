@@ -108,11 +108,21 @@ class PaymentService
 
         // Reuse pembayaran pending kanal yang sama (anti dobel-klik).
         // Hindari LIKE wildcard '_' (perilaku beda SQLite vs MySQL): filter di PHP.
-        $existing = Pembayaran::where('tagihan_id', $tagihan->id)
+        // Cek dilakukan dengan kunci baris tagihan agar klik ganda bersamaan
+        // tidak membuat dua baris pending (cek-pertama di sini, cek-ulang di
+        // dalam transaksi setelah driver dipanggil — pemanggil HTTP tidak boleh
+        // menahan lock DB).
+        $cariPending = fn (): ?Pembayaran => Pembayaran::where('tagihan_id', $tagihan->id)
             ->where('status', 'pending')
             ->latest('id')
             ->get()
             ->first(fn (Pembayaran $p) => str_starts_with((string) $p->metode, $group.'_'));
+
+        $existing = DB::transaction(function () use ($tagihan, $cariPending): ?Pembayaran {
+            Tagihan::whereKey($tagihan->id)->lockForUpdate()->first();
+
+            return $cariPending();
+        });
 
         if ($existing) {
             return $existing;
@@ -124,16 +134,25 @@ class PaymentService
             ? '-'.strtolower((string) $customer['method'])
             : '';
 
-        return Pembayaran::create([
-            'tagihan_id' => $tagihan->id,
-            'reference' => $result['reference'],
-            'va_number' => $result['va_number'] ?? null,
-            'qr_payload' => $result['qr_payload'] ?? $result['qr_string'] ?? null,
-            'expires_at' => $result['expires_at'] ?? null,
-            'metode' => $group.'_'.$this->activeDriverKey().$suffix,
-            'nominal' => $tagihan->sisa() > 0 ? $tagihan->sisa() : $tagihan->nominal,
-            'status' => 'pending',
-        ])->fresh();
+        return DB::transaction(function () use ($tagihan, $group, $suffix, $result, $cariPending): Pembayaran {
+            Tagihan::whereKey($tagihan->id)->lockForUpdate()->first();
+
+            // Request lain mungkin sudah membuat baris pending saat driver dipanggil.
+            if ($menang = $cariPending()) {
+                return $menang;
+            }
+
+            return Pembayaran::create([
+                'tagihan_id' => $tagihan->id,
+                'reference' => $result['reference'],
+                'va_number' => $result['va_number'] ?? null,
+                'qr_payload' => $result['qr_payload'] ?? $result['qr_string'] ?? null,
+                'expires_at' => $result['expires_at'] ?? null,
+                'metode' => $group.'_'.$this->activeDriverKey().$suffix,
+                'nominal' => $tagihan->sisa() > 0 ? $tagihan->sisa() : $tagihan->nominal,
+                'status' => 'pending',
+            ])->fresh();
+        });
     }
 
     /** Tandai pembayaran lunas berdasarkan reference. Idempotent, aman dari double-settle. */

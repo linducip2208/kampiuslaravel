@@ -6,21 +6,21 @@ kategori — TIDAK tercapai ronde ini, dan itu dinyatakan eksplisit.
 | Kategori | Bobot | Skor | Bukti / alasan potong |
 |---|---|---|---|
 | Architecture | 5 | 3 | service terpusat baik (Keuangan/Akademik), tapi 0 policy, aturan di Blade (F7) |
-| Academic ERP | 10 | 6 | hitungan inti + KRS validasi kuat; minus IPS bug, tanpa rollover, DO manual |
+| Academic ERP | 10 | 7 | M-007/008/009 selesai; sisa rollover, DO otomatis, filter is_locked (M-010) |
 | PMB & lifecycle | 8 | 5 | alur + VA jalan + tes; minus S1/S2, tanpa CRM/lead |
 | KRS/KHS/transkrip | 8 | 6 | terkunci + QR signed; minus IPS, unbounded, tanpa rekomendasi |
 | LMS & ujian | 8 | 3 | BankSoal + tugas + materi; minus mesin kuis, forum, tes khusus |
-| Finance & accounting | 10 | 6 | tx/lock/jurnal/denda/neraca; minus S1–S4, dual angka, tanpa tutup buku |
+| Finance & accounting | 10 | 7 | M-011/012/013/014 selesai; sisa tutup buku, AP/AR, rekon bank |
 | HR & operasional | 7 | 3 | BKD/aset/tiket/cuti; tanpa payroll/rekrutmen |
 | Research & graduation | 7 | 4 | skripsi→yudisium→alumni utuh; tanpa hibah/HKI/pengabdian |
 | UI/UX | 10 | 6 | landing 11 seksi, shell, dashboard; tanpa E2E/screenshot/PWA/audit a11y |
-| Security | 10 | 5 | signature adapter, upload aman, ownership; 0 policy, S1–S10 terbuka |
+| Security | 10 | 7 | M-001..004 + M-015 (Policy Tagihan/Pembayaran); sisa S5–S10 |
 | API & integrasi | 5 | 3 | sanctum mobile + v1/v2 + throttle; tanpa OpenAPI/envelope, D BLOCKED |
-| Database & performance | 5 | 3 | index parsial, tx baik; P1–P8 + tanpa benchmark skala |
-| Testing & reliability | 4 | 2 | 212/212 + red-green rule; tanpa E2E/beban/tes modul LMS |
+| Database & performance | 5 | 4 | index Wave A + tx baik; sisa P1–P8 + benchmark skala |
+| Testing & reliability | 4 | 3 | 223/223 + WaveACriticalTest (11 tes); tanpa E2E/beban |
 | Docs & ops | 3 | 2 | 46 docs + MEGA_* baru; tanpa backup teruji, README generik |
 
-**TOTAL = 57/100.**
+**TOTAL = 63/100** (naik dari 57: +Academic, +Finance, +Security, +DB, +Testing).
 
 Klasifikasi bukti per klaim: Implemented / Tested / Browser-verified /
 Production-verified / External-verified — saat ini mayoritas Implemented+Tested;

@@ -11,9 +11,9 @@
         <div class="card-body">
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
-                    <label class="form-label" for="ipk">IPK semester lalu</label>
-                    <input id="ipk" type="number" step="0.01" min="0" max="4" wire:model="ipk" class="form-control @error('ipk') is-invalid @enderror">
-                    @error('ipk') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <label class="form-label" for="ipk">IPK terakhir (otomatis)</label>
+                    <input id="ipk" type="number" step="0.01" min="0" max="4" wire:model="ipk" readonly class="form-control" aria-readonly="true">
+                    <div class="form-hint">Dihitung sistem dari nilai. Tidak bisa diubah manual.</div>
                 </div>
                 <div class="col-md-8">
                     <div class="d-flex gap-4">

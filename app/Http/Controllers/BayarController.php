@@ -8,6 +8,7 @@ use App\Models\Tagihan;
 use App\Services\KalenderService;
 use App\Services\Payment\PaymentService;
 use App\Services\PmbVaService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,8 @@ use Illuminate\View\View;
 
 class BayarController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index(): View
     {
         $mahasiswaId = Mahasiswa::where('user_id', Auth::id())->value('id');
@@ -32,7 +35,7 @@ class BayarController extends Controller
 
     public function createVa(Request $request, Tagihan $tagihan, PaymentService $pay): JsonResponse
     {
-        $this->authorizeTagihan($tagihan);
+        $this->authorize('bayar', $tagihan);
 
         abort_if($tagihan->status === 'lunas', 422, 'Tagihan sudah lunas.');
 
@@ -91,7 +94,11 @@ class BayarController extends Controller
 
         $reference = $pay->driver()->verifyCallback($payload);
 
-        if (! $reference && str_starts_with((string) ($payload['reference'] ?? ''), 'PMBVA-')) {
+        // Fallback PMBVA HANYA untuk driver simulasi (tanpa signature by design,
+        // sudah ditolak di production pada guard di atas). Di driver nyata,
+        // callback tanpa signature valid DITOLAK — jika tidak, siapa pun bisa
+        // melunasi VA hanya dengan menebak reference.
+        if (! $reference && $pay->activeDriverKey() === 'simulated' && str_starts_with((string) ($payload['reference'] ?? ''), 'PMBVA-')) {
             $reference = (string) $payload['reference'];
         }
 
@@ -129,7 +136,7 @@ class BayarController extends Controller
     /** Refund pembayaran verified (role keuangan). Reversal terbayar + jurnal. */
     public function refund(Request $request, Pembayaran $pembayaran, PaymentService $pay): JsonResponse
     {
-        abort_unless(Auth::user()->hasAnyRole(['keuangan', 'superadmin']), 403);
+        $this->authorize('refund', $pembayaran);
 
         $data = $request->validate(['reason' => 'nullable|string|max:255']);
 
@@ -144,13 +151,11 @@ class BayarController extends Controller
 
     private function authorizeTagihan(Tagihan $tagihan): void
     {
-        $mahasiswaId = Mahasiswa::where('user_id', Auth::id())->value('id');
-
-        abort_unless($tagihan->mahasiswa_id === $mahasiswaId || Auth::user()->hasAnyRole(['keuangan', 'superadmin', 'admin_prodi']), 403);
+        $this->authorize('view', $tagihan);
     }
 
     private function authorizePembayaran(Pembayaran $pembayaran): void
     {
-        $this->authorizeTagihan($pembayaran->tagihan);
+        $this->authorize('view', $pembayaran);
     }
 }

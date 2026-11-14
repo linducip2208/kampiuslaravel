@@ -77,7 +77,7 @@ Route::get('/', function () {
         'prodi' => $safe('prodi', fn () => Prodi::count()),
         'matakuliah' => $safe('matakuliah', fn () => Matakuliah::count()),
         'audit' => $safe('audit_logs', fn () => AuditLog::count()),
-        'piutang' => $safe('tagihan', fn () => Tagihan::whereIn('status', ['belum_bayar', 'sebagian'])->sum(DB::raw('nominal - terbayar'))),
+        'piutang' => $safe('tagihan', fn () => Tagihan::whereIn('status', ['belum_bayar', 'sebagian'])->sum(DB::raw('nominal + COALESCE(denda,0) - COALESCE(terbayar,0)'))),
         'krs_pending' => $safe('krs', fn () => Krs::where('status', 'diajukan')->count()),
         'krs_ok' => $safe('krs', fn () => Krs::where('status', 'disetujui')->whereDate('updated_at', today())->count()),
         'dosen' => $safe('dosen', fn () => Dosen::where('status', 'aktif')->count()),
@@ -113,7 +113,7 @@ Route::get('/', function () {
             return is_iterable($n) ? $n : [];
         })(),
         'lunas_pct' => $safe('tagihan', function () {
-            $total = (float) Tagihan::sum('nominal');
+            $total = (float) Tagihan::sum(DB::raw('nominal + COALESCE(denda,0)'));
             $bayar = (float) Tagihan::sum('terbayar');
 
             return $total > 0 ? (int) round($bayar / $total * 100) : 0;

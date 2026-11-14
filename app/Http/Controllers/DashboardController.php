@@ -273,7 +273,7 @@ class DashboardController extends Controller
             : 0;
 
         $stats['piutang'] = Schema::hasTable('tagihan')
-            ? (int) DB::table('tagihan')->whereIn('status', ['belum_bayar', 'sebagian'])->selectRaw('COALESCE(SUM(nominal - terbayar),0) as t')->value('t')
+            ? (int) DB::table('tagihan')->whereIn('status', ['belum_bayar', 'sebagian'])->selectRaw('COALESCE(SUM(nominal + COALESCE(denda,0) - COALESCE(terbayar,0)),0) as t')->value('t')
             : 0;
 
         $stats['krs_pending'] = Schema::hasTable('krs') ? DB::table('krs')->where('status', 'diajukan')->count() : 0;

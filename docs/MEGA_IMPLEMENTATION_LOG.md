@@ -12,6 +12,29 @@
 - Status git: bersih @ `10baa98`. TIDAK ADA kode diubah ronde ini (hanya docs,
   setelah ini). Tidak ada commit/push tanpa perintah eksplisit.
 
+## 2026-11-14 — WAVE A batch 1: 13 item selesai, 223/223 hijau
+
+Kode (pola laravel-best-practices: ikuti konvensi repo, tanpa pola baru):
+- M-001 `BayarController::callback` — fallback PMBVA hanya driver simulasi
+  (tolak signature-null di driver nyata); M-002 tx+`lockForUpdate` di
+  `PmbVaService::settleByReference`; M-003 cek pending+lunas di dalam tx
+  terkunci di `BayarManual::simpan`; M-004 check → driver → recheck-tx di
+  `PaymentService::createTransaction` (tanpa menahan lock saat HTTP).
+- M-007 IPS semester berjalan (`KhsController::ipSemesterBerjalan`, bukan IPK
+  global); M-008 IPK server-side di `Pengajuan` (input browser diabaikan,
+  field readonly + snapshot = server); M-009 IPK wali berbobot SKS
+  (single-query; temuan turunan: integer-division SQLite → `* 1.0`).
+- M-011 piutang/lunas_pct termasuk denda di 3 titik (dashboard, pimpinan,
+  landing `web.php:80,115`); M-012 `postPenerimaan` tolak nominal ≤0 + assert
+  seimbang; M-013 migrasi `2026_11_14_182700` index wave_a; M-014 migrasi
+  `2026_11_14_182701` soft deletes `tagihan_cicilan` + `SoftDeletes` model;
+  M-015 `TagihanPolicy` (`view`/`bayar`/`verify`) + `PembayaranPolicy`
+  (`view`/`refund`), registrasi `Gate::policy`, `BayarController` delegasi
+  via `AuthorizesRequests`; M-019 rename `ExampleUnitTest`.
+- Tes: `tests/Feature/WaveACriticalTest.php` (11 tes: IPS, IPK-manual,
+  IPK-wali, callback-PMBVA-403, settle ganda, bayar-manual ganda, piutang,
+  jurnal-nol, cicilan restore, policy HTTP + matriks Gate).
+
 ## Berikutnya (diusulkan, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.

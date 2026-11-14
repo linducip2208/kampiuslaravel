@@ -2,10 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\Pembayaran;
 use App\Models\Pengumuman;
+use App\Models\Tagihan;
 use App\Models\TahunAkademik;
+use App\Policies\PembayaranPolicy;
+use App\Policies\TagihanPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
@@ -27,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(Tagihan::class, TagihanPolicy::class);
+        Gate::policy(Pembayaran::class, PembayaranPolicy::class);
+
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by($request->user()?->id ?: $request->ip()));
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
         RateLimiter::for('public', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));

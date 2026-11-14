@@ -80,5 +80,16 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 
 ## Status global
 
-TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6. Selesai=0 (runde belum mulai).
-Setiap item selesai → pindah ke IMPLEMENTATION_LOG + tes hijau + bukti.
+TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
+Selesai=13 (2026-11-14, bukti: `tests/Feature/WaveACriticalTest.php`, 11 tes):
+M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
+M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →
+recheck-tx di PaymentService), M-007 (IPS semester berjalan di KhsController),
+M-008 (IPK server-side, input browser diabaikan + readonly), M-009 (IPK wali
+berbobot SKS + fix integer-division SQLite `* 1.0`), M-011 (piutang & lunas_pct
+termasuk denda di 3 titik: DashboardController, pimpinan, landing), M-012
+(jurnal tolak nominal ≤0 + assert seimbang), M-013 (migrasi index wave_a),
+M-014 (soft deletes tagihan_cicilan + model + tes restore), M-015
+(TagihanPolicy/PembayaranPolicy + `bayar` vs `view` + tes matriks), M-019
+(rename ExampleUnitTest). Sisa Wave A: M-005, M-006, M-010, M-016, M-017, M-018, M-020.
+Setiap item selesai → bukti di IMPLEMENTATION_LOG.

@@ -31,13 +31,29 @@ class KhsController extends Controller
             'mahasiswaId' => $mahasiswaId,
             'nilai' => $ringkasan['nilai'],
             'ipk' => $ringkasan['ipk'],
-            'ip' => $ringkasan['ipk'],
+            'ip' => $this->ipSemesterBerjalan($ringkasan),
             'totalSks' => $ringkasan['total_sks'],
             'perTahun' => $ringkasan['per_tahun'],
             'verifyUrl' => $verifyUrl,
             'qrSvg' => QrSvg::trySvg($verifyUrl),
             'tte' => DokumenTte::stamp('KHS-'.$mahasiswa->nim.'-'.$mahasiswaId),
         ]);
+    }
+
+    /**
+     * IP semester berjalan = IP tahun akademik terbaru (bukan IPK global).
+     *
+     * @param  array{per_tahun: array<int, array{ip: float, sks: int}>}  $ringkasan
+     */
+    private function ipSemesterBerjalan(array $ringkasan): float
+    {
+        $perTahun = $ringkasan['per_tahun'] ?? [];
+
+        if ($perTahun === []) {
+            return 0.0;
+        }
+
+        return (float) ($perTahun[max(array_keys($perTahun))]['ip'] ?? 0.0);
     }
 
     /**
