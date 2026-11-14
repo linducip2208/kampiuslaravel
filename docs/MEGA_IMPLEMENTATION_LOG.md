@@ -90,7 +90,33 @@ Kode:
   (aditif; asersi lama tetap hijau).
 - Tes: `tests/Feature/WaveBBatch1Test.php` (13 tes).
 
-## Berikutnya (Wave B batch 2, belum dieksekusi)
+## 2026-11-14 — WAVE B batch 2: 6 item selesai, 252/252 hijau
+
+Kode:
+- M-022 `routes/console.php`: `akademik:rollover` terjadwal `yearlyOn(2,1)` +
+  `yearlyOn(8,1)` 00:30 + `withoutOverlapping` (idempoten; nonaktifkan manual
+  bila kalender menyimpang).
+- M-023 `AkademikService::kandidatDo($minSemester = 4, $batasIpk = 2.0)` —
+  1 query agregat (IPK terbobot + distinct semester, hanya status aktif);
+  command `akademik:evaluasi-do [--min-semester] [--batas-ipk] [--terapkan]`
+  (kering default; --terapkan ubah aktif→do + AuditLog, hanya status aktif).
+- M-025/P1 `JadwalService::{ruangBentrok,dosenBentrok,pinjamRuang}` → predikat
+  overlap di sisi DB + `normalisasiJam()` (batas tepat 09:30 vs 09:30:00 tidak
+  salah overlap); `jamOverlap()` dipertahankan untuk BC.
+- M-025/P3 `validasiKrs()`: prasyarat 1 query lulus (distinct matakuliah) +
+  kuota via `kursiTerisiBanyak()` (2 query untuk N kelas, bukan 2N).
+- M-026 `RekomendasiMkService::rekomendasi()` tambah `matakuliah_id` per ulangi
+  + `kelas_tersedia[mk]` (periode aktif: kelas_id/kelas/terisi/kuota/penuh +
+  `posisi_waitlist` bila penuh); tanpa periode aktif → peta kosong; BC
+  (`ulangi`, `batas_sks`, `saran` tak berubah — `AiFeatureTest` hijau).
+- M-035 tanpa ubah prod (service idempoten + UI + tes sudah ada) — bukti baru:
+  `tak_dikenal` + re-run tak mengubah `reconciled_at`.
+- M-041 `setujuiPinjam()` cek-ulang kuliah+booking di tx terkunci + tolak
+  non-diajukan (422); rute `GET /fasilitas/pinjam` (semua login; setujui/tolak
+  tetap superadmin/admin_prodi di komponen).
+- Tes: `tests/Feature/WaveBBatch2Test.php` (8 tes).
+
+## Berikutnya (Wave B batch 3, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

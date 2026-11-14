@@ -142,6 +142,41 @@ class AkademikService
         }
     }
 
+    /**
+     * M-025/P3: hitung kursi terisi untuk banyak kelas sekaligus (1 query).
+     *
+     * @param  list<int>  $kelasIds
+     * @return array<int, int> peta kelas_id => terisi
+     */
+    public static function kursiTerisiBanyak(array $kelasIds, ?int $abaikanKrsId = null): array
+    {
+        $kelasIds = array_values(array_unique(array_map('intval', $kelasIds)));
+
+        if ($kelasIds === []) {
+            return [];
+        }
+
+        try {
+            $query = DB::table('krs_detail')
+                ->join('krs', 'krs.id', '=', 'krs_detail.krs_id')
+                ->whereIn('krs_detail.kelas_id', $kelasIds)
+                ->whereIn('krs.status', [Krs::STATUS_DRAFT, Krs::STATUS_DIAJUKAN, Krs::STATUS_DISETUJUI]);
+
+            if ($abaikanKrsId !== null) {
+                $query->where('krs.id', '!=', $abaikanKrsId);
+            }
+
+            return $query
+                ->groupBy('krs_detail.kelas_id')
+                ->selectRaw('krs_detail.kelas_id, count(*) as terisi')
+                ->pluck('terisi', 'krs_detail.kelas_id')
+                ->map(fn ($v): int => (int) $v)
+                ->all();
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
     public static function kuotaKelas(int $kelasId): int
     {
         try {
@@ -149,6 +184,43 @@ class AkademikService
         } catch (\Throwable) {
             return 0;
         }
+    }
+
+    /**
+     * M-023: kandidat DO — mahasiswa aktif yang telah menempuh minimal
+     * $minSemester semester (distinct tahun_akademik pada nilai terkunci)
+     * dengan IPK di bawah $batasIpk. Aturan konservatif & terdokumentasi;
+     * penerapan status tetap eksplisit via command --terapkan (audit trail).
+     *
+     * @return Collection<int, array{mahasiswa_id: int, nim: string, ipk: float, semester: int}>
+     */
+    public static function kandidatDo(int $minSemester = 4, float $batasIpk = 2.0): Collection
+    {
+        try {
+            $rows = DB::table('nilai')
+                ->join('kelas', 'kelas.id', '=', 'nilai.kelas_id')
+                ->join('matakuliah', 'matakuliah.id', '=', 'kelas.matakuliah_id')
+                ->join('mahasiswa', 'mahasiswa.id', '=', 'nilai.mahasiswa_id')
+                ->where('nilai.is_locked', true)
+                ->where('mahasiswa.status', 'aktif')
+                ->groupBy('nilai.mahasiswa_id', 'mahasiswa.nim')
+                ->selectRaw('nilai.mahasiswa_id, mahasiswa.nim as nim')
+                ->selectRaw('sum(nilai.bobot * matakuliah.sks) / nullif(sum(matakuliah.sks), 0) as ipk')
+                ->selectRaw('count(distinct kelas.tahun_akademik_id) as semester')
+                ->get();
+        } catch (\Throwable) {
+            return collect();
+        }
+
+        return $rows
+            ->map(fn ($r) => [
+                'mahasiswa_id' => (int) $r->mahasiswa_id,
+                'nim' => (string) $r->nim,
+                'ipk' => round((float) $r->ipk, 2),
+                'semester' => (int) $r->semester,
+            ])
+            ->filter(fn ($r) => $r['semester'] >= $minSemester && $r['ipk'] < $batasIpk)
+            ->values();
     }
 
     public static function kelasPenuh(int $kelasId, ?int $abaikanKrsId = null): bool
@@ -194,6 +266,7 @@ class AkademikService
         }
 
         // Prasyarat: kolom legacy tunggal + relasi ganda mk_prasyarat (jenis=prasyarat).
+        // M-025/P3: 1 query lulus untuk semua prasyarat (bukan exists() per loop).
         try {
             $kelas = DB::table('kelas')
                 ->leftJoin('matakuliah', 'matakuliah.id', '=', 'kelas.matakuliah_id')
@@ -210,6 +283,9 @@ class AkademikService
                     ->get(['matakuliah_id', 'prasyarat_id']);
             }
 
+            $wajibPerKelas = [];
+            $semuaPra = [];
+
             foreach ($kelas as $k) {
                 $wajib = [];
                 if ($k->prasyarat_id) {
@@ -218,19 +294,31 @@ class AkademikService
                 foreach ($tambahan->where('matakuliah_id', $k->mk_id) as $rel) {
                     $wajib[(int) $rel->prasyarat_id] = true;
                 }
+                $wajibPerKelas[$k->kelas_id] = ['nama' => $k->mk_nama ?? $k->kode ?? 'matakuliah', 'pra' => array_keys($wajib)];
 
                 foreach (array_keys($wajib) as $praId) {
-                    $lulus = DB::table('nilai')
-                        ->where('mahasiswa_id', $mahasiswaId)
-                        ->whereIn('kelas_id', function ($q) use ($praId): void {
-                            $q->select('id')->from('kelas')->where('matakuliah_id', $praId);
-                        })
-                        ->where('bobot', '>', 0)
-                        ->exists();
+                    $semuaPra[$praId] = true;
+                }
+            }
 
-                    if (! $lulus) {
-                        $nama = $k->mk_nama ?? $k->kode ?? 'matakuliah';
-                        $pesan[] = "Prasyarat belum lulus untuk mengambil {$nama}.";
+            $lulusMk = [];
+            if ($semuaPra !== []) {
+                $lulusMk = DB::table('nilai')
+                    ->join('kelas', 'kelas.id', '=', 'nilai.kelas_id')
+                    ->where('nilai.mahasiswa_id', $mahasiswaId)
+                    ->where('nilai.bobot', '>', 0)
+                    ->whereIn('kelas.matakuliah_id', array_keys($semuaPra))
+                    ->distinct()
+                    ->pluck('kelas.matakuliah_id')
+                    ->map(fn ($v): int => (int) $v)
+                    ->flip()
+                    ->all();
+            }
+
+            foreach ($wajibPerKelas as $data) {
+                foreach ($data['pra'] as $praId) {
+                    if (! isset($lulusMk[$praId])) {
+                        $pesan[] = "Prasyarat belum lulus untuk mengambil {$data['nama']}.";
                         break;
                     }
                 }
@@ -262,14 +350,25 @@ class AkademikService
         }
 
         // Kuota (hitung KRS aktif saja; KRS ditolak tidak memakan kuota).
+        // M-025/P3: 2 query untuk semua kelas (bukan 2N).
+        $kuotas = [];
+        $terisiMap = self::kursiTerisiBanyak($kelasIds, $abaikanKrsId);
+
+        try {
+            $kuotas = DB::table('kelas')->whereIn('id', $kelasIds)->pluck('kuota', 'id')
+                ->map(fn ($v): int => (int) ($v ?? 0))->all();
+        } catch (\Throwable) {
+            // Tabel kelas belum ada — lewati cek kuota.
+        }
+
         foreach ($kelasIds as $kelasId) {
-            $kuota = self::kuotaKelas($kelasId);
+            $kuota = $kuotas[$kelasId] ?? 0;
 
             if ($kuota <= 0) {
                 continue;
             }
 
-            $terisi = self::kursiTerisi($kelasId, $abaikanKrsId);
+            $terisi = $terisiMap[$kelasId] ?? 0;
 
             if ($terisi >= $kuota) {
                 $pesan[] = "Kuota kelas #{$kelasId} penuh ({$terisi}/{$kuota}). Silakan masuk waiting list.";

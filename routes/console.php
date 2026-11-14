@@ -14,4 +14,9 @@ app()->booted(function () {
     $schedule->command('tagihan:ingatkan')->dailyAt('08:00')->withoutOverlapping();
     // Denda otomatis harian (idempoten: nilai ditimpa, bukan diakumulasi).
     $schedule->command('denda:terapkan')->dailyAt('01:00')->withoutOverlapping();
+    // M-022 scheduler akademik: rollover periode tiap awal semester
+    // (ganjil ~Agustus, genap ~Februari). Idempoten (firstOrCreate + 1 aktif);
+    // nonaktifkan manual bila kalender akademik menyimpang.
+    $schedule->command('akademik:rollover')->yearlyOn(2, 1, '00:30')->withoutOverlapping();
+    $schedule->command('akademik:rollover')->yearlyOn(8, 1, '00:30')->withoutOverlapping();
 });

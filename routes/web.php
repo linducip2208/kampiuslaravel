@@ -283,6 +283,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/kalender', fn () => view('pages.livewire-page', ['component' => 'kalender.kelola', 'title' => 'Kalender Akademik']))->name('kalender.index');
     Route::get('/kalender.ics', [KalenderController::class, 'ics'])->name('kalender.ics');
     Route::get('/helpdesk', fn () => view('pages.livewire-page', ['component' => 'helpdesk.tiket', 'title' => 'Helpdesk']))->name('helpdesk.index');
+    // M-041: reservasi lab/fasilitas — semua user login bisa mengajukan,
+    // persetujuan digerbang di komponen (superadmin/admin_prodi).
+    Route::get('/fasilitas/pinjam', fn () => view('pages.livewire-page', ['component' => 'jadwal.pinjam-ruang', 'title' => 'Pinjam Ruang & Fasilitas']))->name('fasilitas.pinjam');
 
     // Audit viewer: pola permission Spatie (M-016) — semua pemegang laporan.view.
     Route::middleware('permission:laporan.view')->group(function () {

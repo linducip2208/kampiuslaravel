@@ -81,21 +81,20 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=28 (2026-11-14, suite 244 hijau):
+Selesai=34 (2026-11-14, suite 252 hijau):
 Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
 `tests/Feature/WaveABatch2Test.php` 8 tes): M-001..M-020 — detail di bawah.
 Wave B Batch 1: 8 item P0/P1 (bukti: `tests/Feature/WaveBBatch1Test.php`
-13 tes): M-021 (tepat 1 periode aktif: `TahunAkademik::aktifkan()` tx+lock,
-migrasi index+reparasi, `akademik:rollover` idempoten), M-024 (KHS/Transkrip
-dipaginasi 25 + filter `?tahun=`, IPK tetap global dari ringkasan),
-M-027 (tes TugasCrud/KumpulTugas/MateriCrud: role, deadline, anti-spoof,
-mimes), M-037 (otorisasi ekspor `can:laporan.view` di LaporanController +
-chunk/streaming tetap), M-045 (envelope `ApiEnvelope` backward-compat +
-`GET /api/openapi.json` ter-generate), M-046 (throttle rute sensitif:
-payment.callback, pddikti.push/export/sync, keuangan.refund),
-M-047 (`backup:create` JSON-gzip chunked + `backup:verify` teruji),
-M-048 (`/health` + `v2/status` memuat checks db/migrasi).
-Sisa Wave B: M-022, M-023, M-025, M-026, M-028..M-036, M-038..M-044.
+13 tes): M-021, M-024, M-027, M-037, M-045, M-046, M-047, M-048
+(detail di IMPLEMENTATION_LOG).
+Wave B Batch 2: 6 item (bukti: `tests/Feature/WaveBBatch2Test.php` 8 tes):
+M-022 (rollover terjadwal 1 Feb & 1 Agu), M-023 (`kandidatDo` +
+`akademik:evaluasi-do [--terapkan]` + AuditLog), M-025/P1+P3 (overlap DB-side;
+prasyarat 1 query; kuota via `kursiTerisiBanyak`), M-026 (rekomendasi +
+`kelas_tersedia` & `posisi_waitlist` periode aktif), M-035 (rekon tak_dikenal +
+re-run idempoten), M-041 (`setujuiPinjam` re-check tx + rute
+`/fasilitas/pinjam`).
+Sisa Wave B: M-028..M-034, M-036, M-038..M-040, M-042..M-044.
 Wave C/D: belum dimulai (D semua BLOCKED).
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →

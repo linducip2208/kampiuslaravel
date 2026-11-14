@@ -11,6 +11,7 @@ use App\Models\Ruang;
 use Carbon\Carbon;
 use DomainException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Penjadwalan anti-bentrok + pinjam ruang + presensi dosen/BAP.
@@ -37,6 +38,18 @@ class JadwalService
     }
 
     /**
+     * M-025/P1: predikat overlap jam di sisi DB (kolom TIME, format HH:MM:SS).
+     * Input dinormalisasi ke HH:MM:SS agar batas tepat (10:00 vs 10:00:00)
+     * tidak salah dianggap overlap.
+     */
+    private static function normalisasiJam(string $jam): string
+    {
+        $jam = substr(trim($jam), 0, 5);
+
+        return preg_match('/^\d{2}:\d{2}:\d{2}$/', $jam) ? $jam : $jam.':00';
+    }
+
+    /**
      * Cek bentrok ruang pada hari+jam tertentu (jadwal kuliah mingguan).
      */
     public static function ruangBentrok(?int $ruangId, string $hari, string $mulai, string $selesai, ?int $ignoreKelasId = null): bool
@@ -45,15 +58,17 @@ class JadwalService
             return false;
         }
 
+        $mulai = self::normalisasiJam($mulai);
+        $selesai = self::normalisasiJam($selesai);
+
         return Kelas::where('ruang_id', $ruangId)
             ->where('hari', $hari)
+            ->whereNotNull('jam_mulai')
+            ->whereNotNull('jam_selesai')
             ->when($ignoreKelasId, fn ($q) => $q->where('id', '!=', $ignoreKelasId))
-            ->get(['jam_mulai', 'jam_selesai'])
-            ->contains(fn ($k) => $k->jam_mulai && $k->jam_selesai
-                && self::jamOverlap(
-                    substr((string) $k->jam_mulai, 0, 5), substr((string) $k->jam_selesai, 0, 5),
-                    substr($mulai, 0, 5), substr($selesai, 0, 5)
-                ));
+            ->where('jam_mulai', '<', $selesai)
+            ->where('jam_selesai', '>', $mulai)
+            ->exists();
     }
 
     /**
@@ -65,15 +80,17 @@ class JadwalService
             return false;
         }
 
+        $mulai = self::normalisasiJam($mulai);
+        $selesai = self::normalisasiJam($selesai);
+
         return Kelas::where('dosen_id', $dosenId)
             ->where('hari', $hari)
+            ->whereNotNull('jam_mulai')
+            ->whereNotNull('jam_selesai')
             ->when($ignoreKelasId, fn ($q) => $q->where('id', '!=', $ignoreKelasId))
-            ->get(['jam_mulai', 'jam_selesai'])
-            ->contains(fn ($k) => $k->jam_mulai && $k->jam_selesai
-                && self::jamOverlap(
-                    substr((string) $k->jam_mulai, 0, 5), substr((string) $k->jam_selesai, 0, 5),
-                    substr($mulai, 0, 5), substr($selesai, 0, 5)
-                ));
+            ->where('jam_mulai', '<', $selesai)
+            ->where('jam_selesai', '>', $mulai)
+            ->exists();
     }
 
     /**
@@ -175,11 +192,14 @@ class JadwalService
 
         $hari = self::hariDariTanggal($tanggal);
 
+        // M-025/P1: overlap di sisi DB (bukan get()->contains()).
         $bentrokKuliah = Kelas::where('ruang_id', $ruangId)
             ->where('hari', $hari)
-            ->get(['jam_mulai', 'jam_selesai'])
-            ->contains(fn ($k) => $k->jam_mulai && $k->jam_selesai
-                && self::jamOverlap(substr((string) $k->jam_mulai, 0, 5), substr((string) $k->jam_selesai, 0, 5), $mulai, $selesai));
+            ->whereNotNull('jam_mulai')
+            ->whereNotNull('jam_selesai')
+            ->where('jam_mulai', '<', self::normalisasiJam($selesai))
+            ->where('jam_selesai', '>', self::normalisasiJam($mulai))
+            ->exists();
 
         if ($bentrokKuliah) {
             throw new DomainException('Ruang dipakai jadwal kuliah pada jam tersebut.');
@@ -188,10 +208,11 @@ class JadwalService
         $bentrokBooking = PeminjamanRuang::where('ruang_id', $ruangId)
             ->whereDate('tanggal', $tanggal)
             ->whereIn('status', [PeminjamanRuang::STATUS_DIAJUKAN, PeminjamanRuang::STATUS_DISETUJUI])
-            ->get(['jam_mulai', 'jam_selesai'])
-            ->contains(fn ($b) => self::jamOverlap(
-                substr((string) $b->jam_mulai, 0, 5), substr((string) $b->jam_selesai, 0, 5), $mulai, $selesai
-            ));
+            ->whereNotNull('jam_mulai')
+            ->whereNotNull('jam_selesai')
+            ->where('jam_mulai', '<', self::normalisasiJam($selesai))
+            ->where('jam_selesai', '>', self::normalisasiJam($mulai))
+            ->exists();
 
         if ($bentrokBooking) {
             throw new DomainException('Ruang sudah dipinjam pada jam tersebut.');
@@ -210,9 +231,50 @@ class JadwalService
 
     public static function setujuiPinjam(PeminjamanRuang $pinjam, ?string $catatan = null): PeminjamanRuang
     {
-        $pinjam->update(['status' => PeminjamanRuang::STATUS_DISETUJUI, 'catatan_admin' => $catatan]);
+        // M-041: cek-ulang bentrok di dalam transaksi terkunci — dua persetujuan
+        // bersamaan untuk slot yang sama tidak bisa lolos dua-duanya.
+        return DB::transaction(function () use ($pinjam, $catatan): PeminjamanRuang {
+            $locked = PeminjamanRuang::whereKey($pinjam->id)->lockForUpdate()->firstOrFail();
 
-        return $pinjam->refresh();
+            abort_if($locked->status !== PeminjamanRuang::STATUS_DIAJUKAN, 422, 'Hanya pengajuan diajukan yang bisa disetujui.');
+
+            $mulai = substr((string) $locked->jam_mulai, 0, 5);
+            $selesai = substr((string) $locked->jam_selesai, 0, 5);
+
+            $hari = self::hariDariTanggal($locked->tanggal instanceof \DateTimeInterface
+                ? $locked->tanggal->format('Y-m-d')
+                : (string) $locked->tanggal);
+
+            $bentrokKuliah = Kelas::where('ruang_id', $locked->ruang_id)
+                ->where('hari', $hari)
+                ->whereNotNull('jam_mulai')
+                ->whereNotNull('jam_selesai')
+                ->where('jam_mulai', '<', self::normalisasiJam($selesai))
+                ->where('jam_selesai', '>', self::normalisasiJam($mulai))
+                ->exists();
+
+            if ($bentrokKuliah) {
+                throw new DomainException('Ruang dipakai jadwal kuliah pada jam tersebut.');
+            }
+
+            $bentrokBooking = PeminjamanRuang::where('ruang_id', $locked->ruang_id)
+                ->whereDate('tanggal', $locked->tanggal instanceof \DateTimeInterface ? $locked->tanggal->format('Y-m-d') : (string) $locked->tanggal)
+                ->where('id', '!=', $locked->id)
+                ->whereIn('status', [PeminjamanRuang::STATUS_DIAJUKAN, PeminjamanRuang::STATUS_DISETUJUI])
+                ->whereNotNull('jam_mulai')
+                ->whereNotNull('jam_selesai')
+                ->where('jam_mulai', '<', self::normalisasiJam($selesai))
+                ->where('jam_selesai', '>', self::normalisasiJam($mulai))
+                ->exists();
+
+            if ($bentrokBooking) {
+                throw new DomainException('Ruang sudah dipinjam pada jam tersebut.');
+            }
+
+            $locked->update(['status' => PeminjamanRuang::STATUS_DISETUJUI, 'catatan_admin' => $catatan]);
+
+            return $locked->refresh();
+        });
     }
 
     public static function tolakPinjam(PeminjamanRuang $pinjam, ?string $catatan = null): PeminjamanRuang
