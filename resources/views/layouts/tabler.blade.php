@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="KAMPIUS — University ERP & Academic Management System: PMB, akademik, keuangan, dan pelaporan kampus terpadu.">
-    <meta property="og:title" content="@yield('title', config('app.name', 'KAMPIUS'))">
+    <meta name="description" content="KAMPUS — University ERP & Academic Management System: PMB, akademik, keuangan, dan pelaporan kampus terpadu.">
+    <meta property="og:title" content="@yield('title', config('app.name', 'KAMPUS'))">
     <meta property="og:description" content="Kelola PMB, KRS, nilai, keuangan, dan laporan dalam satu sistem kampus terpadu.">
     <meta property="og:type" content="website">
-    <title>@yield('title', config('app.name', 'KAMPIUS'))</title>
+    <title>@yield('title', config('app.name', 'KAMPUS'))</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
-    <link rel="icon" type="image/png" href="{{ asset('img/logo-kampius-mark.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('img/logo-kampus-mark.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
     <style>
@@ -235,7 +235,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-                    <a href="{{ route('home') }}" class="text-decoration-none d-inline-flex align-items-center gap-2"><img src="{{ asset('img/logo-kampius-mark.png') }}" alt="Logo KAMPIUS" width="30" height="30" style="border-radius:8px">KAMPIUS <span class="text-secondary small fw-normal">ERP</span></a>
+                    <a href="{{ route('home') }}" class="text-decoration-none d-inline-flex align-items-center gap-2"><img src="{{ asset('img/logo-kampus-mark.png') }}" alt="Logo KAMPUS" width="30" height="30" style="border-radius:8px">KAMPUS <span class="text-secondary small fw-normal">ERP</span></a>
                 </h1>
                 <div class="collapse navbar-collapse" id="public-menu">
                     <ul class="navbar-nav">
@@ -267,9 +267,9 @@
         <div class="kampius-nav-overlay" data-kampius-nav-close aria-hidden="true"></div>
         <aside class="kampius-sidebar" aria-label="Navigasi utama">
             <div class="kampius-brand">
-                <a href="{{ route('dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none" aria-label="KAMPIUS Dashboard">
-                    <img src="{{ asset('img/logo-kampius-mark.png') }}" alt="Logo KAMPIUS" width="38" height="38" style="border-radius:11px;flex-shrink:0">
-                    <span class="kampius-brand-text"><strong>KAMPIUS</strong><small>University ERP</small></span>
+                <a href="{{ route('dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none" aria-label="KAMPUS Dashboard">
+                    <img src="{{ asset('img/logo-kampus-mark.png') }}" alt="Logo KAMPUS" width="38" height="38" style="border-radius:11px;flex-shrink:0">
+                    <span class="kampius-brand-text"><strong>KAMPUS</strong><small>University ERP</small></span>
                 </a>
                 <button type="button" class="kampius-collapse-btn d-none d-lg-inline-flex" data-kampius-collapse aria-label="Lipatkan navigasi">
                     <svg class="chev-open" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
@@ -461,7 +461,7 @@
             <div class="row text-center align-items-center flex-row-reverse">
                 <div class="col-12 col-lg-auto mt-3 mt-lg-0">
                     <ul class="list-inline list-inline-dots mb-0">
-                        <li class="list-inline-item">KAMPIUS • SIMAK Kuliah — Laravel {{ app()->version() }}</li>
+                        <li class="list-inline-item">KAMPUS • SIMAK Kuliah — Laravel {{ app()->version() }}</li>
                     </ul>
                 </div>
             </div>

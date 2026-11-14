@@ -2,7 +2,7 @@
 
 @section('public-nav', true)
 @section('no-header', true)
-@section('title', 'KAMPIUS — University ERP & Academic Management System')
+@section('title', 'KAMPUS — University ERP & Academic Management System')
 
 @push('styles')
 <style>
@@ -122,7 +122,7 @@
             <div class="col-lg-5">
                 <span class="kampius-eyebrow"><span class="dot"></span> Sistem Informasi Kampus Terpadu</span>
                 <h1 class="display-5 fw-bold mt-3">Satu Platform untuk Seluruh Operasi Kampus</h1>
-                <p class="opacity-75">KAMPIUS mengintegrasikan PMB, akademik, keuangan, dan pelaporan dalam satu sistem yang aman, modern, dan mudah digunakan — untuk {{ number_format($stats['mahasiswa'] ?? 0) }} mahasiswa dan {{ number_format($stats['dosen'] ?? 0) }} dosen yang telah terdata.</p>
+                <p class="opacity-75">KAMPUS mengintegrasikan PMB, akademik, keuangan, dan pelaporan dalam satu sistem yang aman, modern, dan mudah digunakan — untuk {{ number_format($stats['mahasiswa'] ?? 0) }} mahasiswa dan {{ number_format($stats['dosen'] ?? 0) }} dosen yang telah terdata.</p>
                 <div class="d-flex flex-wrap gap-2 mt-3">
                     <a href="{{ route('pmb.create') }}" class="btn btn-light btn-lg">Mulai Pendaftaran →</a>
                     <a href="{{ route('dokumen.index') }}" class="btn btn-outline-light btn-lg">Dokumentasi</a>
@@ -133,10 +133,10 @@
             </div>
             <div class="col-lg-7">
                 {{-- Mockup dashboard ERP (HTML/CSS, data real agregat) --}}
-                <div class="kampius-mock" role="img" aria-label="Pratinjau dashboard KAMPIUS ERP">
+                <div class="kampius-mock" role="img" aria-label="Pratinjau dashboard KAMPUS ERP">
                     <div class="kampius-mock-topbar">
                         <i style="background:#DC4545"></i><i style="background:#E9A23B"></i><i style="background:#16A36A"></i>
-                        <span class="ms-2 small text-secondary">KAMPIUS — Ringkasan Eksekutif</span>
+                        <span class="ms-2 small text-secondary">KAMPUS — Ringkasan Eksekutif</span>
                         <span class="ms-auto badge bg-green-lt">Live</span>
                     </div>
                     <div class="kampius-mock-body">
@@ -178,7 +178,7 @@
 {{-- ============ 2b. FOTO KAMPUS (AI WAN 2.1, lokal) ============ --}}
 <div class="container-xl mt-4" style="max-width: 1280px">
     <div class="position-relative overflow-hidden" style="border-radius:18px">
-        <img src="{{ asset('img/kampus-hero-wan.png') }}" alt="Gedung kampus modern KAMPIUS" class="w-100 d-block" style="max-height:420px;object-fit:cover" loading="lazy">
+        <img src="{{ asset('img/kampus-hero-wan.png') }}" alt="Gedung kampus modern KAMPUS" class="w-100 d-block" style="max-height:420px;object-fit:cover" loading="lazy">
         <div class="position-absolute bottom-0 start-0 end-0 p-3 p-md-4 d-flex flex-wrap align-items-end gap-2" style="background:linear-gradient(transparent, rgba(16,29,75,.82))">
             <div class="text-white me-auto">
                 <strong class="d-block">Kampus Modern, Sistem Modern</strong>
@@ -259,7 +259,7 @@
             <div class="col-lg-6">
                 <div class="kampius-mock">
                     <div class="kampius-mock-topbar"><i style="background:#DC4545"></i><i style="background:#E9A23B"></i><i style="background:#16A36A"></i><span class="ms-2 small text-secondary">Keuangan — Verifikasi Pembayaran</span></div>
-                    <img src="{{ asset('img/keuangan-wan.png') }}" alt="Visual analitik keuangan KAMPIUS" class="w-100 d-block" style="height:140px;object-fit:cover" loading="lazy">
+                    <img src="{{ asset('img/keuangan-wan.png') }}" alt="Visual analitik keuangan KAMPUS" class="w-100 d-block" style="height:140px;object-fit:cover" loading="lazy">
                     <div class="p-3">
                         <div class="d-flex justify-content-between mb-2"><strong>Antrean verifikasi</strong><span class="badge bg-warning-lt">{{ number_format($stats['pembayaran_pending'] ?? 0) }} menunggu</span></div>
                         <div class="kampius-mock-rows">
@@ -311,7 +311,7 @@
         @endforeach
     </div>
     <div class="card kampius-card mt-3"><div class="row g-0 align-items-center">
-        <div class="col-md-6"><img src="{{ asset('img/wisuda-wan.png') }}" alt="Wisuda kampus KAMPIUS" class="img-fluid w-100 h-100" style="object-fit:cover;min-height:220px;border-radius:16px 0 0 16px" loading="lazy"></div>
+        <div class="col-md-6"><img src="{{ asset('img/wisuda-wan.png') }}" alt="Wisuda kampus KAMPUS" class="img-fluid w-100 h-100" style="object-fit:cover;min-height:220px;border-radius:16px 0 0 16px" loading="lazy"></div>
         <div class="col-md-6 p-4">
             <h3 class="mb-1">Dari Pendaftar hingga Wisudawan</h3>
             <p class="text-secondary">Satu alur utuh tanpa data terpisah — dan setiap dokumen penting terverifikasi QR.</p>
@@ -353,7 +353,7 @@
     <div class="row row-cards">
         <div class="col-lg-6">
             <div class="card h-100 bg-dark text-white overflow-hidden">
-                <img src="{{ asset('img/keamanan-wan.png') }}" alt="Perisai keamanan siber KAMPIUS" class="w-100 d-block" style="height:150px;object-fit:cover" loading="lazy">
+                <img src="{{ asset('img/keamanan-wan.png') }}" alt="Perisai keamanan siber KAMPUS" class="w-100 d-block" style="height:150px;object-fit:cover" loading="lazy">
                 <div class="card-body">
                     <span class="badge bg-dark-lt text-info mb-2">KEAMANAN TERVERIFIKASI</span>
                     <h2 class="text-white">Keamanan Tingkat Enterprise</h2>
@@ -396,7 +396,7 @@
     <div class="accordion mt-3" id="faqAccordion">
         @php
             $faqs = [
-                ['Bagaimana cara mencoba KAMPIUS?', 'Klik Demo Gratis dan masuk dengan akun demo sesuai peran (mahasiswa, dosen, keuangan, admin). Setiap peran melihat menu dan datanya sendiri.'],
+                ['Bagaimana cara mencoba KAMPUS?', 'Klik Demo Gratis dan masuk dengan akun demo sesuai peran (mahasiswa, dosen, keuangan, admin). Setiap peran melihat menu dan datanya sendiri.'],
                 ['Apakah data saya aman dan terisolasi?', 'Ya. Setiap rute dilindungi peran dan kepemilikan data dicek di server — mahasiswa hanya melihat datanya sendiri, dosen hanya bimbingannya.'],
                 ['Bagaimana pembayaran kuliah dilakukan?', 'Mahasiswa membuat VA/QRIS dari tagihannya, atau mengunggah bukti manual untuk diverifikasi petugas keuangan dengan jurnal otomatis.'],
                 ['Apakah dokumen ijazah dan transkrip bisa diverifikasi?', 'Ya. Setiap dokumen membawa QR bertanda tangan digital yang bisa dicek siapa pun lewat halaman verifikasi publik.'],
@@ -419,7 +419,7 @@
 {{-- ============ 10. CTA ============ --}}
 <div class="kampius-landing-hero text-white mt-5">
     <div class="container-xl py-5 text-center position-relative" style="max-width: 1280px; z-index:1">
-        <h2 class="fw-bold">Siap Mengelola Kampus dengan KAMPIUS?</h2>
+        <h2 class="fw-bold">Siap Mengelola Kampus dengan KAMPUS?</h2>
         <p class="opacity-75 mb-3">Mulai dari PMB online hari ini — tanpa instalasi rumit.</p>
         <div class="d-flex justify-content-center gap-2 flex-wrap">
             <a href="{{ route('pmb.create') }}" class="btn btn-light btn-lg">Daftar PMB →</a>
@@ -431,7 +431,7 @@
 {{-- ============ 11. FOOTER ============ --}}
 <footer class="container-xl mt-4 mb-3" style="max-width: 1280px" id="kontak">
     <div class="d-flex flex-wrap justify-content-between align-items-center text-secondary small gap-2">
-        <span class="d-inline-flex align-items-center gap-2"><img src="{{ asset('img/logo-kampius-mark.png') }}" alt="Logo KAMPIUS" width="22" height="22" style="border-radius:6px"><strong class="text-dark">KAMPIUS</strong> <span class="text-secondary">University ERP</span></span>
+        <span class="d-inline-flex align-items-center gap-2"><img src="{{ asset('img/logo-kampus-mark.png') }}" alt="Logo KAMPUS" width="22" height="22" style="border-radius:6px"><strong class="text-dark">KAMPUS</strong> <span class="text-secondary">University ERP</span></span>
         <span>
             <a href="{{ route('home') }}" class="me-3">Beranda</a>
             <a href="#modul" class="me-3">Modul</a>
@@ -439,7 +439,7 @@
             <a href="#faq" class="me-3">FAQ</a>
             <a href="#kontak">Kontak</a>
         </span>
-        <span>© {{ date('Y') }} KAMPIUS. Data agregat di halaman ini dihitung langsung dari database.</span>
+        <span>© {{ date('Y') }} KAMPUS. Data agregat di halaman ini dihitung langsung dari database.</span>
     </div>
 </footer>
 @endsection

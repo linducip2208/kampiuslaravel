@@ -1,6 +1,6 @@
 @extends('layouts.tabler')
 
-@section('title', 'Dashboard - '.config('app.name', 'KAMPIUS'))
+@section('title', 'Dashboard - '.config('app.name', 'KAMPUS'))
 @section('pretitle', date('l, d M Y'))
 @section('page-title', 'Ringkasan')
 

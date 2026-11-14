@@ -1,6 +1,6 @@
 @extends('layouts.tabler')
 
-@section('title', 'Dashboard Pimpinan - KAMPIUS')
+@section('title', 'Dashboard Pimpinan - KAMPUS')
 @section('pretitle', 'Laporan Eksekutif')
 @section('page-title', 'Dashboard Pimpinan')
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Masuk — {{ config('app.name', 'SIMAK Kuliah') }}</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
-    <link rel="icon" type="image/png" href="{{ asset('img/logo-kampius-mark.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('img/logo-kampus-mark.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
 </head>
@@ -18,7 +18,7 @@
                     <div class="row g-0">
                         <div class="col-md-6 d-none d-md-block bg-primary text-white">
                             <div class="card-body d-flex flex-column justify-content-center h-100 p-5">
-                                <div class="mb-3"><img src="{{ asset('img/logo-kampius.png') }}" alt="Logo KAMPIUS University ERP" style="max-width:220px;height:auto"></div>
+                                <div class="mb-3"><img src="{{ asset('img/logo-kampus.png') }}" alt="Logo KAMPUS University ERP" style="max-width:220px;height:auto"></div>
                                 <h1 class="text-white">SIMAK Kuliah</h1>
                                 <p class="text-white-50">Satu kendali untuk setiap fase perjalanan mahasiswa — PMB, KRS, LMS, nilai, skripsi, keuangan, dan surat.</p>
                                 <ul class="list-unstyled text-white-50">
