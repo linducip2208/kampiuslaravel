@@ -4,140 +4,168 @@
 @section('no-header', true)
 @section('title', 'KAMPIUS — University ERP & Academic Management System')
 
-@section('content')
-{{-- ============ NAVBAR ============ --}}
-<header class="navbar navbar-expand-md d-print-none sticky-top bg-white border-bottom">
-    <div class="container-xl" style="max-width: 1280px">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landing-menu" aria-label="Menu navigasi">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-            <a href="{{ route('home') }}" class="text-decoration-none"><span class="avatar avatar-sm bg-primary text-white me-1">🎓</span><strong>Kampus</strong> <span class="text-secondary fw-normal small">University ERP</span></a>
-        </h1>
-        <div class="collapse navbar-collapse" id="landing-menu">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link active" href="{{ route('home') }}"><span class="badge bg-primary">Beranda</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="#fitur">Fitur</a></li>
-                <li class="nav-item"><a class="nav-link" href="#modul">Modul</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('dokumen.index') }}">Dokumentasi</a></li>
-                <li class="nav-item"><a class="nav-link" href="#tentang">Tentang</a></li>
-                <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
-            </ul>
-            <div class="ms-auto d-flex gap-2 align-items-center">
-                <a href="{{ route('login') }}" class="btn btn-outline-primary">Login</a>
-                <a href="{{ route('login') }}" class="btn btn-primary">Demo Gratis →</a>
-            </div>
-        </div>
-    </div>
-</header>
+@push('styles')
+<style>
+    .kampius-landing-hero {
+        background: linear-gradient(135deg, #10234B 0%, #1046A0 55%, #1769F5 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .kampius-landing-hero::after {
+        content: "";
+        position: absolute;
+        right: -120px; top: -120px;
+        width: 420px; height: 420px;
+        border-radius: 50%;
+        background: rgba(17,197,232,.22);
+    }
+    .kampius-landing-hero::before {
+        content: "";
+        position: absolute;
+        left: -100px; bottom: -140px;
+        width: 300px; height: 300px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.06);
+    }
+    .kampius-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        background: rgba(255,255,255,.12);
+        border: 1px solid rgba(255,255,255,.2);
+        color: #fff;
+        border-radius: 999px;
+        padding: .3rem .9rem;
+        font-size: .78rem;
+    }
+    .kampius-eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: #16A36A; }
+    .kampius-mock {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 30px 80px rgba(0,0,0,.35);
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+    }
+    .kampius-mock-topbar {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .6rem .9rem;
+        border-bottom: 1px solid #E8EEF7;
+    }
+    .kampius-mock-topbar i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .kampius-mock-body { display: flex; min-height: 320px; }
+    .kampius-mock-side {
+        width: 150px;
+        background: #10234B;
+        color: #c9d6ea;
+        font-size: .68rem;
+        padding: .8rem .6rem;
+        display: flex;
+        flex-direction: column;
+        gap: .35rem;
+    }
+    .kampius-mock-side span { padding: .3rem .5rem; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kampius-mock-side span.on { background: rgba(23,105,245,.5); color: #fff; }
+    .kampius-mock-main { flex: 1; padding: .9rem; background: #F5F8FD; min-width: 0; }
+    .kampius-mock-stats { display: flex; gap: .5rem; margin-bottom: .6rem; }
+    .kampius-mock-stat {
+        flex: 1;
+        background: #fff;
+        border: 1px solid #E8EEF7;
+        border-radius: 10px;
+        padding: .45rem .55rem;
+        min-width: 0;
+    }
+    .kampius-mock-stat b { display: block; font-size: .95rem; color: #10234B; }
+    .kampius-mock-stat small { color: #77849A; font-size: .62rem; }
+    .kampius-mock-chart {
+        background: #fff;
+        border: 1px solid #E8EEF7;
+        border-radius: 10px;
+        padding: .55rem .6rem;
+        margin-bottom: .6rem;
+    }
+    .kampius-mock-bars { display: flex; align-items: flex-end; gap: 5px; height: 74px; }
+    .kampius-mock-bars i { flex: 1; border-radius: 3px 3px 0 0; min-height: 6px; }
+    .kampius-mock-rows { background: #fff; border: 1px solid #E8EEF7; border-radius: 10px; padding: .2rem .6rem; }
+    .kampius-mock-rows div { display: flex; justify-content: space-between; font-size: .66rem; padding: .32rem 0; border-bottom: 1px solid #F1F4F9; color: #172B4D; }
+    .kampius-mock-rows div:last-child { border-bottom: 0; }
+    .kampius-modul { transition: box-shadow .2s ease, transform .2s ease; height: 100%; }
+    .kampius-modul:hover { box-shadow: 0 14px 30px rgba(23,105,245,.14); transform: translateY(-3px); }
+    .kampius-modul-icon {
+        width: 46px; height: 46px; border-radius: 14px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 1.25rem; flex-shrink: 0;
+    }
+    .kampius-step-num {
+        width: 44px; height: 44px; border-radius: 50%;
+        background: #10234B; color: #fff;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-weight: 800; margin-bottom: .5rem;
+    }
+    .kampius-step-line { position: absolute; top: 22px; left: 60px; right: -10px; height: 2px; background: #E0E8F3; }
+    .kampius-role { transition: box-shadow .2s ease, transform .2s ease; height: 100%; }
+    .kampius-role:hover { box-shadow: 0 14px 30px rgba(23,105,245,.14); transform: translateY(-3px); }
+    @media (max-width: 991.98px) {
+        .kampius-mock-side { display: none; }
+    }
+</style>
+@endpush
 
-{{-- ============ HERO ============ --}}
-@php
-    $heroImg = file_exists(public_path('img/kampus-hero.png')) ? asset('img/kampus-hero.png') : null;
-@endphp
-<div class="bg-blue-lt" @if($heroImg) style="background: linear-gradient(100deg, rgba(255,255,255,.96) 30%, rgba(255,255,255,.55) 55%, rgba(255,255,255,.15) 100%), url('{{ $heroImg }}') center/cover no-repeat;" @endif>
+@section('content')
+{{-- ============ 2. HERO ============ --}}
+<div class="kampius-landing-hero text-white">
     <div class="container-xl py-5" style="max-width: 1280px">
-        <div class="row align-items-center g-4">
+        <div class="row align-items-center g-4 position-relative" style="z-index:1">
             <div class="col-lg-5">
-                <span class="badge bg-blue-lt text-primary mb-3">● Sistem Informasi Kampus Terpadu</span>
-                <h1 class="display-4 fw-bold">KAMPIUS ERP Solusi Lengkap Manajemen Perguruan Tinggi</h1>
-                <p class="text-secondary">Kelola seluruh proses akademik, keuangan dan administrasi kampus dalam satu sistem yang modern, aman dan mudah digunakan.</p>
+                <span class="kampius-eyebrow"><span class="dot"></span> Sistem Informasi Kampus Terpadu</span>
+                <h1 class="display-5 fw-bold mt-3">Satu Platform untuk Seluruh Operasi Kampus</h1>
+                <p class="opacity-75">KAMPIUS mengintegrasikan PMB, akademik, keuangan, dan pelaporan dalam satu sistem yang aman, modern, dan mudah digunakan — untuk {{ number_format($stats['mahasiswa'] ?? 0) }} mahasiswa dan {{ number_format($stats['dosen'] ?? 0) }} dosen yang telah terdata.</p>
                 <div class="d-flex flex-wrap gap-2 mt-3">
-                    <a href="{{ route('pmb.create') }}" class="btn btn-primary btn-lg">✈ Mulai Sekarang →</a>
-                    <a href="{{ route('login') }}" class="btn btn-white btn-lg">▷ Lihat Demo</a>
+                    <a href="{{ route('pmb.create') }}" class="btn btn-light btn-lg">Mulai Pendaftaran →</a>
+                    <a href="{{ route('dokumen.index') }}" class="btn btn-outline-light btn-lg">Dokumentasi</a>
                 </div>
-                <div class="d-flex flex-wrap gap-3 mt-3 small">
-                    <span>✓ Modern UI/UX</span><span>✓ Aman &amp; Terpercaya</span><span>✓ Support Penuh</span>
+                <div class="d-flex flex-wrap gap-3 mt-4 small opacity-75">
+                    <span>✓ Hak akses berbasis peran</span><span>✓ Audit trail aktivitas</span><span>✓ QR verifikasi dokumen</span>
                 </div>
             </div>
             <div class="col-lg-7">
-                <div class="card">
-                    <div class="row g-0">
-                        <div class="col-md-3 bg-dark text-white d-none d-md-block" style="border-radius: .5rem 0 0 .5rem">
-                            <div class="p-2">
-                                <div class="d-flex align-items-center gap-1 mb-2"><span class="avatar avatar-xs bg-primary text-white">🎓</span><strong class="small">Kampus</strong></div>
-                                <div class="nav flex-column small">
-                                    <span class="text-white bg-blue rounded px-2 py-1 mb-1">▦ Dashboard</span>
-                                    <span class="px-2 py-1 text-white-50">📖 Akademik</span>
-                                    <span class="px-2 py-1 text-white-50">💳 Keuangan</span>
-                                    <span class="px-2 py-1 text-white-50">👥 Kepegawaian</span>
-                                    <span class="px-2 py-1 text-white-50">📝 PMB</span>
-                                    <span class="px-2 py-1 text-white-50">📊 Laporan</span>
-                                    <span class="px-2 py-1 text-white-50">⚙ Pengaturan</span>
-                                </div>
-                            </div>
+                {{-- Mockup dashboard ERP (HTML/CSS, data real agregat) --}}
+                <div class="kampius-mock" role="img" aria-label="Pratinjau dashboard KAMPIUS ERP">
+                    <div class="kampius-mock-topbar">
+                        <i style="background:#DC4545"></i><i style="background:#E9A23B"></i><i style="background:#16A36A"></i>
+                        <span class="ms-2 small text-secondary">KAMPIUS — Ringkasan Eksekutif</span>
+                        <span class="ms-auto badge bg-green-lt">Live</span>
+                    </div>
+                    <div class="kampius-mock-body">
+                        <div class="kampius-mock-side" aria-hidden="true">
+                            <span class="on">▦ Ringkasan</span><span>🎓 Akademik</span><span>💳 Keuangan</span><span>👥 Mahasiswa</span><span>📝 PMB</span><span>📊 Laporan</span><span>⚙ Sistem</span>
                         </div>
-                        <div class="col-md-9">
-                            <div class="card-header border-0 py-2">
-                                <h3 class="card-title mb-0">Dashboard</h3>
-                                <div class="card-actions"><span class="badge bg-green-lt">● Admin ▾</span></div>
+                        <div class="kampius-mock-main">
+                            <div class="kampius-mock-stats">
+                                <div class="kampius-mock-stat"><b>{{ number_format($stats['mahasiswa'] ?? 0) }}</b><small>Mahasiswa</small></div>
+                                <div class="kampius-mock-stat"><b>{{ number_format($stats['dosen'] ?? 0) }}</b><small>Dosen</small></div>
+                                <div class="kampius-mock-stat"><b>{{ number_format($stats['prodi'] ?? 0) }}</b><small>Prodi</small></div>
+                                <div class="kampius-mock-stat"><b>{{ (int) ($stats['krs_pct'] ?? 0) }}%</b><small>KRS disetujui</small></div>
                             </div>
-                            <div class="card-body bg-light">
-                                <div class="row row-cards mb-3">
-                                    @php
-                                        $statCards = [
-                                            [number_format($stats['mahasiswa'] ?? 0), 'Total Mahasiswa', 'bg-blue-lt'],
-                                            [number_format($stats['dosen'] ?? 0), 'Dosen Aktif', 'bg-green-lt'],
-                                            [number_format($stats['matakuliah'] ?? 0), 'Mata Kuliah', 'bg-yellow-lt'],
-                                            [(int) ($stats['krs_pct'] ?? 0).'%', 'KRS Disetujui', 'bg-purple-lt'],
-                                        ];
-                                    @endphp
-                                    @foreach($statCards as [$nilai, $label, $warna])
-                                        <div class="col-6 col-md-3">
-                                            <div class="card card-sm"><div class="card-body text-center p-2">
-                                                <span class="badge {{ $warna }} mb-1">●</span>
-                                                <div class="h3 mb-0">{{ $nilai }}</div>
-                                                <div class="text-secondary small">{{ $label }}</div>
-                                            </div></div>
-                                        </div>
+                            <div class="kampius-mock-chart">
+                                <small class="text-secondary">Penerimaan terverifikasi · 6 bulan</small>
+                                @php
+                                    $vals = $stats['bayar_bulanan']['nominal'] ?? [];
+                                    $maks = max(1, max($vals ?: [0]));
+                                @endphp
+                                <div class="kampius-mock-bars mt-1">
+                                    @foreach($vals as $v)
+                                        <i style="height:{{ max(8, $v / $maks * 100) }}%;background:{{ $loop->last ? '#1769F5' : '#9DB9E8' }}" title="Rp {{ number_format($v, 0, ',', '.') }}"></i>
                                     @endforeach
                                 </div>
-                                <div class="row row-cards">
-                                    <div class="col-md-7">
-                                        <div class="card h-100"><div class="card-body p-2">
-                                            <h4 class="card-title">Statistik Akademik</h4>
-                                            @php
-                                                $bl = $stats['bayar_bulanan'] ?? ['labels' => [], 'nominal' => []];
-                                                $vals = $bl['nominal']; $labs = $bl['labels'];
-                                                $maks = max(1, max($vals ?: [0]));
-                                                $w = 100; $h = 26; $titik = [];
-                                                foreach ($vals as $i => $v) {
-                                                    $x = 6 + $i * (($w - 12) / max(1, count($vals) - 1));
-                                                    $y = $h - 3 - ($v / $maks) * ($h - 9);
-                                                    $titik[] = round($x, 1).'.'.round($y, 1);
-                                                }
-                                            @endphp
-                                            <svg viewBox="0 0 {{ $w }} {{ $h }}" class="w-100" style="height: 80px" role="img" aria-label="Statistik akademik">
-                                                <polyline points="{{ implode(' ', $titik) }}" fill="none" stroke="#206bc4" stroke-width="1.5"></polyline>
-                                                @foreach($titik as $t)
-                                                    @php [$cx, $cy] = explode('.', $t); @endphp
-                                                    <circle cx="{{ $cx }}" cy="{{ $cy }}" r="1.4" fill="#206bc4"></circle>
-                                                @endforeach
-                                            </svg>
-                                            <div class="d-flex justify-content-between text-secondary small">
-                                                @foreach($labs as $l)
-                                                    <span>{{ $l }}</span>
-                                                @endforeach
-                                            </div>
-                                        </div></div>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <div class="card h-100"><div class="card-body p-2 text-center">
-                                            <h4 class="card-title text-start">Status Pembayaran</h4>
-                                            @php
-                                                $lp = (int) ($stats['lunas_pct'] ?? 0);
-                                                $r = 15.9; $c = 2 * pi() * $r;
-                                            @endphp
-                                            <svg viewBox="0 0 42 42" style="height: 90px" role="img" aria-label="Lunas {{ $lp }}%">
-                                                <circle cx="21" cy="21" r="{{ $r }}" fill="none" stroke="#e6e8e9" stroke-width="5"></circle>
-                                                <circle cx="21" cy="21" r="{{ $r }}" fill="none" stroke="#206bc4" stroke-width="5" stroke-dasharray="{{ round($c * $lp / 100, 1) }} {{ round($c, 1) }}" stroke-linecap="round" transform="rotate(-90 21 21)"></circle>
-                                                <circle cx="21" cy="21" r="{{ $r }}" fill="none" stroke="#2fb344" stroke-width="5" stroke-dasharray="{{ round($c * min($lp, 100) / 100, 1) }} {{ round($c, 1) }}" stroke-linecap="round" transform="rotate(-90 21 21)" opacity="0.35"></circle>
-                                            </svg>
-                                            <div class="small text-start"><span class="badge badge-dot bg-blue"></span> Lunas {{ $lp }}%</div>
-                                            <div class="small text-start"><span class="badge badge-dot bg-yellow"></span> Belum {{ 100 - $lp }}%</div>
-                                        </div></div>
-                                    </div>
-                                </div>
+                            </div>
+                            <div class="kampius-mock-rows">
+                                <div><span>KRS menunggu persetujuan</span><strong>{{ number_format($stats['krs_pending'] ?? 0) }}</strong></div>
+                                <div><span>Mahasiswa baru bulan ini</span><strong>{{ number_format($stats['pmb_baru'] ?? 0) }}</strong></div>
+                                <div><span>Kehadiran tercatat</span><strong>{{ (int) ($stats['hadir_pct'] ?? 0) }}%</strong></div>
                             </div>
                         </div>
                     </div>
@@ -147,207 +175,250 @@
     </div>
 </div>
 
-{{-- ============ STRIP FITUR ============ --}}
-<div class="container-xl mt-4" style="max-width: 1280px" id="fitur">
-    <div class="card"><div class="card-body">
-        <div class="row text-center">
-            @php
-                $strip = [
-                    ['🎓', 'PMB Online', 'Pendaftaran mahasiswa lebih mudah'],
-                    ['👥', 'Manajemen Mahasiswa', 'Data lengkap & terintegrasi'],
-                    ['📘', 'Akademik', 'KRS, KHS dan kurikulum'],
-                    ['💳', 'Keuangan', 'Tagihan & pembayaran terintegrasi'],
-                    ['📊', 'Laporan Lengkap', 'Data real-time & akurat'],
-                    ['🛡', 'Keamanan Data', 'Berstandar enterprise'],
-                ];
-            @endphp
-            @foreach($strip as [$ikon, $judul, $sub])
-                <div class="col-6 col-md-2 mb-3 mb-md-0">
-                    <div class="avatar bg-blue-lt mb-1">{{ $ikon }}</div>
-                    <div><strong class="small">{{ $judul }}</strong></div>
-                    <div class="text-secondary small">{{ $sub }}</div>
-                </div>
-            @endforeach
-        </div>
-    </div></div>
-</div>
-
-{{-- ============ MODUL ============ --}}
-<div class="container-xl mt-4" style="max-width: 1280px" id="modul">
-    <div class="d-flex justify-content-between align-items-end mb-3">
-        <div>
-            <div class="text-info small mb-1">Modul Lengkap</div>
-            <h2>Fitur Unggulan Kampus ERP</h2>
-            <p class="text-secondary mb-0">Semua kebutuhan kampus dalam satu platform terintegrasi</p>
-        </div>
-        <a href="{{ route('login') }}" class="d-none d-md-block">Lihat Semua Fitur →</a>
-    </div>
-    @php
-        $moduls = [
-            ['🧑‍🎓', 'Penerimaan Mahasiswa Baru (PMB)', 'pmb.create'],
-            ['👥', 'Manajemen Mahasiswa', 'publik.prodi'],
-            ['📖', 'Akademik & Kurikulum', 'admin.master'],
-            ['📝', 'KRS & KHS', 'mahasiswa.krs.pengajuan'],
-            ['💳', 'Keuangan & UKT', 'keuangan.bayar'],
-            ['📚', 'LMS, Absensi & Bimbingan', 'lms.materi'],
-            ['📜', 'Surat & Transkrip (QR)', 'surat.pengajuan'],
-            ['📊', 'Pelaporan Akademik', 'dashboard.pimpinan'],
-            ['📅', 'Kalender Akademik', 'kalender.index'],
-            ['🤖', 'AI Chatbot & Analitik', 'ai.chat'],
-            ['🎓', 'Alumni & Magang Hub', 'publik.alumni'],
-            ['📈', 'Funnel PMB & Yudisium', 'pmb.funnel'],
-        ];
-    @endphp
-    <div class="row row-cards">
-        @foreach($moduls as [$ikon, $nama, $rute])
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100"><div class="card-body d-flex gap-3 align-items-center">
-                    <span class="avatar avatar-lg bg-blue-lt">{{ $ikon }}</span>
-                    <div><h3 class="card-title mb-0">{{ $nama }}</h3><a href="{{ route($rute) }}" class="small">Buka →</a></div>
+{{-- ============ 3. PRODUCT VALUE ============ --}}
+<div class="container-xl mt-4" style="max-width: 1280px" id="nilai">
+    <div class="row text-center g-3">
+        @php
+            $values = [
+                ['Akademik Terintegrasi', 'KRS, KHS, nilai, kurikulum, dan jadwal dalam satu alur yang konsisten dan teraudit.'],
+                ['Keuangan Terkendali', 'Tagihan, VA/QRIS, verifikasi berjenjang, jurnal otomatis, dan rekonsiliasi bank.'],
+                ['Siklus Mahasiswa Penuh', 'Dari PMB hingga yudisium, wisuda, dan alumni — tanpa data terpisah.'],
+                ['Akses Sesuai Peran', 'Rektor, BAAK, keuangan, dosen, dan mahasiswa melihat tepat yang seharusnya.'],
+            ];
+        @endphp
+        @foreach($values as [$judul, $deskripsi])
+            <div class="col-md-3">
+                <div class="card kampius-modul"><div class="card-body">
+                    <h3 class="h4">{{ $judul }}</h3>
+                    <p class="text-secondary small mb-0">{{ $deskripsi }}</p>
                 </div></div>
             </div>
         @endforeach
     </div>
 </div>
 
-{{-- ============ PERAN ============ --}}
-<div class="bg-light mt-4" id="peran">
-    <div class="container-xl py-5" style="max-width: 1280px">
-        <div class="row align-items-center">
-            <div class="col-lg-3">
-                <div class="text-info small mb-1">● Untuk Semua Peran</div>
-                <h2>Akses Sesuai Peran dan Kewenangan</h2>
-                <p class="text-secondary">Sistem yang fleksibel dengan hak akses terstruktur untuk setiap pengguna.</p>
-                <a href="{{ route('dokumen.index') }}" class="btn btn-primary">Pelajari Selengkapnya →</a>
+{{-- ============ 4. MODULE SHOWCASE ============ --}}
+<div class="container-xl mt-5" style="max-width: 1280px" id="modul">
+    <div class="mb-3">
+        <div class="text-primary small mb-1 fw-bold">MODUL LENGKAP</div>
+        <h2>Semua Kebutuhan Kampus, Satu Platform</h2>
+        <p class="text-secondary mb-0">Setiap kartu membuka modul aslinya (masuk sesuai peran Anda).</p>
+    </div>
+    @php
+        $moduls = [
+            ['🧑‍🎓', 'PMB Online', 'Pendaftaran, seleksi, dan verifikasi calon mahasiswa.', 'pmb.create'],
+            ['🎓', 'Akademik & Kurikulum', 'Prodi, kurikulum, mata kuliah, dan jadwal.', 'publik.prodi'],
+            ['📝', 'KRS & KHS', 'Pengajuan KRS, persetujuan PA, dan KHS terverifikasi.', 'mahasiswa.krs.pengajuan'],
+            ['💳', 'Keuangan & UKT', 'Tagihan massal, VA/QRIS, dan verifikasi berjenjang.', 'keuangan.bayar'],
+            ['📚', 'LMS & Absensi', 'Materi, tugas, dan presensi QR per pertemuan.', 'lms.materi'],
+            ['📜', 'Surat & Transkrip', 'Penomoran otomatis dan verifikasi QR anti-palsu.', 'surat.pengajuan'],
+            ['🎓', 'Skripsi & Sidang', 'Judul, bimbingan, sidang, dan penilaian penguji.', 'skripsi.pengajuan'],
+            ['🏅', 'Beasiswa', 'Program, penetapan, dan potongan otomatis tagihan.', 'keuangan.beasiswa'],
+            ['🎓', 'Yudisium & Wisuda', 'Kelulusan, SKL, batch wisuda, dan PIN ijazah.', 'skripsi.yudisium'],
+            ['👥', 'Alumni & Magang', 'Direktori alumni dan hub lowongan magang.', 'publik.alumni'],
+            ['📊', 'Laporan & Funnel', 'Rekap eksekutif dan funnel konversi PMB.', 'dashboard.pimpinan'],
+            ['🔌', 'Integrasi & API', 'API v1/v2, webhook HMAC, dan PDDikti.', 'admin.integrasi'],
+        ];
+    @endphp
+    <div class="row row-cards">
+        @foreach($moduls as [$ikon, $nama, $deskripsi, $rute])
+            <div class="col-md-6 col-lg-4">
+                <div class="card kampius-modul"><div class="card-body d-flex gap-3">
+                    <span class="kampius-modul-icon bg-blue-lt">{{ $ikon }}</span>
+                    <div>
+                        <h3 class="card-title mb-1">{{ $nama }}</h3>
+                        <p class="text-secondary small mb-1">{{ $deskripsi }}</p>
+                        <a href="{{ route($rute) }}" class="small">Buka modul →</a>
+                    </div>
+                </div></div>
             </div>
-            <div class="col-lg-9">
-                <div class="row row-cards">
-                    @php
-                        $perans = [['Rektor', 'Monitoring strategis'], ['BAAK', 'Administrasi akademik'], ['Keuangan', 'Pengelolaan keuangan'], ['Dosen', 'Mengajar & menilai'], ['Mahasiswa', 'Akses layanan akademik']];
-                    @endphp
-                    @foreach($perans as [$nama, $deskripsi])
-                        <div class="col">
-                            <div class="card h-100"><div class="card-body text-center">
-                                @php $avatars = ['Rektor' => 'avatar-rektor.png', 'BAAK' => 'avatar-baak.png', 'Keuangan' => 'avatar-keuangan.png', 'Dosen' => 'avatar-dosen.png', 'Mahasiswa' => 'avatar-mahasiswa.png']; @endphp
-                                <span class="avatar avatar-lg mb-2" style="background-image: url('{{ asset('img/' . ($avatars[$nama] ?? 'avatar-mahasiswa.png')) }}'); background-size: cover"></span>
-                                <div><strong>{{ $nama }}</strong></div>
-                                <div class="text-secondary small">{{ $deskripsi }}</div>
-                            </div></div>
+        @endforeach
+    </div>
+</div>
+
+{{-- ============ 5. REAL PRODUCT PREVIEW ============ --}}
+<div class="bg-light mt-5">
+    <div class="container-xl py-5" style="max-width: 1280px" id="pratinjau">
+        <div class="text-primary small mb-1 fw-bold">PRATINJAU PRODUK</div>
+        <h2>Lihat Cara Kerjanya</h2>
+        <p class="text-secondary">Komposisi antarmuka yang sama persis dengan modul aslinya.</p>
+        <div class="row row-cards mt-3">
+            <div class="col-lg-6">
+                <div class="kampius-mock">
+                    <div class="kampius-mock-topbar"><i style="background:#DC4545"></i><i style="background:#E9A23B"></i><i style="background:#16A36A"></i><span class="ms-2 small text-secondary">Keuangan — Verifikasi Pembayaran</span></div>
+                    <div class="p-3">
+                        <div class="d-flex justify-content-between mb-2"><strong>Antrean verifikasi</strong><span class="badge bg-warning-lt">{{ number_format($stats['pembayaran_pending'] ?? 0) }} menunggu</span></div>
+                        <div class="kampius-mock-rows">
+                            <div><span>Pembayaran terverifikasi (total)</span><strong>Rp {{ number_format((float) array_sum($stats['bayar_bulanan']['nominal'] ?? []), 0, ',', '.') }}</strong></div>
+                            <div><span>Tingkat pelunasan</span><strong>{{ (int) ($stats['lunas_pct'] ?? 0) }}%</strong></div>
+                            <div><span>Piutang aktif</span><strong>Rp {{ number_format($stats['piutang'] ?? 0, 0, ',', '.') }}</strong></div>
                         </div>
-                    @endforeach
+                        <a href="{{ route('keuangan.verifikasi') }}" class="btn btn-primary btn-sm mt-2">Buka verifikasi →</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="kampius-mock">
+                    <div class="kampius-mock-topbar"><i style="background:#DC4545"></i><i style="background:#E9A23B"></i><i style="background:#16A36A"></i><span class="ms-2 small text-secondary">Akademik — Alur KRS</span></div>
+                    <div class="p-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge bg-blue">1 Pengajuan</span><span class="text-secondary">→</span>
+                            <span class="badge bg-warning-lt">2 Persetujuan PA</span><span class="text-secondary">→</span>
+                            <span class="badge bg-green-lt">3 {{ (int) ($stats['krs_pct'] ?? 0) }}% disetujui</span>
+                        </div>
+                        <div class="kampius-mock-rows">
+                            <div><span>KRS menunggu hari ini</span><strong>{{ number_format($stats['krs_pending'] ?? 0) }}</strong></div>
+                            <div><span>Disetujui hari ini</span><strong>{{ number_format($stats['krs_ok'] ?? 0) }}</strong></div>
+                            <div><span>Kehadiran tercatat</span><strong>{{ (int) ($stats['hadir_pct'] ?? 0) }}%</strong></div>
+                        </div>
+                        <a href="{{ route('mahasiswa.krs.pengajuan') }}" class="btn btn-primary btn-sm mt-2">Buka KRS →</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-{{-- ============ ALUR KERJA ============ --}}
-<div class="container-xl mt-4" style="max-width: 1280px">
-    <div class="row align-items-center">
-        <div class="col-lg-4">
-            <span class="badge bg-blue-lt text-primary mb-2">Alur Kerja</span>
-            <h2>Untuk Mendukung Siklus Akademik</h2>
-            <p class="text-secondary">Dari pendaftaran hingga wisuda, semua lebih terstruktur.</p>
-        </div>
-        <div class="col-lg-8">
-            <div class="row text-center">
-                @php
-                    $langkah = [['1', 'PMB', 'Pendaftaran Online'], ['2', 'Akademik', 'KRS & Perkuliahan'], ['3', 'Keuangan', 'Pembayaran & Tagihan'], ['4', 'Wisuda', 'Kelulusan']];
-                @endphp
-                @foreach($langkah as $i => [$no, $judul, $sub])
-                    <div class="col-3">
-                        <span class="avatar avatar-lg bg-primary text-white mb-2">{{ $no }}</span>
-                        <div><strong>{{ $judul }}</strong></div>
-                        <div class="text-secondary small">{{ $sub }}</div>
-                    </div>
-                @endforeach
+{{-- ============ 6. LIFECYCLE ============ --}}
+<div class="container-xl mt-5" style="max-width: 1280px">
+    <div class="text-primary small mb-1 fw-bold">SIKLUS HIDUP</div>
+    <h2>Dari Pendaftar hingga Alumni</h2>
+    <div class="row text-center mt-3 g-3">
+        @php
+            $siklus = [['PMB', 'Pendaftaran online'], ['Seleksi', 'Verifikasi & nilai'], ['Daftar Ulang', 'NIM & tagihan awal'], ['KRS', 'Rencana studi'], ['Kuliah', 'LMS & absensi'], ['Nilai', 'KHS & IPK'], ['Skripsi', 'Sidang & lulus'], ['Wisuda', 'Yudisium & ijazah'], ['Alumni', 'Tracer & magang']];
+        @endphp
+        @foreach($siklus as [$judul, $sub])
+            <div class="col-4 col-md-2 position-relative">
+                @if(!$loop->last)<span class="kampius-step-line d-none d-md-block"></span>@endif
+                <span class="kampius-step-num">{{ $loop->iteration }}</span>
+                <div><strong class="small">{{ $judul }}</strong></div>
+                <div class="text-secondary small">{{ $sub }}</div>
             </div>
-        </div>
+        @endforeach
+    </div>
+    <div class="text-center mt-3">
+        <a href="{{ route('pmb.create') }}" class="btn btn-primary">Mulai dari PMB →</a>
     </div>
 </div>
 
-{{-- ============ KEAMANAN + FAQ ============ --}}
-<div class="container-xl mt-4" style="max-width: 1280px" id="tentang">
+{{-- ============ 7. ROLE EXPERIENCE ============ --}}
+<div class="container-xl mt-5" style="max-width: 1280px" id="peran">
+    <div class="text-primary small mb-1 fw-bold">UNTUK SEMUA PERAN</div>
+    <h2>Satu Sistem, Pengalaman yang Tepat</h2>
+    <div class="row row-cards mt-3">
+        @php
+            $perans = [
+                ['Rektor', 'Pertumbuhan, kinerja akademik, dan keuangan institusi.', 'dashboard.pimpinan'],
+                ['BAAK', 'Administrasi mahasiswa, KRS, dan kalender akademik.', 'admin.pmb.verifikasi'],
+                ['Keuangan', 'Verifikasi pembayaran dan laporan penerimaan.', 'keuangan.verifikasi'],
+                ['Dosen', 'Jadwal mengajar, roster, dan input nilai.', 'dosen.krs.persetujuan'],
+                ['Mahasiswa', 'KRS, jadwal, nilai, dan tagihan dalam satu tempat.', 'mahasiswa.krs.pengajuan'],
+                ['Admin Prodi', 'Mahasiswa, kurikulum, dan persetujuan program studi.', 'admin.master'],
+            ];
+        @endphp
+        @foreach($perans as [$nama, $deskripsi, $rute])
+            <div class="col-md-4">
+                <div class="card kampius-role"><div class="card-body">
+                    <h3 class="card-title">{{ $nama }}</h3>
+                    <p class="text-secondary small">{{ $deskripsi }}</p>
+                    <a href="{{ route($rute) }}" class="small">Masuk sebagai {{ $nama }} →</a>
+                </div></div>
+            </div>
+        @endforeach
+    </div>
+</div>
+
+{{-- ============ 8. SECURITY + INTEGRATION ============ --}}
+<div class="container-xl mt-5" style="max-width: 1280px" id="keamanan">
     <div class="row row-cards">
         <div class="col-lg-6">
             <div class="card h-100 bg-dark text-white">
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-7">
-                        <span class="badge bg-dark-lt text-info mb-2">● Mengapa Memilih Kampus ERP?</span>
-                    <h2 class="text-white">Lebih Efisien, Lebih Profesional</h2>
-                    <p class="text-white-50">Tingkatkan kualitas layanan kampus dengan sistem ERP yang handal, fleksibel dan mudah digunakan.</p>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">✓ Integrasi penuh antar modul</li>
-                        <li class="mb-2">✓ Keamanan tingkat tinggi</li>
-                        <li class="mb-2">✓ Support &amp; update berkala</li>
-                        <li class="mb-2">✓ Siap untuk pengembangan lebih lanjut</li>
+                    <span class="badge bg-dark-lt text-info mb-2">KEAMANAN TERVERIFIKASI</span>
+                    <h2 class="text-white">Keamanan Tingkat Enterprise</h2>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2">✓ Hak akses berbasis peran di setiap rute</li>
+                        <li class="mb-2">✓ Otorisasi kepemilikan data per pengguna</li>
+                        <li class="mb-2">✓ Dokumen QR bertanda tangan anti-palsu</li>
+                        <li class="mb-2">✓ Audit trail setiap aksi penting</li>
+                        <li class="mb-2">✓ Webhook HMAC dan throttle anti-abuse</li>
                     </ul>
-                    <a href="{{ route('dokumen.index') }}" class="btn btn-outline-light">Tentang Kami →</a>
-                        </div>
-                        <div class="col-md-5 text-center">
-                            <img src="{{ asset('img/security-shield.png') }}" alt="Keamanan data kampus" class="img-fluid rounded" loading="lazy">
-                        </div>
-                    </div>
+                    <a href="{{ route('dokumen.index') }}" class="btn btn-outline-light">Baca dokumentasi →</a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6" id="faq">
-            <span class="badge bg-blue-lt text-primary mb-2">FAQ</span>
-            <h2>Pertanyaan yang Sering Diajukan</h2>
-            <p class="text-secondary">Temukan jawaban atas pertanyaan seputar Kampus ERP.</p>
-            <div class="accordion" id="faqAccordion">
-                @php
-                    $faqs = [
-                        ['Apakah Kampus ERP mendukung multi-campus?', 'Struktur Fakultas → Prodi mendukung banyak program studi dalam satu instalasi. Multi-kampus penuh masuk roadmap.'],
-                        ['Bagaimana cara mendapat demo?', 'Klik Demo Gratis dan masuk dengan akun demo yang tersedia di halaman login.'],
-                        ['Apakah ada layanan support?', 'Ya — support & update berkala termasuk dalam paket implementasi.'],
-                        ['Berapa biaya implementasi?', 'Tergantung jumlah modul dan skala kampus. Hubungi tim kami untuk penawaran.'],
-                    ];
-                @endphp
-                @foreach($faqs as $i => [$tanya, $jawab])
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button {{ $i > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ $i }}">+ {{ $tanya }}</button>
-                        </h2>
-                        <div id="faq{{ $i }}" class="accordion-collapse collapse {{ $i === 0 ? 'show' : '' }}" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body text-secondary">{{ $jawab }}</div>
-                        </div>
-                    </div>
-                @endforeach
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <span class="badge bg-blue-lt text-primary mb-2">INTEGRASI</span>
+                    <h2>Terhubung ke Ekosistem Kampus</h2>
+                    <ul class="list-unstyled mt-3 text-secondary">
+                        <li class="mb-2">→ Payment gateway: VA bank, QRIS, e-wallet</li>
+                        <li class="mb-2">→ API v1 untuk aplikasi mobile</li>
+                        <li class="mb-2">→ API v2 publik + webhook terverifikasi</li>
+                        <li class="mb-2">→ Ekspor PDDikti dan laporan Excel</li>
+                        <li class="mb-2">→ Kalender akademik + format ICS</li>
+                    </ul>
+                    <a href="{{ route('admin.integrasi') }}" class="btn btn-primary">Kelola integrasi →</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-{{-- ============ CTA ============ --}}
-<div class="bg-primary text-white mt-4">
-    <div class="container-xl py-4" style="max-width: 1280px">
-        <div class="row align-items-center">
-            <div class="col">
-                <h2 class="text-white">✈ Siap Meningkatkan Pengelolaan Kampus Anda?</h2>
-                <p class="text-white-50 mb-0">Mulai sekarang dan rasakan kemudahan mengelola kampus dengan Kampus ERP.</p>
+{{-- ============ 9. FAQ ============ --}}
+<div class="container-xl mt-5" style="max-width: 860px" id="faq">
+    <div class="text-center">
+        <span class="badge bg-blue-lt text-primary mb-2">FAQ</span>
+        <h2>Pertanyaan yang Sering Diajukan</h2>
+    </div>
+    <div class="accordion mt-3" id="faqAccordion">
+        @php
+            $faqs = [
+                ['Bagaimana cara mencoba KAMPIUS?', 'Klik Demo Gratis dan masuk dengan akun demo sesuai peran (mahasiswa, dosen, keuangan, admin). Setiap peran melihat menu dan datanya sendiri.'],
+                ['Apakah data saya aman dan terisolasi?', 'Ya. Setiap rute dilindungi peran dan kepemilikan data dicek di server — mahasiswa hanya melihat datanya sendiri, dosen hanya bimbingannya.'],
+                ['Bagaimana pembayaran kuliah dilakukan?', 'Mahasiswa membuat VA/QRIS dari tagihannya, atau mengunggah bukti manual untuk diverifikasi petugas keuangan dengan jurnal otomatis.'],
+                ['Apakah dokumen ijazah dan transkrip bisa diverifikasi?', 'Ya. Setiap dokumen membawa QR bertanda tangan digital yang bisa dicek siapa pun lewat halaman verifikasi publik.'],
+                ['Apakah mendukung banyak program studi?', 'Ya. Struktur Fakultas → Program Studi mendukung banyak prodi dalam satu instalasi, dengan rekap per prodi.'],
+            ];
+        @endphp
+        @foreach($faqs as $i => [$tanya, $jawab])
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button {{ $i > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ $i }}" aria-expanded="{{ $i === 0 ? 'true' : 'false' }}">{{ $tanya }}</button>
+                </h2>
+                <div id="faq{{ $i }}" class="accordion-collapse collapse {{ $i === 0 ? 'show' : '' }}" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-secondary">{{ $jawab }}</div>
+                </div>
             </div>
-            <div class="col-auto">
-                <a href="{{ route('login') }}" class="btn btn-light btn-lg">Mulai Demo Gratis →</a>
-            </div>
+        @endforeach
+    </div>
+</div>
+
+{{-- ============ 10. CTA ============ --}}
+<div class="kampius-landing-hero text-white mt-5">
+    <div class="container-xl py-5 text-center position-relative" style="max-width: 1280px; z-index:1">
+        <h2 class="fw-bold">Siap Mengelola Kampus dengan KAMPIUS?</h2>
+        <p class="opacity-75 mb-3">Mulai dari PMB online hari ini — tanpa instalasi rumit.</p>
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <a href="{{ route('pmb.create') }}" class="btn btn-light btn-lg">Daftar PMB →</a>
+            <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg">Demo Gratis</a>
         </div>
     </div>
 </div>
 
-{{-- ============ FOOTER ============ --}}
-<footer class="container-xl mt-3 mb-3" style="max-width: 1280px" id="kontak">
-    <div class="d-flex flex-wrap justify-content-between align-items-center text-secondary small">
+{{-- ============ 11. FOOTER ============ --}}
+<footer class="container-xl mt-4 mb-3" style="max-width: 1280px" id="kontak">
+    <div class="d-flex flex-wrap justify-content-between align-items-center text-secondary small gap-2">
         <span><strong class="text-dark">🎓 KAMPIUS</strong> <span class="text-secondary">University ERP</span></span>
         <span>
             <a href="{{ route('home') }}" class="me-3">Beranda</a>
-            <a href="#fitur" class="me-3">Fitur</a>
             <a href="#modul" class="me-3">Modul</a>
             <a href="{{ route('dokumen.index') }}" class="me-3">Dokumentasi</a>
-            <a href="#tentang" class="me-3">Tentang</a>
+            <a href="#faq" class="me-3">FAQ</a>
             <a href="#kontak">Kontak</a>
         </span>
-        <span>© {{ date('Y') }} Kampus ERP. Semua hak dilindungi.</span>
+        <span>© {{ date('Y') }} KAMPIUS. Data agregat di halaman ini dihitung langsung dari database.</span>
     </div>
 </footer>
 @endsection

@@ -63,6 +63,13 @@
 - Keputusan: agregat dihitung langsung (bounded + index); CacheStoreTest mengunci perilaku aman default framework.
 ## 2026-11-14 — verifikasi pre-deploy cache
 - route:cache + view:cache + config:cache sukses; / & /dashboard lolos dengan cache aktif; optimize:clear setelahnya.
+## 2026-11-14 (UI overhaul, BELUM COMMIT) — shell + dashboard + landing baru
+- Shell: sidebar terang + collapse persisten + drawer mobile, topbar (breadcrumb, pencarian /cari nyata, badge periode, lonceng notifikasi real, menu akun), footer universal.
+- Dashboard: komposisi 8 blok (hero sapaan peran, 6 metrik, strip institusi, growth, donat, arus kas, funnel PMB real, performa, pengumuman, 3 antrean scoped, aktivitas, aksi cepat).
+- Landing 11 seksi + mockup HTML/CSS berdata real; pencarian global + composer notifikasi/periode; bayar/KRS diseragamkan; 200/200 tes hijau.
+## 2026-11-14 (lanjutan) — konsistensi modul generik + form PMB
+- pages/livewire-page: kartu kampius + breadcrumb 3 tingkat → berlaku untuk SEMUA halaman Livewire (keuangan, admin, kalender, helpdesk, profil, AI, dsb).
+- PMB publik: tombol submit dengan loading anti double-submit.
 ## 2026-11-14 — konsistensi tombol alur KRS
 - 4 tombol tanpa kelas Tabler (ajukan, keluar waitlist, setujui/tolak PA) kini ber-style + loading; KrsFlowTest tetap hijau.
 ## 2026-11-14 — hardening konfigurasi produksi

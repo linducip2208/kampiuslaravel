@@ -182,6 +182,8 @@ class DashboardController extends Controller
         }
 
         // --- Scope dosen: KRS menunggu khusus bimbingannya (selaras PersetujuanPa) ---
+        // $bimbinganIds null = tanpa scope (staf melihat semua); array = hanya milik bimbingan.
+        $bimbinganIds = null;
         if ($has('krs') && $has('mahasiswa')) {
             $user = auth()->user();
             $isDosenOnly = $user && $user->hasRole('dosen') && ! $user->hasAnyRole(['mahasiswa', 'superadmin', 'admin_prodi']);
@@ -198,6 +200,22 @@ class DashboardController extends Controller
                 }
             }
         }
+
+        // --- Antrean operasional (guarded, dibatasi) ---
+        $funnel = $has('pmb_pendaftars')
+            ? PmbPendaftar::selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status')->all()
+            : [];
+        $tunggakanTop = ($has('tagihan') && $has('mahasiswa'))
+            ? Tagihan::with(['mahasiswa.user'])->whereIn('status', ['belum_bayar', 'sebagian'])
+                ->orderByRaw('(nominal - terbayar) DESC')->take(5)->get()
+            : collect();
+        $krsAntreanQuery = $has('krs')
+            ? Krs::with(['mahasiswa.user'])->where('status', 'diajukan')
+            : null;
+        if ($krsAntreanQuery && $bimbinganIds !== null) {
+            $krsAntreanQuery->whereIn('mahasiswa_id', $bimbinganIds ?: [0]);
+        }
+        $krsAntrean = $krsAntreanQuery ? $krsAntreanQuery->latest('id')->take(5)->get() : collect();
 
         return view('dashboard', [
             'stats' => [
@@ -229,6 +247,9 @@ class DashboardController extends Controller
             'locks' => KalenderService::locks(),
             'aktivitas' => $aktivitas,
             'saya' => $saya,
+            'funnel' => $funnel,
+            'tunggakanTop' => $tunggakanTop,
+            'krsAntrean' => $krsAntrean,
         ]);
     }
 

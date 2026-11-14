@@ -165,14 +165,17 @@ class HardeningTest extends TestCase
         $dosenUser->assignRole('dosen');
         $dosen = Dosen::factory()->create(['user_id' => $dosenUser->id]);
 
-        $bimbingan = Mahasiswa::factory()->create(['dosen_pa_id' => $dosen->id]);
-        $lain = Mahasiswa::factory()->create(['dosen_pa_id' => null]);
+        $userBimbingan = User::factory()->create(['name' => 'Bimbingan Unik Zain']);
+        $bimbingan = Mahasiswa::factory()->create(['user_id' => $userBimbingan->id, 'dosen_pa_id' => $dosen->id]);
+        $userLain = User::factory()->create(['name' => 'Lain Unik Kirana']);
+        $lain = Mahasiswa::factory()->create(['user_id' => $userLain->id, 'dosen_pa_id' => null]);
         Krs::factory()->create(['mahasiswa_id' => $bimbingan->id, 'status' => 'diajukan']);
         Krs::factory()->create(['mahasiswa_id' => $lain->id, 'status' => 'diajukan']);
 
         $this->actingAs($dosenUser)->get(route('dashboard'))
             ->assertOk()
             ->assertSee('Bimbingan Anda')
-            ->assertSee('1 pengajuan');
+            ->assertSee('Bimbingan Unik Zain')
+            ->assertDontSee('Lain Unik Kirana');
     }
 }

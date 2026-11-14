@@ -10,6 +10,7 @@ use App\Http\Controllers\KtmController;
 use App\Http\Controllers\KwitansiController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PddiktiController;
+use App\Http\Controllers\PencarianController;
 use App\Http\Controllers\PmbController;
 use App\Http\Controllers\PmbFunnelController;
 use App\Http\Controllers\PublikController;
@@ -276,6 +277,7 @@ Route::middleware('auth')->group(function () {
 
     // Kalender & helpdesk: semua user login (kepemilikan dicek di komponen)
     Route::get('/profil', fn () => view('pages.livewire-page', ['component' => 'profil', 'title' => 'Profil Saya']))->name('profil');
+    Route::get('/cari', [PencarianController::class, 'index'])->name('pencarian');
     Route::get('/kalender', fn () => view('pages.livewire-page', ['component' => 'kalender.kelola', 'title' => 'Kalender Akademik']))->name('kalender.index');
     Route::get('/kalender.ics', [KalenderController::class, 'ics'])->name('kalender.ics');
     Route::get('/helpdesk', fn () => view('pages.livewire-page', ['component' => 'helpdesk.tiket', 'title' => 'Helpdesk']))->name('helpdesk.index');

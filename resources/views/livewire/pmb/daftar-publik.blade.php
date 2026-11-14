@@ -130,6 +130,9 @@
             @endforeach
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">Daftar</button>
+        <button type="submit" class="btn btn-primary w-100 btn-lg" wire:loading.attr="disabled" wire:target="submit">
+            <span wire:loading.remove wire:target="submit">Daftar Sekarang</span>
+            <span wire:loading wire:target="submit"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Mengirim pendaftaran…</span>
+        </button>
     </form>
 </div>
