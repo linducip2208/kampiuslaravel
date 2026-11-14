@@ -167,12 +167,17 @@ class WaveCBatch1Test extends TestCase
         $this->assertSame(150, (int) $row->estimasi_biaya);
     }
 
-    /** M-060: manifest valid + sw terdaftar + halaman offline. */
+    /** M-060: manifest valid + sw terdaftar + halaman offline + ikon baru. */
     public function test_pwa_manifest_dan_offline(): void
     {
         $manifest = json_decode((string) file_get_contents(public_path('manifest.webmanifest')), true);
         $this->assertSame('KAMPUS — Portal Mahasiswa', $manifest['name']);
         $this->assertNotEmpty($manifest['icons']);
+        $sizes = array_column($manifest['icons'], 'sizes');
+        $this->assertContains('192x192', $sizes);
+        $this->assertContains('512x512', $sizes);
+        $tujuan = array_column($manifest['icons'], 'purpose');
+        $this->assertContains('maskable', $tujuan);
         $this->assertSame('#1769F5', $manifest['theme_color']);
 
         $sw = (string) file_get_contents(public_path('sw.js'));
@@ -183,6 +188,15 @@ class WaveCBatch1Test extends TestCase
         $this->assertStringContainsString('manifest.webmanifest', $layout);
         $this->assertStringContainsString('theme-color', $layout);
         $this->assertStringContainsString('/sw.js', $layout);
+
+        // Favicon baru: ico multi-ukuran + apple-touch-icon + ikon PWA ada.
+        $this->assertFileExists(public_path('favicon.ico'));
+        $this->assertFileExists(public_path('apple-touch-icon.png'));
+        $this->assertFileExists(public_path('img/icon-192.png'));
+        $this->assertFileExists(public_path('img/icon-512.png'));
+        [$w, $h] = getimagesize(public_path('apple-touch-icon.png'));
+        $this->assertSame(180, $w);
+        $this->assertSame(180, $h);
 
         $this->get(route('publik.offline'))->assertOk()->assertSee('luring');
     }

@@ -9,6 +9,7 @@
     <meta property="og:type" content="website">
     <title>@yield('title', config('app.name', 'KAMPUS'))</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('img/icon-192.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('img/logo-kampus-mark.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
