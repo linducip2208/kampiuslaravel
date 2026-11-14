@@ -259,6 +259,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/laporan/export/pmb', [LaporanController::class, 'exportPmb'])->name('laporan.export.pmb');
         Route::get('/laporan/export/krs', [LaporanController::class, 'exportKrs'])->name('laporan.export.krs');
         Route::get('/laporan/export/nilai', [LaporanController::class, 'exportNilai'])->name('laporan.export.nilai');
+        Route::get('/laporan/export/neraca', [LaporanController::class, 'exportNeraca'])->name('laporan.export.neraca');
         Route::get('/skripsi/yudisium', fn () => view('pages.livewire-page', ['component' => 'skripsi.yudisium', 'title' => 'Yudisium']))->name('skripsi.yudisium');
     });
 

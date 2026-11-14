@@ -48,5 +48,12 @@
             <a href="{{ route('laporan.export.nilai') }}" class="btn btn-outline-primary">Download CSV</a>
         </div></div>
     </div>
+    <div class="col-md-6">
+        <div class="card kampius-card h-100"><div class="card-body">
+            <h3 class="card-title">Neraca Saldo</h3>
+            <p class="text-secondary">Unduh posisi tiap akun dari jurnal yang diposting (bukan dokumen akuntansi resmi).</p>
+            <a href="{{ route('laporan.export.neraca') }}" class="btn btn-outline-primary">Download CSV</a>
+        </div></div>
+    </div>
 </div>
 @endsection

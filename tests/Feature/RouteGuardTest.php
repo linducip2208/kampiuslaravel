@@ -21,6 +21,8 @@ class RouteGuardTest extends TestCase
         return [
             'laporan.index' => ['pimpinan'],
             'laporan.export.tagihan' => ['pimpinan'],
+            'laporan.export.neraca' => ['pimpinan'],
+            'pencarian' => ['auth'],
             'pmb.funnel' => ['pimpinan'],
             'keuangan.tagihan' => ['keuangan'],
             'keuangan.verifikasi' => ['keuangan'],

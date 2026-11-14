@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Livewire\Admin\UserData;
 use App\Livewire\Profil;
+use App\Models\Mahasiswa;
+use App\Models\Tagihan;
 use App\Models\User;
 use Database\Seeders\RolesPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -102,5 +104,31 @@ class UserDataTest extends TestCase
             ->assertSee('Password berhasil diganti.');
 
         $this->assertTrue(Hash::check('baru-baru123', $user->fresh()->password));
+    }
+
+    public function test_profil_menampilkan_linimasa_milik_sendiri(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('mahasiswa');
+        $mhs = Mahasiswa::factory()->create(['user_id' => $user->id]);
+        Tagihan::create([
+            'mahasiswa_id' => $mhs->id, 'jenis' => 'UKT',
+            'nominal' => 750000, 'terbayar' => 0, 'status' => 'belum_bayar',
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(Profil::class)
+            ->assertSee('Linimasa Saya')
+            ->assertSee('Tagihan UKT belum_bayar');
+    }
+
+    public function test_profil_non_mahasiswa_tanpa_linimasa(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('dosen');
+
+        Livewire::actingAs($user)
+            ->test(Profil::class)
+            ->assertDontSee('Linimasa Saya');
     }
 }

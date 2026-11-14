@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Absensi;
+use App\Models\JurnalKeuangan;
 use App\Models\Krs;
 use App\Models\Nilai;
 use App\Models\PmbPendaftar;
@@ -188,6 +189,31 @@ class LaporanController extends Controller
 
             fclose($out);
         }, 'nilai-'.now()->format('Ymd-His').'.csv');
+    }
+
+    /**
+     * Neraca saldo dari jurnal yang sudah diposting (bukan dokumen resmi akuntansi).
+     * Arsip yang di-soft-delete otomatis dikecualikan.
+     */
+    public function exportNeraca(): StreamedResponse
+    {
+        return response()->streamDownload(function () {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['akun', 'debet', 'kredit', 'saldo'], ';');
+
+            $debet = JurnalKeuangan::selectRaw('akun_debet as akun, SUM(nominal) as total')
+                ->groupBy('akun_debet')->pluck('total', 'akun');
+            $kredit = JurnalKeuangan::selectRaw('akun_kredit as akun, SUM(nominal) as total')
+                ->groupBy('akun_kredit')->pluck('total', 'akun');
+
+            foreach ($debet->keys()->merge($kredit->keys())->unique()->sort()->values() as $akun) {
+                $d = (int) ($debet[$akun] ?? 0);
+                $k = (int) ($kredit[$akun] ?? 0);
+                fputcsv($out, [$akun, $d, $k, $d - $k], ';');
+            }
+
+            fclose($out);
+        }, 'neraca-saldo-'.now()->format('Ymd-His').'.csv');
     }
 
     public function rekapAbsensi(): array

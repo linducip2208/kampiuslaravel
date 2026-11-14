@@ -1,7 +1,7 @@
 <div>
     <div class="row row-cards">
         <div class="col-lg-6">
-            <form wire:submit="simpanProfil" class="card">
+            <form wire:submit="simpanProfil" class="card kampius-card">
                 <div class="card-header"><h3 class="card-title">Profil Saya</h3></div>
                 <div class="card-body">
                     @if($messageProfil)
@@ -22,7 +22,7 @@
             </form>
         </div>
         <div class="col-lg-6">
-            <form wire:submit="gantiPassword" class="card">
+            <form wire:submit="gantiPassword" class="card kampius-card">
                 <div class="card-header"><h3 class="card-title">Ganti Password</h3></div>
                 <div class="card-body">
                     @if($messagePassword)
@@ -47,4 +47,17 @@
             </form>
         </div>
     </div>
+    @if(($linimasa ?? collect())->isNotEmpty())
+        <div class="card kampius-card mt-3">
+            <div class="card-header"><h3 class="card-title">Linimasa Saya</h3></div>
+            <div class="list-group list-group-flush">
+                @foreach($linimasa as $e)
+                    <div class="list-group-item d-flex gap-2">
+                        <span class="badge bg-blue-lt text-nowrap">{{ $e['tanggal'] }}</span>
+                        <div class="min-w-0"><strong class="d-block text-truncate">{{ $e['judul'] }}</strong><span class="small kampius-muted">{{ $e['sub'] }}</span></div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
 </div>

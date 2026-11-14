@@ -1,12 +1,28 @@
-# FINAL_SCORECARD (evidence-based)
-1. UI/UX 14/15 — dashboard+pimpinan selaras + SEO + role-scope; sisa overhaul modul minor.
-2. Akademik 13/15 — prasyarat tunggal+ganda + scope bimbingan teruji; sisa transkrip OTA & wisuda lanjutan.
-3. Keuangan 10/10 — billing, verifikasi, gateway+retry, jurnal, rekonsiliasi, denda terjadwal+UI, semua teruji.
-4. CRUD 10/10 — konfirmasi + loading + search/filter + empty state di semua modul utama.
-5. Security/RBAC 15/15 — fix server-side + guard middleware/traversal/self-delete teruji.
-6. Database 7/8 — soft delete + 9 index + audit; sisa harmonisasi restrict.
-7. API 7/7 — owner-scope + lunas guard + retry 3x (teruji flaky driver).
-8. Performance 6/7 — 5 N+1 fix + 9 index + benchmark 79 query; belum cache.
-9. Testing 8/8 — 197 hijau; belum browser/responsive.
-10. Docs 5/5 — 18 file cocok implementasi.
-TOTAL: 92/100.
+# FINAL SCORECARD — KAMPIUS MEGA COMMAND (2026-11-14)
+
+Riwayat: 42 → 92/100 (rubrik lama, 9 kategori; 204 tes hijau).
+Di bawah ini penilaian rubrik mega-command 12 kategori / 100 poin,
+evidence-based, tanpa inflasi.
+
+| # | Kategori | Skor | Bukti inti |
+|---|---|---|---|
+| 1 | Arsitektur | 4/5 | Lapisan + invarian + alur terdokumentasi (MASTER_ARCHITECTURE); multi-kampus hanya persiapan |
+| 2 | UI/UX | 12/15 | Shell+dashboard+landing baru, terverifikasi visual pemilik; tanpa screenshot terarsip & uji 9 breakpoint |
+| 3 | Akademik ERP | 12/15 | KRS/KHS/nilai/prasyarat/transkrip teruji; OBE & transkrip OTA belum ada |
+| 4 | PMB & lifecycle | 8/10 | Funnel+verify+daftarUlang+linimasa; tanpa CRM scoring/follow-up |
+| 5 | LMS & OBE | 6/10 | Materi/tugas/absensi/LMS berjalan; tanpa kuis/bank soal/ujian; tanpa OBE |
+| 6 | Keuangan & akuntansi | 8/10 | Billing/verify/jurnal/rekonsiliasi/neraca/denda terjadwal; tanpa GL penuh/tutup periode |
+| 7 | HR & layanan mhs | 4/5 | Dosen/tendik/cuti/skripsi/yudisium/wisuda/alumni/helpdesk/surat; tanpa workload/BKD penuh |
+| 8 | Keamanan | 9/10 | RBAC+IDOR+upload+HMAC+sesi teruji (SecurityConfig/RouteGuard/Hardening); tanpa MFA/pentest/WAF |
+| 9 | API & integrasi | 4/5 | v1/v2 + retry + HMAC; tanpa SSO/gateway prod/kredensial |
+| 10 | DB & performa | 4/5 | Index live + N+1 + benchmark 93<100; tanpa cache (ditolak berdasar bukti) |
+| 11 | Testing | 4/5 | 204/204 hijau + guard regresi; tanpa browser/responsif/beban |
+| 12 | Dokumentasi & operasi | 4/5 | 25+ dokumen nyata + backup/restore + deploy terverifikasi; tanpa rehearsal restore & pipeline staging |
+
+**TOTAL: 79/100.**
+
+Bukan 100/100 — dan tidak diklaim. Peta jujur menuju 100 ada di
+docs/ROADMAP.md (butuh: kredensial, repo Flutter, SOP kampus, browser QA,
+keputusan produk, migrasi berisiko yang disetujui pemilik).
+Bukti mentah: docs/FEATURE_MATRIX.md (status per fitur),
+docs/TESTING_REPORT.md (204 hijau), docs/UI_UX_BEFORE_AFTER.md.

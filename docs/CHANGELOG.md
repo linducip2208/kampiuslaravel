@@ -70,6 +70,11 @@
 ## 2026-11-14 (lanjutan) — konsistensi modul generik + form PMB
 - pages/livewire-page: kartu kampius + breadcrumb 3 tingkat → berlaku untuk SEMUA halaman Livewire (keuangan, admin, kalender, helpdesk, profil, AI, dsb).
 - PMB publik: tombol submit dengan loading anti double-submit.
+## 2026-11-14 (mega command) — neraca saldo + linimasa + dokumen bukti
+- Keuangan: ekspor neraca saldo per akun (guard pimpinan, teruji 2 arah + 403).
+- Profil mahasiswa: linimasa siklus (akun→KRS→tagihan→bayar), owner-scope, teruji ada/tidak.
+- RouteGuardTest mencakup neraca + pencarian; skor mega 79/100 terdokumentasi jujur.
+- Docs baru: MODULE_INVENTORY, FEATURE_MATRIX, SECURITY_AUDIT, BACKUP_RESTORE, TESTING_REPORT, ROADMAP, API_DOCUMENTATION, INTEGRATION_GUIDE, DEPLOYMENT_GUIDE, MASTER_ARCHITECTURE; FINAL_SCORECARD ditulis ulang per rubrik mega.
 ## 2026-11-14 — konsistensi tombol alur KRS
 - 4 tombol tanpa kelas Tabler (ajukan, keluar waitlist, setujui/tolak PA) kini ber-style + loading; KrsFlowTest tetap hijau.
 ## 2026-11-14 — hardening konfigurasi produksi
