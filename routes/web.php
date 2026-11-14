@@ -229,6 +229,9 @@ Route::middleware('auth')->group(function () {
         ]))->name('nilai.kunci');
         Route::get('/skripsi/pembimbing', fn () => view('pages.livewire-page', ['component' => 'skripsi.set-pembimbing', 'title' => 'Penetapan Pembimbing']))->name('skripsi.pembimbing');
         Route::get('/sidang/nilai', fn () => view('pages.livewire-page', ['component' => 'sidang.nilai-sidang', 'title' => 'Nilai Sidang']))->name('sidang.nilai');
+        Route::get('/riset/hibah', fn () => view('pages.livewire-page', ['component' => 'riset.hibah', 'title' => 'Hibah Riset']))->name('riset.hibah');
+        Route::get('/riset/publikasi', fn () => view('pages.livewire-page', ['component' => 'riset.publikasi', 'title' => 'Publikasi & HKI']))->name('riset.publikasi');
+        Route::get('/riset/pengabdian', fn () => view('pages.livewire-page', ['component' => 'riset.pengabdian', 'title' => 'Pengabdian Masyarakat']))->name('riset.pengabdian');
     });
 
     // Keuangan & admin prodi
@@ -238,6 +241,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/keuangan/beasiswa', fn () => view('pages.livewire-page', ['component' => 'beasiswa.kelola', 'title' => 'Beasiswa']))->name('keuangan.beasiswa');
         Route::get('/keuangan/denda', fn () => view('pages.livewire-page', ['component' => 'keuangan.denda-rule-kelola', 'title' => 'Aturan Denda']))->name('keuangan.denda');
         Route::post('/keuangan/refund/{pembayaran}', [BayarController::class, 'refund'])->middleware('throttle:30,1')->name('keuangan.refund');
+        Route::get('/keuangan/tutup-buku', fn () => view('pages.livewire-page', ['component' => 'keuangan.tutup-buku', 'title' => 'Tutup Buku']))->name('keuangan.tutup-buku');
+        Route::get('/keuangan/anggaran', fn () => view('pages.livewire-page', ['component' => 'keuangan.anggaran', 'title' => 'Anggaran']))->name('keuangan.anggaran');
         Route::get('/surat/nomor', fn () => view('pages.livewire-page', ['component' => 'surat.nomor-otomatis', 'title' => 'Nomor Surat']))->name('surat.nomor');
     });
 
@@ -273,6 +278,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/dosen', fn () => view('pages.livewire-page', ['component' => 'admin.dosen-data', 'title' => 'Data Dosen & Tendik']))->name('admin.dosen');
         Route::get('/admin/kurikulum', fn () => view('pages.livewire-page', ['component' => 'master.kurikulum', 'title' => 'Kurikulum']))->name('admin.kurikulum');
         Route::get('/admin/impor', fn () => view('pages.livewire-page', ['component' => 'admin.impor-csv', 'title' => 'Impor CSV']))->name('admin.impor');
+        Route::get('/admin/organisasi', fn () => view('pages.livewire-page', ['component' => 'organisasi.kelola', 'title' => 'Organisasi Kemahasiswaan']))->name('admin.organisasi');
         Route::get('/admin/jadwal', fn () => view('pages.livewire-page', ['component' => 'jadwal.generate', 'title' => 'Jadwal Kuliah']))->name('admin.jadwal');
         Route::get('/admin/impor/template/{jenis}', [LaporanController::class, 'templateImpor'])->name('admin.impor.template');
     });

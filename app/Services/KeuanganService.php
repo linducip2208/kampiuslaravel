@@ -9,6 +9,7 @@ use App\Models\MahasiswaBeasiswa;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use App\Models\TagihanCicilan;
+use App\Models\TutupBuku;
 use App\Models\UktTemplate;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -345,6 +346,14 @@ class KeuanganService
             throw new \InvalidArgumentException('Nominal jurnal penerimaan harus positif.');
         }
 
+        // M-032: periode tutup-buku menolak jurnal baru.
+        $tahunId = $pembayaran->tagihan?->tahun_akademik_id
+            ?? Tagihan::whereKey($pembayaran->tagihan_id)->value('tahun_akademik_id');
+
+        if (TutupBuku::terkunci($tahunId ? (int) $tahunId : null)) {
+            throw new \RuntimeException('Periode sudah tutup buku; jurnal baru ditolak.');
+        }
+
         $jurnal = JurnalKeuangan::firstOrCreate(
             ['pembayaran_id' => $pembayaran->id, 'jenis' => 'penerimaan'],
             [
@@ -380,6 +389,11 @@ class KeuanganService
             }
 
             $tagihan = Tagihan::lockForUpdate()->findOrFail($pembayaran->tagihan_id);
+
+            // M-032: periode tutup-buku menolak refund (jurnal reversal baru).
+            if (TutupBuku::terkunci($tagihan->tahun_akademik_id ? (int) $tagihan->tahun_akademik_id : null)) {
+                throw new \RuntimeException('Periode sudah tutup buku; refund ditolak.');
+            }
 
             $pembayaran->update([
                 'refunded_at' => now(),

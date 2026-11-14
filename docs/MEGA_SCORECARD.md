@@ -10,17 +10,17 @@ kategori — TIDAK tercapai ronde ini, dan itu dinyatakan eksplisit.
 | PMB & lifecycle | 8 | 5 | alur + VA jalan + tes; minus S1/S2, tanpa CRM/lead |
 | KRS/KHS/transkrip | 8 | 6 | terkunci + QR signed; minus IPS, unbounded, tanpa rekomendasi |
 | LMS & ujian | 8 | 4 | BankSoal + tugas/materi teruji (M-027); minus mesin kuis, forum |
-| Finance & accounting | 10 | 9 | rekon bank teruji idempoten (M-035); sisa tutup buku, AP/AR, aset |
-| HR & operasional | 7 | 4 | reservasi exposed + anti-double (M-041); tanpa payroll/rekrutmen |
-| Research & graduation | 7 | 4 | skripsi→yudisium→alumni utuh; tanpa hibah/HKI/pengabdian |
+| Finance & accounting | 10 | 9 | tutup-buku + anggaran + rekon selesai; sisa AP/AR, aset akuntansi |
+| HR & operasional | 7 | 5 | reservasi + organisasi/UKM selesai; tanpa payroll/rekrutmen |
+| Research & graduation | 7 | 6 | hibah + publikasi + pengabdian dasar selesai; tanpa review lanjut/HKI filing |
 | UI/UX | 10 | 6 | landing 11 seksi, shell, dashboard; tanpa E2E/screenshot/PWA/audit a11y |
 | Security | 10 | 8 | M-001..006 + M-015/016/017 selesai (allowlist, audit, Policy, permission, idempotency); sisa S8–S10 |
 | API & integrasi | 5 | 4 | envelope + OpenAPI + throttle sensitif; D BLOCKED |
 | Database & performance | 5 | 5 | overlap DB-side + batch prasyarat/kuota (P1/P3); ringkasan locked-only |
-| Testing & reliability | 4 | 4 | 252/252 + WaveA (19) + WaveB (21); tanpa E2E/beban |
+| Testing & reliability | 4 | 4 | 260/260 + WaveA (19) + WaveB (29); tanpa E2E/beban |
 | Docs & ops | 3 | 3 | backup teruji (create/verify) + 47 docs; tanpa E2E/beban |
 
-**TOTAL = 76/100** (naik dari 72: +Academic, +Finance, +HR, +DB/Performance).
+**TOTAL = 79/100** (naik dari 76: +Research, +HR).
 
 Klasifikasi bukti per klaim: Implemented / Tested / Browser-verified /
 Production-verified / External-verified — saat ini mayoritas Implemented+Tested;

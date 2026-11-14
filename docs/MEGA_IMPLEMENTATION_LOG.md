@@ -116,7 +116,31 @@ Kode:
   tetap superadmin/admin_prodi di komponen).
 - Tes: `tests/Feature/WaveBBatch2Test.php` (8 tes).
 
-## Berikutnya (Wave B batch 3, belum dieksekusi)
+## 2026-11-14 — WAVE B batch 3: 6 item selesai, 260/260 hijau
+
+Kode (vertical slice: migrasi + model + Livewire + blade + rute + tes):
+- M-032 migrasi `tutup_buku` (tahun_akademik_id unik, status, ditutup/dibuka
+  oleh+at, catatan) + model `TutupBuku::terkunci()`; guard di
+  `KeuanganService::postPenerimaan()` + `::refundPembayaran()` (throw bila
+  terkunci); Livewire `Keuangan/TutupBuku` (tutup/buka + AuditLog) di grup
+  keuangan (`/keuangan/tutup-buku`).
+- M-033 migrasi `anggaran` (unik tahun+kode) + model + `AnggaranService`
+  (`realisasi()` = jurnal penerimaan−refund per jenis+tahun;
+  `ringkasanPeriode()`); Livewire `Keuangan/Anggaran` (CRUD + tabel
+  realisasi/sisa/%) di grup keuangan.
+- M-040 migrasi `organisasi` + `organisasi_anggota` (unik pair) + model;
+  Livewire `Organisasi/Kelola` (CRUD + tambah anggota per NIM idempoten +
+  toggle aktif + AuditLog) di grup admin (`/admin/organisasi`).
+- M-042 migrasi `hibah_riset` + `hibah_pencairan` + model (`totalCair()`);
+  Livewire `Riset/Hibah` (CRUD + catat pencairan + AuditLog) di grup dosen.
+- M-043 migrasi `publikasi` (jenis/doi/status + index dosen) + model;
+  Livewire `Riset/Publikasi` owner-scope (dosen kelola miliknya; hapus orang
+  lain → 403; staf penuh) di grup dosen.
+- M-044 migrasi `pengabdian` + model; Livewire `Riset/Pengabdian`
+  (validasi tanggal_selesai ≥ mulai) di grup dosen.
+- Tes: `tests/Feature/WaveBBatch3Test.php` (8 tes).
+
+## Berikutnya (Wave B batch 4 + Wave C, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

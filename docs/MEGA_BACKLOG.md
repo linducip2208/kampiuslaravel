@@ -81,20 +81,22 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=34 (2026-11-14, suite 252 hijau):
+Selesai=40 (2026-11-14, suite 260 hijau):
 Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
 `tests/Feature/WaveABatch2Test.php` 8 tes): M-001..M-020 — detail di bawah.
-Wave B Batch 1: 8 item P0/P1 (bukti: `tests/Feature/WaveBBatch1Test.php`
-13 tes): M-021, M-024, M-027, M-037, M-045, M-046, M-047, M-048
-(detail di IMPLEMENTATION_LOG).
+Wave B Batch 1: 8 item (bukti: `tests/Feature/WaveBBatch1Test.php` 13 tes):
+M-021, M-024, M-027, M-037, M-045, M-046, M-047, M-048 (detail di
+IMPLEMENTATION_LOG).
 Wave B Batch 2: 6 item (bukti: `tests/Feature/WaveBBatch2Test.php` 8 tes):
-M-022 (rollover terjadwal 1 Feb & 1 Agu), M-023 (`kandidatDo` +
-`akademik:evaluasi-do [--terapkan]` + AuditLog), M-025/P1+P3 (overlap DB-side;
-prasyarat 1 query; kuota via `kursiTerisiBanyak`), M-026 (rekomendasi +
-`kelas_tersedia` & `posisi_waitlist` periode aktif), M-035 (rekon tak_dikenal +
-re-run idempoten), M-041 (`setujuiPinjam` re-check tx + rute
-`/fasilitas/pinjam`).
-Sisa Wave B: M-028..M-034, M-036, M-038..M-040, M-042..M-044.
+M-022, M-023, M-025, M-026, M-035, M-041 (detail di IMPLEMENTATION_LOG).
+Wave B Batch 3: 6 item (bukti: `tests/Feature/WaveBBatch3Test.php` 8 tes):
+M-032 (`tutup_buku` + guard jurnal/refund + buka-terkendali + AuditLog),
+M-033 (`anggaran` + `AnggaranService::realisasi` penerimaan−refund),
+M-040 (`organisasi` + `organisasi_anggota` per NIM idempoten),
+M-042 (`hibah_riset` + `hibah_pencairan` bertahap + total cair),
+M-043 (`publikasi` owner-scope dosen), M-044 (`pengabdian` + validasi tanggal).
+Sisa Wave B: M-028..M-031 (mesin kuis XL, forum, SCORM), M-034 (AP/AR),
+M-036 (aset akuntansi), M-038 (payroll XL), M-039 (rekrutmen).
 Wave C/D: belum dimulai (D semua BLOCKED).
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →
