@@ -173,3 +173,21 @@ Mode di halaman Integrasi → `tenant.mode`: `single` (saat ini) atau
 
 Sampai disetujui, biarkan `tenant.mode = single` — tidak ada kode bisnis
 yang membaca mode ini hari ini.
+
+## 11. Status Wave D — matriks kesiapan jujur (2026-11-15)
+
+Kode adapter selesai dan teruji; yang belum ada adalah **kredensial/
+konektivitas produksi** (nol kredensial di repo, sesuai aturan). Bukti
+otomatis: `tests/Feature/WaveDReadinessTest.php`.
+
+| Item | Adapter (kode) | Bukti tes | Kurang (eksternal) | Status |
+|---|---|---|---|---|
+| M-061 Feeder | `PddiktiService` + tes koneksi + `pddikti.sync` | IntegrasiTest, readiness | base URL + user/pass Feeder | BLOCKED |
+| M-062 gateway prod | pola driver `config/payment.php` + guard simulasi-ditolak-di-prod | WaveACriticalTest | merchant key prod + callback URL publik | BLOCKED |
+| M-063 WA | `WaService` (simulasi bila gateway kosong) | readiness (simulasi true) | gateway_url + token | BLOCKED |
+| M-064 Email/FCM | FCM token + `MailService` + `TagihanReminderMail` (guard SMTP) | kontrak mobile + readiness | SMTP host/kredensial, service-account FCM | SELESAI (kode), kirim nyata butuh kredensial |
+| M-065 SSO | dokumen aktivasi §4 (Socialite belum dipasang) | — | Client ID/Secret Google+Entra | BLOCKED |
+| M-066 TTE | forward BSrE `pddikti/tte` | readiness (rute ada) | base URL + user/pass BSrE | BLOCKED |
+
+Channel email ikut idempotensi notif H-7/H+7 yang sama (tanpa spam);
+hanya jalan bila `MAIL_MAILER=smtp` + host terisi + user punya email.

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Notifikasi;
 use App\Services\KeuanganService;
+use App\Services\MailService;
 use App\Services\WaService;
 use Illuminate\Console\Command;
 
@@ -40,6 +41,23 @@ class TagihanReminderCommand extends Command
                         'judul' => $a === 'h-7' ? 'Tagihan jatuh tempo 7 hari lagi' : 'Tagihan lewat jatuh tempo',
                         'isi' => $pesan,
                     ]);
+
+                    // M-064: email sebagai channel ke-4 (WA + inbox + FCM sudah
+                    // ada). Hanya bila SMTP terkonfigurasi + user punya email;
+                    // ikut idempotensi notif h-7/hp7 yang sama (tanpa spam).
+                    if (! empty($user->email) && MailService::terkonfigurasi()) {
+                        try {
+                            MailService::kirimTagihan(
+                                (string) $user->email,
+                                (string) ($user->name ?? 'Mahasiswa'),
+                                $pesan,
+                                (string) ($tagihan->jenis ?? 'UKT'),
+                                number_format((int) $tagihan->nominal, 0, ',', '.')
+                            );
+                        } catch (\Throwable $e) {
+                            report($e);
+                        }
+                    }
                 }
 
                 KeuanganService::tandaiPengingatTerkirim($tagihan, $a);

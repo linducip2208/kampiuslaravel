@@ -245,10 +245,27 @@ Kode:
   `GET /lms/paket/{pertemuan}` (semua login, throttle 10,1).
 - Tes: `tests/Feature/WaveCBatch4Test.php` (4 tes).
 
-## Status akhir: 59/66 — 7 tersisa semuanya BLOCKED
-- M-054 multi-kampus: butuh DESAIN isolasi yang disahkan.
-- M-061..066 (Wave D): butuh konektivitas nyata (Feeder, gateway prod,
-  WA, Email/FCM penuh, SSO, TTE) — nol kredensial di repo.
+## 2026-11-15 — Wave D readiness + M-054 desain: 293/293 hijau
+
+Bukan kode integrasi pura-pura — yang dikerjakan jujur bisa diuji:
+- M-054: `docs/DESAIN_MULTI_KAMPUS.md` (Opsi A shared-schema+kampus_id
+  direkomendasikan, matriks permission, resolusi tenant, migrasi 5 fase +
+  rollback, checklist pengesahan). Status MENUNGGU PENGESAHAN — tetap
+  BLOCKED, dan diverifikasi tes bahwa BELUM ADA kode isolasi
+  (`KampusScope`/`Kampus` tidak ada).
+- M-064: `Mail/TagihanReminderMail` + `Services/MailService`
+  (`terkonfigurasi()`: smtp+host, selain itu no-op) + hook di
+  `tagihan:ingatkan` (ikut idempotensi H-7/HP7, try/catch report).
+  FCM sudah ada sebelumnya (token + graceful skip + NotifLog).
+- `docs/INTEGRASI.md` §11: matriks kesiapan Wave D per item
+  (adapter vs kredensial yang kurang).
+- Tes: `tests/Feature/WaveDReadinessTest.php` (4 tes).
+
+## Status akhir: 60/66 — 6 tersisa semuanya BLOCKED eksternal
+- M-054 multi-kampus: desain di `DESAIN_MULTI_KAMPUS.md`, MENUNGGU PENGESAHAN.
+- M-061,062,063,065,066: butuh konektivitas nyata (Feeder, gateway prod,
+  WA gateway, SSO creds, TTE BSrE) — nol kredensial di repo.
+  M-064 selesai di level kode (FCM + email); kirim nyata butuh SMTP/FCM creds.
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

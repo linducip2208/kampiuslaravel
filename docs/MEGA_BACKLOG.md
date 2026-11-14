@@ -81,9 +81,10 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=59 (2026-11-15, suite 289 hijau):
-Wave B SELESAI 28/28. Wave A 20/20. Wave C 11/12 (sisa M-054 BLOCKED).
-Wave D 6 item BLOCKED. Rincian batch di bawah.
+Selesai=60 (2026-11-15, suite 293 hijau):
+Wave A 20/20, Wave B 28/28, Wave C 11/12 SELESAI (sisa M-054 BLOCKED).
+Wave D: M-061,062,063,065,066 BLOCKED + M-064 SELESAI
+(channel email `MailService`; kirim nyata butuh SMTP). Rincian batch di bawah.
 Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
 `tests/Feature/WaveABatch2Test.php` 8 tes): M-001..M-020 — detail di bawah.
 Wave B Batch 1: 8 item (bukti: `tests/Feature/WaveBBatch1Test.php` 13 tes):
