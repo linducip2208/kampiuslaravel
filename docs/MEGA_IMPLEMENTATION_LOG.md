@@ -213,7 +213,22 @@ Kode:
   OpenAPI 3.1) — tanpa ubah prod.
 - Tes: `tests/Feature/WaveCBatch2Test.php` (4 tes).
 
-## Berikutnya (SCORM + XL tersisa, belum dieksekusi)
+## 2026-11-15 — WAVE C batch 3: 2 item XL selesai, 285/285 hijau
+
+Kode:
+- M-049 migrasi `cpl` (unik prodi+kode) + `cpmk` (unik MK+kode, bobot) +
+  `cpmk_asesmen` (unik cpmk+tipe+sumber, tipe quiz_soal|tugas) + model/relasi;
+  `ObeService::ketercapaian()` (skor kuis = skor/bobot, tugas = nilai/100,
+  terbobot per CPMK→CPL, hanya asesmen yang dikerjakan); Livewire
+  `Obe/Kelola` (CRUD CPL/CPMK + pemetaan + rekap per NIM) di `/admin/obe`.
+- M-052 migrasi `coa` + `jurnal_umum` + `jurnal_item`; `GlService::posting()`
+  (xor-sisi per baris, ≥2 baris, seimbang, akun aktif, guard tutup-buku),
+  `::bukuBesar()` (saldo berjalan sisi normal), `::neracaSaldo()`,
+  `::seederDasarCoa()` (8 akun); Livewire `Keuangan/Gl` (CoA + jurnal
+  dinamis + neraca + buku besar) di `/keuangan/gl`.
+- Tes: `tests/Feature/WaveCBatch3Test.php` (4 tes).
+
+## Berikutnya (RAG + SCORM, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.

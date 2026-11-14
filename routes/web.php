@@ -256,6 +256,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/keuangan/tutup-buku', fn () => view('pages.livewire-page', ['component' => 'keuangan.tutup-buku', 'title' => 'Tutup Buku']))->name('keuangan.tutup-buku');
         Route::get('/keuangan/hutang', fn () => view('pages.livewire-page', ['component' => 'keuangan.hutang', 'title' => 'Utang Usaha']))->name('keuangan.hutang');
         Route::get('/keuangan/payroll', fn () => view('pages.livewire-page', ['component' => 'keuangan.payroll', 'title' => 'Penggajian']))->name('keuangan.payroll');
+        Route::get('/keuangan/gl', fn () => view('pages.livewire-page', ['component' => 'keuangan.gl', 'title' => 'Buku Besar']))->name('keuangan.gl');
         Route::get('/keuangan/anggaran', fn () => view('pages.livewire-page', ['component' => 'keuangan.anggaran', 'title' => 'Anggaran']))->name('keuangan.anggaran');
         Route::get('/surat/nomor', fn () => view('pages.livewire-page', ['component' => 'surat.nomor-otomatis', 'title' => 'Nomor Surat']))->name('surat.nomor');
     });
@@ -293,6 +294,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/dosen', fn () => view('pages.livewire-page', ['component' => 'admin.dosen-data', 'title' => 'Data Dosen & Tendik']))->name('admin.dosen');
         Route::get('/admin/kurikulum', fn () => view('pages.livewire-page', ['component' => 'master.kurikulum', 'title' => 'Kurikulum']))->name('admin.kurikulum');
         Route::get('/admin/impor', fn () => view('pages.livewire-page', ['component' => 'admin.impor-csv', 'title' => 'Impor CSV']))->name('admin.impor');
+        Route::get('/admin/obe', fn () => view('pages.livewire-page', ['component' => 'obe.kelola', 'title' => 'OBE / CPL-CPMK']))->name('admin.obe');
         Route::get('/admin/akreditasi', fn () => view('pages.livewire-page', ['component' => 'admin.akreditasi', 'title' => 'Akreditasi']))->name('admin.akreditasi');
         Route::get('/admin/organisasi', fn () => view('pages.livewire-page', ['component' => 'organisasi.kelola', 'title' => 'Organisasi Kemahasiswaan']))->name('admin.organisasi');
         Route::get('/admin/rekrutmen', fn () => view('pages.livewire-page', ['component' => 'rekrutmen.kelola', 'title' => 'Rekrutmen']))->name('admin.rekrutmen');

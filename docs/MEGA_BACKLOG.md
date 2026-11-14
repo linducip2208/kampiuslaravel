@@ -81,7 +81,7 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=55 (2026-11-15, suite 281 hijau):
+Selesai=59 (2026-11-15, suite 285 hijau):
 Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
 `tests/Feature/WaveABatch2Test.php` 8 tes): M-001..M-020 — detail di bawah.
 Wave B Batch 1: 8 item (bukti: `tests/Feature/WaveBBatch1Test.php` 13 tes):
@@ -130,8 +130,14 @@ tracer publik `Tracer/Isi` verifikasi NIM di `/tracer` + Livewire
 `Admin/Tracer` rekap di `/admin/tracer`), M-056 (`EksekutifService::kpi()`
 agregat + Livewire `Analitik/Eksekutif` di `/laporan/eksekutif`),
 M-059 (kontrak API Flutter: 14 endpoint diuji bentuknya, tanpa ubah prod).
-Sisa: M-030/031 (SCORM/offline), M-049 (OBE/CPL XL), M-052 (GL penuh XL),
-M-057 (RAG knowledge-base XL), M-054 (multi-kampus BLOCKED).
+Wave C Batch 3: 2 item XL (bukti: `tests/Feature/WaveCBatch3Test.php` 4 tes):
+M-049 (OBE: `cpl` + `cpmk` + `cpmk_asesmen` quiz/tugas + `ObeService`
+ketercapaian terbobot + Livewire `Obe/Kelola` di `/admin/obe`),
+M-052 (GL penuh: `coa` + `jurnal_umum` + `jurnal_item` + `GlService`
+posting-berimbang/buku-besar/neraca-saldo + guard tutup-buku +
+`seederDasarCoa` + Livewire `Keuangan/Gl` di `/keuangan/gl`).
+Sisa: M-030/031 (SCORM/offline), M-057 (RAG knowledge-base XL),
+M-054 (multi-kampus BLOCKED).
 Wave D: 6 item BLOCKED (butuh konektivitas nyata).
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →
