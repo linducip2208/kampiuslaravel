@@ -1,4 +1,4 @@
-# DEVELOPMENT MASTER — 1.130 ITEM (KAMPIUS ERP, 2026-11-14)
+# DEVELOPMENT MASTER — 1.130 ITEM (KAMPUS ERP, 2026-11-14)
 
 Format ringkas per baris (kolom penuh 15-atribut diringkas agar dapat diaudit):
 `ID | Nama pengembangan | Modul | Prioritas(P0-P3) | Kompleksitas(R/S/B) | Status | Kriteria terima + uji`.

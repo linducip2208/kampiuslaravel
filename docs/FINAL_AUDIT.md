@@ -13,7 +13,7 @@
 TOTAL: 67/100. Bukan 100/100. Blocker: kuota/transaction hardening, migrasi aman, screenshot browser, landing overhaul.
 ## File diubah sesi ini
 - resources/views/dashboard.blade.php, dashboard/pimpinan.blade.php
-- resources/views/layouts/tabler.blade.php (grup + KAMPIUS + KRS fix)
+- resources/views/layouts/tabler.blade.php (grup + KAMPUS + KRS fix)
 - app/Http/Controllers/DashboardController.php, BayarController.php, Api/V1/TagihanController.php
 - app/Livewire/Nilai/InputNilai.php, Lms/KumpulTugas.php
 - docs/* (8 file)

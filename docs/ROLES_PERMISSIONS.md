@@ -1,4 +1,4 @@
-# ROLES & PERMISSIONS — KAMPIUS
+# ROLES & PERMISSIONS — KAMPUS
 Sumber: database/seeders/RolesPermissionsSeeder.php
 - superadmin: semua permission
 - admin_prodi: master, pmb.view/verify, krs.manage/approve, skripsi, surat, pengumuman, laporan.view

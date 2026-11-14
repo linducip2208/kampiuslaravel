@@ -1,4 +1,4 @@
-# MODULE INVENTORY — KAMPIUS (dari source aktual, 2026-11-14)
+# MODULE INVENTORY — KAMPUS (dari source aktual, 2026-11-14)
 
 Sumber: routes/web.php, routes/api.php, routes/console.php, app/Models (82),
 app/Http/Controllers (35), app/Livewire (44 komponen), resources/views (~80).

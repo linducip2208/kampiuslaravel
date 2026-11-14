@@ -1,4 +1,4 @@
-# FINAL SCORECARD — KAMPIUS MEGA COMMAND (2026-11-14)
+# FINAL SCORECARD — KAMPUS MEGA COMMAND (2026-11-14)
 
 Riwayat: 42 → 92/100 (rubrik lama, 9 kategori; 207 tes hijau).
 Di bawah ini penilaian rubrik mega-command 12 kategori / 100 poin,

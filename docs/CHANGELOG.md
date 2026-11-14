@@ -1,4 +1,8 @@
 # CHANGELOG
+## 2026-11-14 — Logo KAMPUS v2 profesional (emblem WAN 2.1 baru + rebrand KAMPIUS→KAMPUS)
+- Emblem baru via ComfyUI WAN 2.1 lokal (seed 9011): huruf K navy + toga, komposit PIL modern (divider + aksen orange, subtitle UNIVERSITY ERP).
+- File: `public/img/logo-kampus.png` + `logo-kampus-mark.png`; `logo-kampius.*` lama ditimpa isi sama (URL lama tetap benar); favicon + apple-touch-icon diregenerasi.
+- Seluruh teks user-visible di views: KAMPIUS→KAMPUS; docs diselaraskan; manifest canonical `storage/app/public/generated/manifest-kampus.json`.
 ## 2026-11-13 — Hardening transaksi + sidebar grup + dashboard premium + factory fix
 - Test-infra: TahunAkademikFactory deterministik unik (perbaiki flaky unique tahun+semester di KeuanganPhase2Test).
 ## 2026-11-13 (ronde 3) — N+1 + otorisasi + SEO + tes hardening
@@ -99,8 +103,8 @@
 - API docs: contoh login/tagihan/VA/callback + error standar.
 - Audit: semua route sidebar + welcome terverifikasi ada (tidak ada dead link).
 - Dashboard utama: stat real, performa KRS, earnings, donut angkatan, messages, activity.
-- Sidebar grup permission-aware; KRS dosen -> persetujuan; brand KAMPIUS.
+- Sidebar grup permission-aware; KRS dosen -> persetujuan; brand KAMPUS.
 - Pimpinan dashboard: 12 kartu + keuangan ringkas + tren.
 - Fix: KumpulTugas anti-spoof, VA tolak lunas, authorize tagihan, InputNilai ownership+transaction, generateMassal transaction+race-safe, BayarManual dedup pending+transaction+cleanup file, PMB store/submit transaction+lock kuota, Verifikasi status/kelulusan transaction+lock, Sidang setStatus transaction.
-- Landing: judul SEO KAMPIUS + hero + footer brand.
+- Landing: judul SEO KAMPUS + hero + footer brand.
 - Docs: 10 file di docs/.

@@ -1,4 +1,4 @@
-# API — KAMPIUS
+# API — KAMPUS
 - v1 (auth:sanctum, abilities:mobile): /me, jadwal-hari-ini, krs-aktif, nilai-ringkas, absensi/scan, tugas, tagihan (+VA), bimbingan, pengumuman, notifikasi, ai/chat, device-token.
 - v2 publik (throttle 60,1): /status, /prodi, /pengumuman. Webhook: /webhook/terima (HMAC X-Webhook-Signature, throttle 30,1).
 - Kontrak dipertahankan. Perbaikan: Tagihan index eager load; createVa tolak lunas (422); Tugas index owner-scope.

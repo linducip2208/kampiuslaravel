@@ -1,6 +1,6 @@
 # Generate Gambar — ComfyUI WAN 2.1 (server lokal, tanpa API eksternal)
 
-Semua generate gambar di KAMPIUS memakai **server ComfyUI lokal**
+Semua generate gambar di KAMPUS memakai **server ComfyUI lokal**
 (`http://127.0.0.1:8188`, model WAN 2.1). Laravel hanya mengirim workflow
 API-format lalu menyimpan hasilnya. Tidak ada kredensial/API key di repo —
 semua via `.env` / halaman admin Integrasi.

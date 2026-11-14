@@ -38,5 +38,5 @@ foreach ($assets as [$key, $prompt, $w, $h, $steps, $seed]) {
         $out[$key] = null;
     }
 }
-file_put_contents(__DIR__.'/storage/app/public/generated/manifest-kampius.json', json_encode($out, JSON_PRETTY_PRINT));
-echo "MANIFEST: storage/app/public/generated/manifest-kampius.json\n";
+file_put_contents(__DIR__.'/storage/app/public/generated/manifest-kampus.json', json_encode($out, JSON_PRETTY_PRINT));
+echo "MANIFEST: storage/app/public/generated/manifest-kampus.json\n";

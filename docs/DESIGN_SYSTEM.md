@@ -1,4 +1,4 @@
-# DESIGN SYSTEM — KAMPIUS ERP
+# DESIGN SYSTEM — KAMPUS ERP
 
 Versi 2.0 (2026-11-14): shell terang + topbar + dashboard komposisi baru.
 
