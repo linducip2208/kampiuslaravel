@@ -220,6 +220,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/lms/tugas', fn (Request $r) => view('lms.tugas', [
             'kelasId' => $r->integer('kelas') ?: Kelas::latest('id')->value('id'),
         ]))->name('lms.tugas');
+        Route::get('/lms/bank-soal', fn () => view('pages.livewire-page', ['component' => 'lms.bank-soal', 'title' => 'Bank Soal']))->name('lms.bank');
         Route::get('/nilai/input', fn (Request $r) => view('nilai.input', [
             'kelasId' => $r->integer('kelas') ?: Kelas::latest('id')->value('id'),
         ]))->name('nilai.input');

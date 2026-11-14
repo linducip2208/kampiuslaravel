@@ -41,7 +41,8 @@ VERIFIED = implementasi + rute + validasi + otorisasi + DB + UI + tes hijau.
 | Route guard regression | VERIFIED | RouteGuardTest |
 | Linimasa mahasiswa | VERIFIED | Profil::linimasaMahasiswa, UserDataTest (+2) |
 | KRS bimbingan di dashboard | VERIFIED | HardeningTest (nama, bukan angka) |
-| Mesin kuis / bank soal | NOT_STARTED | Lihat ROADMAP |
+| Bank soal PG/esai (CRUD + validasi) | VERIFIED | Lms/BankSoal, BankSoalTest (5); mesin ujian tetap NOT_STARTED |
+| Mesin kuis / ujian online | NOT_STARTED | Lihat ROADMAP (butuh assignment engine di atas bank soal) |
 | OBE CPL/CPMK | NOT_STARTED | Lihat ROADMAP (jangan klaim akreditasi) |
 | Riset & pengmas | NOT_STARTED | Lihat ROADMAP |
 | GL penuh (CoA/tutup periode) | PARTIAL | Jurnal + neraca ada; tutup periode terkontrol belum ada |

@@ -8,6 +8,9 @@
     <meta property="og:description" content="Kelola PMB, KRS, nilai, keuangan, dan laporan dalam satu sistem kampus terpadu.">
     <meta property="og:type" content="website">
     <title>@yield('title', config('app.name', 'KAMPIUS'))</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="icon" type="image/png" href="{{ asset('img/logo-kampius-mark.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
     <style>
         :root {
@@ -232,7 +235,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-                    <a href="{{ route('home') }}" class="text-decoration-none">KAMPIUS <span class="text-secondary small fw-normal">ERP</span></a>
+                    <a href="{{ route('home') }}" class="text-decoration-none d-inline-flex align-items-center gap-2"><img src="{{ asset('img/logo-kampius-mark.png') }}" alt="Logo KAMPIUS" width="30" height="30" style="border-radius:8px">KAMPIUS <span class="text-secondary small fw-normal">ERP</span></a>
                 </h1>
                 <div class="collapse navbar-collapse" id="public-menu">
                     <ul class="navbar-nav">
@@ -265,7 +268,7 @@
         <aside class="kampius-sidebar" aria-label="Navigasi utama">
             <div class="kampius-brand">
                 <a href="{{ route('dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none" aria-label="KAMPIUS Dashboard">
-                    <span class="kampius-brand-mark" aria-hidden="true">K</span>
+                    <img src="{{ asset('img/logo-kampius-mark.png') }}" alt="Logo KAMPIUS" width="38" height="38" style="border-radius:11px;flex-shrink:0">
                     <span class="kampius-brand-text"><strong>KAMPIUS</strong><small>University ERP</small></span>
                 </a>
                 <button type="button" class="kampius-collapse-btn d-none d-lg-inline-flex" data-kampius-collapse aria-label="Lipatkan navigasi">
@@ -292,7 +295,8 @@
                             ['route' => 'publik.prodi', 'label' => 'Program Studi', 'roles' => null, 'icon' => 'M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4', 'pattern' => 'publik.prodi*'],
                             ['route' => 'admin.kurikulum', 'label' => 'Kurikulum', 'roles' => ['superadmin', 'admin_prodi'], 'icon' => 'M4 4h16v12H4z', 'pattern' => 'admin.kurikulum|admin.master'],
                             ['route' => 'admin.jadwal', 'label' => 'Jadwal Kuliah', 'roles' => ['superadmin', 'admin_prodi'], 'icon' => 'M8 7V3m8 4V3M3 11h18', 'pattern' => 'admin.jadwal'],
-                            ['route' => 'lms.materi', 'label' => 'LMS', 'roles' => ['dosen', 'mahasiswa', 'superadmin', 'admin_prodi'], 'icon' => 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 1 4 4.5v15z', 'pattern' => 'lms.*|absensi.*'],
+                            ['route' => 'lms.materi', 'label' => 'LMS', 'roles' => ['dosen', 'mahasiswa', 'superadmin', 'admin_prodi'], 'icon' => 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 1 4 4.5v15z', 'pattern' => 'lms.materi|lms.tugas|lms.tugas.kumpul|absensi.*'],
+                        ['route' => 'lms.bank', 'label' => 'Bank Soal', 'roles' => ['dosen', 'superadmin', 'admin_prodi'], 'icon' => 'M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2M9 21h6M12 3v18', 'pattern' => 'lms.bank'],
                             ['route' => 'nilai.input', 'label' => 'Nilai', 'roles' => ['dosen', 'superadmin', 'admin_prodi'], 'icon' => 'M3 17l6-6 4 4 8-8', 'pattern' => 'nilai.*|khs.*|transkrip.*'],
                             ['route' => $skripsiRoute, 'label' => 'Skripsi', 'roles' => ['mahasiswa', 'dosen', 'superadmin', 'admin_prodi'], 'icon' => 'M12 20h9', 'pattern' => 'skripsi.pengajuan|skripsi.pembimbing|bimbingan.*|sidang.*'],
                         ],

@@ -1,20 +1,25 @@
-# Generate Gambar — ComfyUI (+ WAN 2.1 /Fallback SD)
+# Generate Gambar — ComfyUI WAN 2.1 (server lokal, tanpa API eksternal)
 
-Semua generate gambar di SIMAK memakai **server ComfyUI eksternal**.
-Laravel hanya mengirim workflow API-format + menyimpan hasilnya. Tidak ada API key/vendor
-yang di-hardcode — semua via `.env` / `config/comfyui.php`.
+Semua generate gambar di KAMPIUS memakai **server ComfyUI lokal**
+(`http://127.0.0.1:8188`, model WAN 2.1). Laravel hanya mengirim workflow
+API-format lalu menyimpan hasilnya. Tidak ada kredensial/API key di repo —
+semua via `.env` / halaman admin Integrasi.
 
-## Status model di server lokal (D:\ComfyUI, RTX 4060 8GB)
+## Status model di server lokal (D:\ComfyUI, RTX 4060 8GB) — UPDATE 2026-11-14
 
-- WAN 2.1 T2V 1.3B + UMT5 fp8 + VAE: terinstal, workflow ada di
-  `storage/app/comfyui/wan21_still_api.json`, TAPI **gagal execution**—
-  `CLIPTextEncode` error `Cannot copy out of meta tensor` (text-encoder fp8
-  tidak termaterialisasi di ComfyUI 0.43 + torch 2.14 env ini). Perlu investigasi
-  versi/comfy-weight-issue sebelum dipakai produksi.
-- Fallback yang dipakai: checkpoint SD1.5 (`checkpoints/v1-5-pruned-emaonly.safetensors`)
-  dengan workflow T2I standar (node ID kompatibel `config/comfyui.php`:
-  prompt=6, negative=7, seed+steps=3, size=5) → hasilkan `public/img/*.png`
-  untuk landing (hero kampus, avatar peran, panel keamanan).
+- WAN 2.1 T2V 1.3B fp16 (`diffusion_models/wan2.1_t2v_1.3B_fp16.safetensors`, UNETLoader `weight_dtype=fp8_e4m3fn`)
+- Text encoder BENAR: `umt5_xxl_fp8_e4m3fn_scaled.safetensors` (6.27 GB di `D:\AI_Models\text_encoders`, ikut ter-index via extra paths).
+  Jangan pakai `umt5-xxl-enc-fp8_e4m3fn.safetensors` (varian city96): seluruh bobotnya tidak terpetakan ("clip missing") sehingga encode gagal dengan `Cannot copy out of meta tensor`.
+- VAE: `wan_2.1_vae.safetensors`.
+- Workflow still-image: `storage/app/comfyui/wan21_still_api.json` (T2V length=13 → `LatentFromBatch` ambil frame pertama → `SaveImage`). Server dijalankan dengan `--lowvram`.
+- Dependensi fp8: `torchao` 0.18.0 terinstal di venv (dependensi komputasi fp8 standar; server harus di-restart setelah instalasi agar terdeteksi).
+- Fallback SD1.5 TIDAK LAGI DIPAKAI — WAN 2.1 terverifikasi end-to-end 2026-11-14:
+  smoke 512px/2-step lolos ±15 dtk; batch produksi 6 aset selesai ±25 mnt
+  (lihat manifest `storage/app/public/generated/manifest-kampius.json`).
+- Cara jalan server: `D:\ComfyUI\venv\Scripts\python.exe D:\ComfyUI\main.py --listen 127.0.0.1 --port 8188 --lowvram --preview-method none`
+  (server harus di-restart setiap instal paket venv baru agar terdeteksi).
+- Aset produksi tersimpan di `public/img/` (`logo-kampius*.png`, `*-wan.png`);
+  skrip batch: `gen-assets.php`, komposit logo: `make-logo.py` (PIL, font Arial sistem).
 
 ## 1. Siapkan ComfyUI + WAN 2.1 (sekali saja)
 

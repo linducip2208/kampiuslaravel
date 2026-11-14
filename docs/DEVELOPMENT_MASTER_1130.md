@@ -374,9 +374,9 @@ Total: A1:115 + A2:115 + A3:105 + A4:120 + A5:120 + A6:115 + A7:105 + A8:115 + A
 | A4-011 | Umpan balik dosen per tugas | P2 | S | NOT_STARTED | Kriteria: komentar + nilai; tes |
 | A4-012 | Revisi pengumpulan (resubmit) | P2 | S | NOT_STARTED | Kriteria: versi + batas; tes |
 | A4-013 | Deteksi plagiarisme tugas | P3 | B | NOT_STARTED | Kriteria: skor similarity; tanpa layanan = stub |
-| A4-014 | Bank soal + kategori + tingkat | P2 | B | NOT_STARTED | Kriteria: CRUD + impor; tes (modul baru) |
-| A4-015 | Soal PG + kunci + bobot | P2 | S | NOT_STARTED | Dependensi bank soal |
-| A4-016 | Soal esai + rubrik | P2 | S | NOT_STARTED | Dependensi bank soal |
+| A4-014 | Bank soal + jenis/kunci/bobot | P2 | S | VERIFIED | CRUD + validasi; BankSoalTest (5 tes). Impor massal tetap NOT_STARTED (lihat A4-028). |
+| A4-015 | Soal PG + kunci + bobot | P2 | S | VERIFIED | Bagian dari A4-014; tes kunci A-F + bobot. |
+| A4-016 | Soal esai + rubrik | P2 | S | PARTIAL | Esai tersimpan tanpa opsi; rubrik penilaian belum ada. |
 | A4-017 | Randomisasi soal per peserta | P2 | B | NOT_STARTED | Kriteria: seed per user; tes determinisme |
 | A4-018 | Randomisasi opsi jawaban | P2 | S | NOT_STARTED | Kriteria: acak per user; tes |
 | A4-019 | Paket ujian + durasi + jadwal | P2 | B | NOT_STARTED | Kriteria: window waktu; tes |

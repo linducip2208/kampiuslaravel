@@ -175,6 +175,19 @@
     </div>
 </div>
 
+{{-- ============ 2b. FOTO KAMPUS (AI WAN 2.1, lokal) ============ --}}
+<div class="container-xl mt-4" style="max-width: 1280px">
+    <div class="position-relative overflow-hidden" style="border-radius:18px">
+        <img src="{{ asset('img/kampus-hero-wan.png') }}" alt="Gedung kampus modern KAMPIUS" class="w-100 d-block" style="max-height:420px;object-fit:cover" loading="lazy">
+        <div class="position-absolute bottom-0 start-0 end-0 p-3 p-md-4 d-flex flex-wrap align-items-end gap-2" style="background:linear-gradient(transparent, rgba(16,29,75,.82))">
+            <div class="text-white me-auto">
+                <strong class="d-block">Kampus Modern, Sistem Modern</strong>
+                <span class="small opacity-75">Gedung, layanan, dan data akademik dalam satu ekosistem digital.</span>
+            </div>
+            <a href="{{ route('pmb.create') }}" class="btn btn-light">Daftar Sekarang →</a>
+        </div>
+    </div>
+</div>
 {{-- ============ 3. PRODUCT VALUE ============ --}}
 <div class="container-xl mt-4" style="max-width: 1280px" id="nilai">
     <div class="row text-center g-3">
@@ -246,6 +259,7 @@
             <div class="col-lg-6">
                 <div class="kampius-mock">
                     <div class="kampius-mock-topbar"><i style="background:#DC4545"></i><i style="background:#E9A23B"></i><i style="background:#16A36A"></i><span class="ms-2 small text-secondary">Keuangan — Verifikasi Pembayaran</span></div>
+                    <img src="{{ asset('img/keuangan-wan.png') }}" alt="Visual analitik keuangan KAMPIUS" class="w-100 d-block" style="height:140px;object-fit:cover" loading="lazy">
                     <div class="p-3">
                         <div class="d-flex justify-content-between mb-2"><strong>Antrean verifikasi</strong><span class="badge bg-warning-lt">{{ number_format($stats['pembayaran_pending'] ?? 0) }} menunggu</span></div>
                         <div class="kampius-mock-rows">
@@ -296,15 +310,21 @@
             </div>
         @endforeach
     </div>
-    <div class="text-center mt-3">
-        <a href="{{ route('pmb.create') }}" class="btn btn-primary">Mulai dari PMB →</a>
-    </div>
+    <div class="card kampius-card mt-3"><div class="row g-0 align-items-center">
+        <div class="col-md-6"><img src="{{ asset('img/wisuda-wan.png') }}" alt="Wisuda kampus KAMPIUS" class="img-fluid w-100 h-100" style="object-fit:cover;min-height:220px;border-radius:16px 0 0 16px" loading="lazy"></div>
+        <div class="col-md-6 p-4">
+            <h3 class="mb-1">Dari Pendaftar hingga Wisudawan</h3>
+            <p class="text-secondary">Satu alur utuh tanpa data terpisah — dan setiap dokumen penting terverifikasi QR.</p>
+            <a href="{{ route('pmb.create') }}" class="btn btn-primary">Mulai dari PMB →</a>
+        </div>
+    </div></div>
 </div>
 
 {{-- ============ 7. ROLE EXPERIENCE ============ --}}
 <div class="container-xl mt-5" style="max-width: 1280px" id="peran">
     <div class="text-primary small mb-1 fw-bold">UNTUK SEMUA PERAN</div>
     <h2>Satu Sistem, Pengalaman yang Tepat</h2>
+    <img src="{{ asset('img/akademik-wan.png') }}" alt="Mahasiswa belajar dengan laptop di kampus" class="img-fluid w-100 mb-3" style="max-height:280px;object-fit:cover;border-radius:16px" loading="lazy">
     <div class="row row-cards mt-3">
         @php
             $perans = [
@@ -332,7 +352,8 @@
 <div class="container-xl mt-5" style="max-width: 1280px" id="keamanan">
     <div class="row row-cards">
         <div class="col-lg-6">
-            <div class="card h-100 bg-dark text-white">
+            <div class="card h-100 bg-dark text-white overflow-hidden">
+                <img src="{{ asset('img/keamanan-wan.png') }}" alt="Perisai keamanan siber KAMPIUS" class="w-100 d-block" style="height:150px;object-fit:cover" loading="lazy">
                 <div class="card-body">
                     <span class="badge bg-dark-lt text-info mb-2">KEAMANAN TERVERIFIKASI</span>
                     <h2 class="text-white">Keamanan Tingkat Enterprise</h2>
@@ -410,7 +431,7 @@
 {{-- ============ 11. FOOTER ============ --}}
 <footer class="container-xl mt-4 mb-3" style="max-width: 1280px" id="kontak">
     <div class="d-flex flex-wrap justify-content-between align-items-center text-secondary small gap-2">
-        <span><strong class="text-dark">🎓 KAMPIUS</strong> <span class="text-secondary">University ERP</span></span>
+        <span class="d-inline-flex align-items-center gap-2"><img src="{{ asset('img/logo-kampius-mark.png') }}" alt="Logo KAMPIUS" width="22" height="22" style="border-radius:6px"><strong class="text-dark">KAMPIUS</strong> <span class="text-secondary">University ERP</span></span>
         <span>
             <a href="{{ route('home') }}" class="me-3">Beranda</a>
             <a href="#modul" class="me-3">Modul</a>

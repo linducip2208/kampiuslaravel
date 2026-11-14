@@ -56,6 +56,12 @@
 - AkademikService::validasiKrs kini memeriksa relasi mk_prasyarat (jenis=prasyarat) selain kolom legacy; PrasyaratTest (2 tes).
 ## 2026-11-14 — scope bimbingan dosen di dashboard
 - KRS menunggu untuk dosen dihitung khusus mahasiswanya (selaras PersetujuanPa), bukan global; HardeningTest +1.
+## 2026-11-14 — Bank Soal CRUD (fondasi kuis, teruji penuh)
+- Migrasi aditif bank_soals (guard hasTable) + model + Livewire Kelola (PG/esai, kunci A-F, bobot, filter MK+pencarian, confirm hapus) + rute lms.bank + menu sidebar + BankSoalTest (5 tes); 212/212 hijau.
+## 2026-11-14 — Logo + gambar landing dari ComfyUI WAN 2.1 lokal
+- Server ComfyUI 0.43 lokal (RTX 4060 8GB, --lowvram) + teks encoder scaled variant (perbaiki meta-tensor error) + torchao 0.18.0.
+- 6 aset terverifikasi visual: emblem logo K+toga, hero kampus, keuangan, akademik, wisuda, keamanan → public/img/* + komposit wordmark PIL + integrasi navbar/landing/login.
+- Tetap tanpa API eksternal; file workflow: storage/app/comfyui/wan21_still_api.json.
 ## 2026-11-14 — wisuda anti-overbook + guard teruji
 - Yudisium::daftarkanWisuda dalam transaksi + lock batch (cek status & kuota ulang di dalam); KelulusanMbkmTest +1 (kuota penuh & batch tutup ditolak).
 ## 2026-11-14 — cache agregat ditolak dengan bukti (bukan asumsi)

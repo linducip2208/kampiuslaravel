@@ -37,6 +37,7 @@ class RouteGuardTest extends TestCase
             'skripsi.yudisium' => ['pimpinan'],
             'dosen.krs.persetujuan' => ['dosen'],
             'nilai.input' => ['dosen'],
+            'lms.bank' => ['dosen'],
         ];
     }
 
