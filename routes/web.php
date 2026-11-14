@@ -163,6 +163,9 @@ Route::get('/lowongan', function () {
 // Karier publik (M-039): daftar lowongan + lamaran tanpa login.
 Route::get('/karier', fn () => view('pages.livewire-page', ['component' => 'rekrutmen.lamar', 'title' => 'Karier']))->middleware('throttle:public')->name('publik.karier');
 
+// M-055: kuesioner tracer publik (tanpa login, verifikasi NIM alumni).
+Route::get('/tracer', fn () => view('pages.livewire-page', ['component' => 'tracer.isi', 'title' => 'Tracer Study']))->middleware('throttle:public')->name('publik.tracer');
+
 // M-060: PWA portal mahasiswa — halaman fallback offline (di-cache service worker).
 Route::get('/offline', fn () => view('publik.offline'))->name('publik.offline');
 // PMB publik
@@ -240,6 +243,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/riset/hibah', fn () => view('pages.livewire-page', ['component' => 'riset.hibah', 'title' => 'Hibah Riset']))->name('riset.hibah');
         Route::get('/riset/publikasi', fn () => view('pages.livewire-page', ['component' => 'riset.publikasi', 'title' => 'Publikasi & HKI']))->name('riset.publikasi');
         Route::get('/riset/pengabdian', fn () => view('pages.livewire-page', ['component' => 'riset.pengabdian', 'title' => 'Pengabdian Masyarakat']))->name('riset.pengabdian');
+        Route::get('/bkd', fn () => view('pages.livewire-page', ['component' => 'bkd.kelola', 'title' => 'Beban Kerja Dosen']))->name('bkd.kelola');
     });
 
     // Keuangan & admin prodi
@@ -276,6 +280,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/laporan/export/krs', [LaporanController::class, 'exportKrs'])->name('laporan.export.krs');
         Route::get('/laporan/export/nilai', [LaporanController::class, 'exportNilai'])->name('laporan.export.nilai');
         Route::get('/laporan/export/neraca', [LaporanController::class, 'exportNeraca'])->name('laporan.export.neraca');
+        Route::get('/laporan/eksekutif', fn () => view('pages.livewire-page', ['component' => 'analitik.eksekutif', 'title' => 'Analitik Eksekutif']))->name('laporan.eksekutif');
         Route::get('/skripsi/yudisium', fn () => view('pages.livewire-page', ['component' => 'skripsi.yudisium', 'title' => 'Yudisium']))->name('skripsi.yudisium');
     });
 
@@ -291,6 +296,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/akreditasi', fn () => view('pages.livewire-page', ['component' => 'admin.akreditasi', 'title' => 'Akreditasi']))->name('admin.akreditasi');
         Route::get('/admin/organisasi', fn () => view('pages.livewire-page', ['component' => 'organisasi.kelola', 'title' => 'Organisasi Kemahasiswaan']))->name('admin.organisasi');
         Route::get('/admin/rekrutmen', fn () => view('pages.livewire-page', ['component' => 'rekrutmen.kelola', 'title' => 'Rekrutmen']))->name('admin.rekrutmen');
+        Route::get('/admin/tracer', fn () => view('pages.livewire-page', ['component' => 'admin.tracer', 'title' => 'Tracer Study']))->name('admin.tracer');
         Route::get('/admin/jadwal', fn () => view('pages.livewire-page', ['component' => 'jadwal.generate', 'title' => 'Jadwal Kuliah']))->name('admin.jadwal');
         Route::get('/admin/impor/template/{jenis}', [LaporanController::class, 'templateImpor'])->name('admin.impor.template');
     });
@@ -303,6 +309,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/kalender', fn () => view('pages.livewire-page', ['component' => 'kalender.kelola', 'title' => 'Kalender Akademik']))->name('kalender.index');
     Route::get('/kalender.ics', [KalenderController::class, 'ics'])->name('kalender.ics');
     Route::get('/helpdesk', fn () => view('pages.livewire-page', ['component' => 'helpdesk.tiket', 'title' => 'Helpdesk']))->name('helpdesk.index');
+    // M-055: alumni memutakhirkan kariernya sendiri.
+    Route::get('/alumni/karier', fn () => view('pages.livewire-page', ['component' => 'alumni.karier', 'title' => 'Karier Saya']))->name('alumni.karier');
     // M-041: reservasi lab/fasilitas — semua user login bisa mengajukan,
     // persetujuan digerbang di komponen (superadmin/admin_prodi).
     Route::get('/fasilitas/pinjam', fn () => view('pages.livewire-page', ['component' => 'jadwal.pinjam-ruang', 'title' => 'Pinjam Ruang & Fasilitas']))->name('fasilitas.pinjam');

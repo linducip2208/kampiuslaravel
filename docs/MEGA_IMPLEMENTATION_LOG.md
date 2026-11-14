@@ -195,7 +195,25 @@ Kode:
   rute `/offline`.
 - Tes: `tests/Feature/WaveCBatch1Test.php` (5 tes).
 
-## Berikutnya (SCORM + sisa Wave C, belum dieksekusi)
+## 2026-11-15 — WAVE C batch 2: 4 item selesai, 281/281 hijau
+
+Kode:
+- M-053 Livewire `Bkd/Kelola` (dosen ajukan + sinkron mengajar; admin
+  setujui/tolak + AuditLog + terbitkan SK via `BkdService::generateSk`;
+  rekap kategori + total SKS) di `/bkd`.
+- M-055 Livewire `Alumni/Karier` (owner update pekerjaan/instansi/tracer-flag)
+  di `/alumni/karier`; tracer publik `Tracer/Isi` (verifikasi NIM alumni,
+  idempoten per mahasiswa) di `/tracer`; Livewire `Admin/Tracer`
+  (rekap status + filter) di `/admin/tracer`.
+- M-056 `EksekutifService::kpi()` (IPK rata, lulusan, serapan tracer, rasio,
+  realisasi anggaran — semua agregat) + Livewire `Analitik/Eksekutif`
+  di `/laporan/eksekutif`.
+- M-059 kontrak Flutter dibuktikan `WaveCBatch2Test::test_kontrak_api_flutter`
+  (14 endpoint: shape stabil, validasi 422, 404 tak dikenal, webhook 503,
+  OpenAPI 3.1) — tanpa ubah prod.
+- Tes: `tests/Feature/WaveCBatch2Test.php` (4 tes).
+
+## Berikutnya (SCORM + XL tersisa, belum dieksekusi)
 
 1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
 2. Wave A M-007..M-010 (IPS/IPK) + tes.
