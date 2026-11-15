@@ -81,7 +81,7 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=60 (2026-11-15, suite 300 hijau):
+Selesai=60 (2026-11-15, suite 304 hijau):
 Wave A 20/20, Wave B 28/28, Wave C 11/12 SELESAI (sisa M-054 BLOCKED).
 Wave D: M-061,062,063,065,066 BLOCKED + M-064 SELESAI
 (channel email `MailService`; kirim nyata butuh SMTP). Rincian batch di bawah.
