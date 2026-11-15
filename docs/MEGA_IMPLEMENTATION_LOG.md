@@ -276,6 +276,19 @@ Bukan kode integrasi pura-pura — yang dikerjakan jujur bisa diuji:
   jadi dipakai ulang `kampus-hero-wan.png` + avatar WAN yang sudah ada —
   tanpa unduh gambar eksternal.
 
+## 2026-11-15 — Utang teknis P5 + P8 selesai, 292/292 hijau (Selesai tetap 60/66: sub-bagian M-025)
+
+- P5 (`Api Jadwal:28-30`): tanpa scope mahasiswa, dosen dibatasi kelasnya
+  sendiri, peran lain dibatasi 200 baris — bentuk respons tetap array
+  (kontrak mobile tidak pecah, diverifikasi `MobileContractTest` implisit
+  via suite penuh).
+- P8: koreksi lokasi — `va_reference` ternyata di `pmb_pendaftars`, bukan
+  `pembayaran` (BACKLOG/M-013 & PERFORMANCE_REPORT §B/§D salah menunjuk
+  tabel — dikoreksi + bukti tes). Migrasi unique
+  `pmb_va_reference_unique` + guard duplikat eksplisit.
+- P2/P6/P7: P2 ditunda sadar (batch admin), P6/P7 diterima dengan alasan
+  tercatat di PERFORMANCE_REPORT §E.
+
 ## Status akhir: 60/66 — 6 tersisa semuanya BLOCKED eksternal
 - M-054 multi-kampus: desain di `DESAIN_MULTI_KAMPUS.md`, MENUNGGU PENGESAHAN.
 - M-061,062,063,065,066: butuh konektivitas nyata (Feeder, gateway prod,

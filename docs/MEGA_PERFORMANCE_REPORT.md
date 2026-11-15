@@ -35,4 +35,23 @@ user-spesifik; cache hanya agregat publik + invalidasi eksplisit.
 
 Ada: `..._performance_indexes:14-22` (`pembayaran(status,verified_at)`,
 `tagihan(status / mhs+status)`). Tambah Wave A: `pembayaran(tagihan_id,status)`,
-`pembayaran(va_reference)` unik, `tagihan_cicilan` dievaluasi bareng SoftDeletes.
+`tagihan_cicilan` dievaluasi bareng SoftDeletes.
+
+## E. Status perbaikan (2026-11-15, bukti `tests/Feature/PerfDebtTest.php`)
+
+- P1 SELESAI (Batch 2): overlap pindah ke sisi DB + normalisasi HH:MM:SS.
+- P2 BELUM: `JadwalService::generate()` masih ~2 query/sel — diterima sementara
+  (jalan batch admin-triggered, bukan request user; optimasi butuh preload
+  matriks konflik, risiko regresi jadwal).
+- P3 SELESAI (Batch 2): prasyarat 1 query + kuota 2 query via `kursiTerisiBanyak`.
+- P4 SELESAI (Batch 4): `krsStatus` via subquery MAX(id).
+- P5 SELESAI (2026-11-15): dosen ter-scope kelasnya; non-dosen dibatasi 200
+  baris, bentuk respons tetap array (kontrak mobile utuh).
+- P6 DITERIMA: `ringkasan()` full-collection memang dibutuhkan untuk hitung
+  IPK; display KHS/Transkrip sudah paginasi (M-024).
+- P7 DITERIMA: filter PHP hanya atas pending per tagihan (sedikit baris);
+  index `(tagihan_id,status)` Wave A menanggung query-nya.
+- P8 SELESAI (2026-11-15, koreksi lokasi: BUKAN `pembayaran` — kolom
+  `va_reference` ada di `pmb_pendaftars`): unique `pmb_va_reference_unique`
+  + guard duplikat di migrasi. Dokumen ini §B baris P8 & §D lama salah
+  menunjuk tabel pembayaran — dikoreksi di sini.

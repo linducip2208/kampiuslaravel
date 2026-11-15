@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\JadwalResource;
+use App\Models\Dosen;
 use App\Models\Kelas;
 use App\Models\Krs;
 use App\Models\Mahasiswa;
@@ -27,6 +28,19 @@ class JadwalController extends Controller
 
             if ($kelasIds !== null) {
                 $query->whereIn('id', $kelasIds);
+            } else {
+                // M-025/P5: tanpa scope mahasiswa, batasi per peran agar tak unbounded.
+                // Dosen: hanya kelasnya sendiri. Peran lain: 200 baris terbaru
+                // (bentuk respons tetap array agar kontrak mobile tidak pecah).
+                $dosenId = class_exists(Dosen::class)
+                    ? Dosen::where('user_id', $request->user()->id)->value('id')
+                    : null;
+
+                if ($dosenId) {
+                    $query->where('dosen_id', $dosenId);
+                } else {
+                    $query->limit(200);
+                }
             }
 
             $jadwal = $query->with(['matakuliah', 'dosen', 'ruang'])->orderBy('jam_mulai')->get();
