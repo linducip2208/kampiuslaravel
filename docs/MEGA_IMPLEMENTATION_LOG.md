@@ -305,6 +305,14 @@ Bukan kode integrasi pura-pura — yang dikerjakan jujur bisa diuji:
   (setup, tes, struktur, status jujur 60/66).
 - Tes: +1 di `tests/Feature/PerformanceBudgetTest.php` (4 tes).
 
+## 2026-11-15 — Smoke test server nyata (MySQL dev), 10/10 endpoint 200
+
+`php artisan serve` + curl ke MySQL lokal (DB terisi: 6 users, 1 mhs):
+`/health` ok/0-pending, `/`, `/login`, `/api/openapi.json`,
+`/offline`, `/karier`, `/tracer`, `/manifest.webmanifest`, `/sw.js`,
+`/api/v2/status` (db up, 0 pending) — semua 200. Blade terkompilasi
+penuh (`view:cache` lolos). Bukan bukti browser/E2E — tetap 0.
+
 ## Status akhir: 60/66 — 6 tersisa semuanya BLOCKED eksternal
 - M-054 multi-kampus: desain di `DESAIN_MULTI_KAMPUS.md`, MENUNGGU PENGESAHAN.
 - M-061,062,063,065,066: butuh konektivitas nyata (Feeder, gateway prod,
