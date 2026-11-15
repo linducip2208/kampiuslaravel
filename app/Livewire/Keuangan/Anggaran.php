@@ -17,7 +17,7 @@ class Anggaran extends Component
     use RequiresRoles;
     use WithPagination;
 
-    public array $allowedRoles = ['keuangan', 'superadmin', 'admin_prodi'];
+    public array $allowedRoles = ['keuangan', 'kasir', 'akuntansi', 'superadmin', 'admin_prodi'];
 
     public ?int $editId = null;
 

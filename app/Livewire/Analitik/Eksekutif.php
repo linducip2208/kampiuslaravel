@@ -13,7 +13,7 @@ class Eksekutif extends Component
 {
     use RequiresRoles;
 
-    public array $allowedRoles = ['pimpinan', 'superadmin', 'admin_prodi'];
+    public array $allowedRoles = ['pimpinan', 'rektor', 'warek', 'dekan', 'wadek', 'superadmin', 'admin_prodi'];
 
     public function render()
     {

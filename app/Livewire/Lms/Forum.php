@@ -34,7 +34,7 @@ class Forum extends Component
 
     protected function authorizeKunci(): void
     {
-        abort_unless(Auth::user()?->hasAnyRole(['dosen', 'superadmin', 'admin_prodi']), 403);
+        abort_unless(Auth::user()?->hasAnyRole(['dosen', 'kaprodi', 'kajur', 'superadmin', 'admin_prodi']), 403);
     }
 
     public function buatThread(): void

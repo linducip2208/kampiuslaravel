@@ -15,7 +15,7 @@ class Tracer extends Component
     use RequiresRoles;
     use WithPagination;
 
-    public array $allowedRoles = ['superadmin', 'admin_prodi', 'pimpinan'];
+    public array $allowedRoles = ['superadmin', 'admin_prodi', 'pimpinan', 'rektor', 'warek', 'dekan', 'wadek'];
 
     public string $filterStatus = '';
 

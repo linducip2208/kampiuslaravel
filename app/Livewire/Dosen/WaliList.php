@@ -14,7 +14,7 @@ class WaliList extends Component
 {
     use RequiresRoles;
 
-    public array $allowedRoles = ['dosen', 'superadmin', 'admin_prodi'];
+    public array $allowedRoles = ['dosen', 'kaprodi', 'kajur', 'superadmin', 'admin_prodi'];
 
     use WithPagination;
 

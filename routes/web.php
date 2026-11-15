@@ -219,8 +219,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/kemahasiswaan/cuti', fn () => view('pages.livewire-page', ['component' => 'kemahasiswaan.cuti', 'title' => 'Cuti & Status Mahasiswa']))->name('kemahasiswaan.cuti');
     });
 
-    // Dosen (+ staf akademik)
-    Route::middleware('role:dosen|superadmin|admin_prodi')->group(function () {
+    // Dosen (+ staf akademik + pimpinan prodi/jurusan)
+    Route::middleware('role:dosen|kaprodi|kajur|superadmin|admin_prodi')->group(function () {
         Route::get('/dosen/krs/persetujuan', fn () => view('dosen.krs-persetujuan'))->name('dosen.krs.persetujuan');
         Route::get('/dosen/wali', fn () => view('dosen.wali'))->name('dosen.wali');
         Route::get('/lms/materi', fn (Request $r) => view('lms.materi', [
@@ -247,8 +247,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/bkd', fn () => view('pages.livewire-page', ['component' => 'bkd.kelola', 'title' => 'Beban Kerja Dosen']))->name('bkd.kelola');
     });
 
-    // Keuangan & admin prodi
-    Route::middleware('role:keuangan|superadmin|admin_prodi')->group(function () {
+    // Keuangan & admin prodi (+ kasir & akuntansi)
+    Route::middleware('role:keuangan|kasir|akuntansi|superadmin|admin_prodi')->group(function () {
         Route::get('/keuangan/tagihan', fn () => view('pages.livewire-page', ['component' => 'keuangan.tagihan-massal', 'title' => 'Tagihan Massal']))->name('keuangan.tagihan');
         Route::get('/keuangan/verifikasi', fn () => view('pages.livewire-page', ['component' => 'keuangan.verifikasi-bayar', 'title' => 'Verifikasi Pembayaran']))->name('keuangan.verifikasi');
         Route::get('/keuangan/beasiswa', fn () => view('pages.livewire-page', ['component' => 'beasiswa.kelola', 'title' => 'Beasiswa']))->name('keuangan.beasiswa');
@@ -262,8 +262,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/surat/nomor', fn () => view('pages.livewire-page', ['component' => 'surat.nomor-otomatis', 'title' => 'Nomor Surat']))->name('surat.nomor');
     });
 
-    // Pimpinan
-    Route::middleware('role:pimpinan|superadmin')->group(function () {
+    // Pimpinan (+ eksekutif universitas & fakultas)
+    Route::middleware('role:pimpinan|rektor|warek|dekan|wadek|superadmin')->group(function () {
         Route::get('/dashboard/pimpinan', [DashboardController::class, 'pimpinan'])->name('dashboard.pimpinan');
         Route::get('/pddikti', [PddiktiController::class, 'index'])->name('pddikti.index');
         Route::get('/pddikti/export/{jenis}', [PddiktiController::class, 'export'])->middleware('throttle:30,1')->name('pddikti.export');

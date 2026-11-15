@@ -59,7 +59,18 @@ class PddiktiController extends Controller
             'record' => 'required|array',
         ]);
 
-        return response()->json($feeder->push($validated['act'], $validated['record']));
+        $hasil = $feeder->push($validated['act'], $validated['record']);
+
+        AuditLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'pddikti.push',
+            'model' => 'pddikti',
+            'model_id' => 0,
+            'diff_json' => ['act' => $validated['act']],
+            'created_at' => now(),
+        ]);
+
+        return response()->json($hasil);
     }
 
     /** Status kesiapan Feeder live-sync (tanpa panggil jaringan — murah & cacheable). */

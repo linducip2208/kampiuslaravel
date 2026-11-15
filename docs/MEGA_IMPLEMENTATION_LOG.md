@@ -326,4 +326,17 @@ penuh (`view:cache` lolos). Bukan bukti browser/E2E — tetap 0.
   penetapan via UI, gate permission vs denial).
 - Tes WaveDReadiness yang basi diperbarui mengikuti status DITOLAK.
 
+## 2026-11-15 — RBAC batch 2 SELESAI: wiring peran + IDOR, 316/316 hijau
+
+- Grup rute: dosen +`kaprodi|kajur`, keuangan +`kasir|akuntansi`,
+  pimpinan +`rektor|warek|dekan|wadek`.
+- Komponen Livewire (`allowedRoles`) ikut diperbarui (21 file) — rute saja
+  memberi rasa aman palsu (terbukti: kaprodi lolos middleware tapi 403 di
+  komponen sebelum fix).
+- `pddikti.push` kini menulis AuditLog (eksekutif baru boleh push).
+- BKD + riset: akun tanpa baris dosen ditolak (anti null===null IDOR).
+- `AuthorizesMahasiswaData`: staf = +kaprodi/kajur/rektor/warek.
+- Tes: `RbacWiringTest` 8 tes (matriks izin/tolak, IDOR menang atas peran,
+  audit push, BKD anti-bocor).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

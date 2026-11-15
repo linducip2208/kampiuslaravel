@@ -33,7 +33,7 @@ class BankTopik extends Component
 
     public function save(): void
     {
-        $this->authorizeRoles(['dosen', 'superadmin', 'admin_prodi']);
+        $this->authorizeRoles(['dosen', 'kaprodi', 'kajur', 'superadmin', 'admin_prodi']);
 
         $this->validate([
             'judul' => 'required|string|max:255',
@@ -102,7 +102,7 @@ class BankTopik extends Component
 
     public function tutup(int $topikId): void
     {
-        $this->authorizeRoles(['dosen', 'superadmin', 'admin_prodi']);
+        $this->authorizeRoles(['dosen', 'kaprodi', 'kajur', 'superadmin', 'admin_prodi']);
 
         $topik = SkripsiTopik::findOrFail($topikId);
         $topik->update(['status' => 'tutup']);

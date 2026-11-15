@@ -14,7 +14,7 @@ class TagihanMassal extends Component
 {
     use RequiresRoles;
 
-    public array $allowedRoles = ['keuangan', 'superadmin', 'admin_prodi'];
+    public array $allowedRoles = ['keuangan', 'kasir', 'akuntansi', 'superadmin', 'admin_prodi'];
 
     public ?int $tahun_id = null;
 

@@ -15,7 +15,7 @@ class VerifikasiBayar extends Component
 {
     use RequiresRoles, WithFileUploads;
 
-    public array $allowedRoles = ['keuangan', 'superadmin'];
+    public array $allowedRoles = ['keuangan', 'kasir', 'akuntansi', 'superadmin'];
 
     public string $statusFilter = 'pending';
 

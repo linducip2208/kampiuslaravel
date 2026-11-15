@@ -15,15 +15,15 @@ Legenda wiring: **P** = gate `permission:`/`can:` aktif, **R** = grup
 | dosen | - | - | - | - | - | x | x | - | x | - | - | - | - | - | R |
 | mahasiswa | - | x | - | - | - | - | - | - | - | - | - | - | - | - | R |
 | pimpinan | - | - | - | - | - | - | - | - | - | - | - | - | - | x | R+P |
-| rektor | - | - | - | - | - | - | - | - | - | - | - | - | - | x | P |
-| warek | - | - | - | - | - | - | - | - | - | - | - | - | - | x | P |
-| dekan | - | - | - | - | - | - | - | - | - | - | - | - | x | x | P |
-| wadek | - | - | - | - | - | - | - | - | - | - | - | - | x | x | P |
-| kaprodi | x | x | x | x | x | x | x | - | x | - | - | x | x | x | P |
-| kajur | x | x | x | x | x | x | x | - | x | - | - | x | x | x | P |
+| rektor | - | - | - | - | - | - | - | - | - | - | - | - | - | x | R+P |
+| warek | - | - | - | - | - | - | - | - | - | - | - | - | - | x | R+P |
+| dekan | - | - | - | - | - | - | - | - | - | - | - | - | x | x | R+P |
+| wadek | - | - | - | - | - | - | - | - | - | - | - | - | x | x | R+P |
+| kaprodi | x | x | x | x | x | x | x | - | x | - | - | x | x | x | R+P |
+| kajur | x | x | x | x | x | x | x | - | x | - | - | x | x | x | R+P |
 | penguji | - | - | - | - | - | - | x | - | x | - | - | - | - | - | - |
-| kasir | - | - | - | - | - | - | - | - | - | - | x | - | - | - | - |
-| akuntansi | - | - | - | - | - | - | - | - | - | - | x | - | - | x | P |
+| kasir | - | - | - | - | - | - | - | - | - | - | x | - | - | - | R+P |
+| akuntansi | - | - | - | - | - | - | - | - | - | - | x | - | - | x | R+P |
 | hrd | - | - | - | - | - | - | - | - | - | - | - | - | x | x | - |
 | auditor | - | - | - | - | - | - | - | - | - | - | - | - | - | x | P |
 | alumni | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
@@ -40,6 +40,14 @@ Catatan jujur:
   tidak butuh gate peran); fungsional saat permission modulnya ada.
 - 6 peran lama TIDAK diubah (diuji regresi di `RbacExpansionTest`).
 
-Batch 2 (belum): wiring `kaprodi`/`kajur` ke grup dosen+admin_prodi,
-`penguji` ke sidang/nilai, `kasir`/`akuntansi` ke grup keuangan per-aksi,
-`hrd` ke payroll/rekrutmen, UI matriks di admin, histori audit penugasan.
+Batch 2 (SELESAI, bukti `tests/Feature/RbacWiringTest.php`, 8 tes):
+wiring `kaprodi`/`kajur` ke grup dosen + komponennya,
+`kasir`/`akuntansi` ke grup keuangan + komponennya,
+`rektor`/`warek`/`dekan`/`wadek` ke grup pimpinan + komponen eksekutif/tracer,
+audit `pddikti.push`, IDOR kepemilikan tetap menang atas peran.
+Belum (batch 3): jalur examiner khusus (`penguji`), halaman HR (`hrd`),
+scoping prodi (`dekan`, OBE), UI matriks di admin, histori audit penugasan,
+delegasi/ekspirasi izin.
+Catatan ronde ini: gate lapis-2 Livewire (`allowedRoles`) ikut diperbarui —
+rute saja memberi rasa aman palsu (terbukti tes merah sebelum fix);
+BKD + riset menolak akun tanpa baris dosen (anti null===null IDOR).

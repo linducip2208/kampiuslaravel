@@ -37,7 +37,7 @@ class Kelola extends Component
 
     protected function authorizeBkd(): void
     {
-        abort_unless(Auth::user()?->hasAnyRole(['dosen', 'superadmin', 'admin_prodi']), 403);
+        abort_unless(Auth::user()?->hasAnyRole(['dosen', 'kaprodi', 'kajur', 'superadmin', 'admin_prodi']), 403);
     }
 
     protected function dosenId(): ?int
@@ -130,7 +130,10 @@ class Kelola extends Component
 
         $query = BebanDosen::with(['dosen.user'])
             ->when($this->tahunId, fn ($q) => $q->where('tahun_akademik_id', $this->tahunId))
-            ->when(! $this->isAdmin() && $this->dosenId(), fn ($q) => $q->where('dosen_id', $this->dosenId()));
+            ->when(! $this->isAdmin() && $this->dosenId(), fn ($q) => $q->where('dosen_id', $this->dosenId()))
+            // Non-admin tanpa baris dosen (mis. kaprodi murni struktural):
+            // tidak mewarisi daftar semua beban (anti-bocor lintas data).
+            ->when(! $this->isAdmin() && ! $this->dosenId(), fn ($q) => $q->whereRaw('0 = 1'));
 
         return view('livewire.bkd.kelola', [
             'bebans' => $query->latest('id')->paginate(10),

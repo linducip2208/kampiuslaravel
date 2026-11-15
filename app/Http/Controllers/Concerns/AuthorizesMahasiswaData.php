@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Otorisasi kepemilikan data mahasiswa.
- * Staf (superadmin/admin_prodi/keuangan/dosen/pimpinan) boleh akses semua;
- * mahasiswa hanya miliknya sendiri. Menyembunyikan tombol BUKAN otorisasi.
+ * Staf (superadmin/admin_prodi/keuangan/dosen/pimpinan + kaprodi/kajur/
+ * rektor/warek setara) boleh akses semua; peran lain (termasuk kasir,
+ * akuntansi, dekan, auditor, mahasiswa) hanya miliknya sendiri.
+ * Menyembunyikan tombol BUKAN otorisasi.
  */
 trait AuthorizesMahasiswaData
 {
@@ -17,7 +19,7 @@ trait AuthorizesMahasiswaData
 
         abort_unless($user, 401);
 
-        if ($user->hasAnyRole(['superadmin', 'admin_prodi', 'keuangan', 'dosen', 'pimpinan'])) {
+        if ($user->hasAnyRole(['superadmin', 'admin_prodi', 'keuangan', 'dosen', 'pimpinan', 'kaprodi', 'kajur', 'rektor', 'warek'])) {
             return;
         }
 

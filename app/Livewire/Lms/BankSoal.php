@@ -18,7 +18,7 @@ class BankSoal extends Component
     use RequiresRoles;
     use WithPagination;
 
-    public array $allowedRoles = ['dosen', 'superadmin', 'admin_prodi'];
+    public array $allowedRoles = ['dosen', 'kaprodi', 'kajur', 'superadmin', 'admin_prodi'];
 
     public ?int $editId = null;
 

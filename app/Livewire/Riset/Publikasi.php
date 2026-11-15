@@ -39,7 +39,7 @@ class Publikasi extends Component
 
     protected function authorizeRiset(): void
     {
-        abort_unless(Auth::user()?->hasAnyRole(['dosen', 'superadmin', 'admin_prodi']), 403);
+        abort_unless(Auth::user()?->hasAnyRole(['dosen', 'kaprodi', 'kajur', 'superadmin', 'admin_prodi']), 403);
     }
 
     protected function dosenId(): ?int
@@ -50,6 +50,7 @@ class Publikasi extends Component
     public function simpan(): void
     {
         $this->authorizeRiset();
+        abort_unless($this->dosenId() || Auth::user()?->hasAnyRole(['superadmin', 'admin_prodi']), 403, 'Akun dosen tidak ditemukan.');
 
         $this->validate([
             'judul' => 'required|string|max:255',
