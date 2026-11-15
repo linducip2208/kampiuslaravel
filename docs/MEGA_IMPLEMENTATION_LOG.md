@@ -352,4 +352,14 @@ penuh (`view:cache` lolos). Bukan bukti browser/E2E — tetap 0.
   audit diff). Perilaku Livewire: `firstOrFail` gagal jadi respons 404,
   bukan exception — asersi = data tak berubah.
 
+## 2026-11-15 — RBAC batch 4 SELESAI + 5 ide bank tereksekusi, 333/333 hijau
+
+RBAC: delegasi berbatas waktu (`delegasi_akses` + `delegasi:sinkron`
+harian + anti-cabut-manual) + `permission:review`, scoping OBE per prodi,
+UI delegasi + matriks diperbarui. Tes: `RbacBatch4Test` (7).
+Ide bank (2 subagen paralel + integrasi): impor CSV bank soal
+(`BankSoalImporTest`, 3), audit baca dokumen (`AuditBacaTest`, 3),
+pesan denda terperinci, sidang tolak bentrok kuliah,
+cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

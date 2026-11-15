@@ -230,6 +230,7 @@ Route::middleware('auth')->group(function () {
             'kelasId' => $r->integer('kelas') ?: Kelas::latest('id')->value('id'),
         ]))->name('lms.tugas');
         Route::get('/lms/bank-soal', fn () => view('pages.livewire-page', ['component' => 'lms.bank-soal', 'title' => 'Bank Soal']))->name('lms.bank');
+        Route::get('/lms/bank-soal-impor', fn (Request $r) => view('lms.bank-soal-impor', ['mkId' => $r->integer('mk') ?: null]))->name('lms.bank.impor');
         Route::get('/lms/kuis', fn (Request $r) => view('lms.kuis', [
             'kelasId' => $r->integer('kelas') ?: Kelas::latest('id')->value('id'),
         ]))->name('lms.kuis');
@@ -290,19 +291,24 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:superadmin|admin_prodi')->group(function () {
         Route::get('/admin/pmb/verifikasi', fn () => view('admin.pmb-verifikasi'))->name('admin.pmb.verifikasi');
         Route::get('/admin/users', fn () => view('pages.livewire-page', ['component' => 'admin.user-data', 'title' => 'Kelola User']))->name('admin.users');
+        Route::get('/admin/delegasi', fn () => view('pages.livewire-page', ['component' => 'admin.delegasi', 'title' => 'Delegasi Peran']))->name('admin.delegasi');
         Route::get('/admin/matriks-rbac', fn () => view('pages.livewire-page', ['component' => 'admin.matriks-rbac', 'title' => 'Matriks Peran']))->name('admin.matriks-rbac');
         Route::get('/admin/integrasi', fn () => view('pages.livewire-page', ['component' => 'admin.integrasi', 'title' => 'Integrasi']))->name('admin.integrasi');
         Route::get('/admin/master', fn () => view('pages.livewire-page', ['component' => 'master.data', 'title' => 'Data Master']))->name('admin.master');
         Route::get('/admin/dosen', fn () => view('pages.livewire-page', ['component' => 'admin.dosen-data', 'title' => 'Data Dosen & Tendik']))->name('admin.dosen');
         Route::get('/admin/kurikulum', fn () => view('pages.livewire-page', ['component' => 'master.kurikulum', 'title' => 'Kurikulum']))->name('admin.kurikulum');
         Route::get('/admin/impor', fn () => view('pages.livewire-page', ['component' => 'admin.impor-csv', 'title' => 'Impor CSV']))->name('admin.impor');
-        Route::get('/admin/obe', fn () => view('pages.livewire-page', ['component' => 'obe.kelola', 'title' => 'OBE / CPL-CPMK']))->name('admin.obe');
         Route::get('/admin/akreditasi', fn () => view('pages.livewire-page', ['component' => 'admin.akreditasi', 'title' => 'Akreditasi']))->name('admin.akreditasi');
         Route::get('/admin/organisasi', fn () => view('pages.livewire-page', ['component' => 'organisasi.kelola', 'title' => 'Organisasi Kemahasiswaan']))->name('admin.organisasi');
         Route::get('/admin/rekrutmen', fn () => view('pages.livewire-page', ['component' => 'rekrutmen.kelola', 'title' => 'Rekrutmen']))->name('admin.rekrutmen');
         Route::get('/admin/tracer', fn () => view('pages.livewire-page', ['component' => 'admin.tracer', 'title' => 'Tracer Study']))->name('admin.tracer');
         Route::get('/admin/jadwal', fn () => view('pages.livewire-page', ['component' => 'jadwal.generate', 'title' => 'Jadwal Kuliah']))->name('admin.jadwal');
         Route::get('/admin/impor/template/{jenis}', [LaporanController::class, 'templateImpor'])->name('admin.impor.template');
+    });
+
+    // OBE per prodi: admin penuh + kaprodi/kajur terkunci prodinya di komponen.
+    Route::middleware('role:superadmin|admin_prodi|kaprodi|kajur')->group(function () {
+        Route::get('/admin/obe', fn () => view('pages.livewire-page', ['component' => 'obe.kelola', 'title' => 'OBE / CPL-CPMK']))->name('admin.obe');
     });
 
     // Kalender & helpdesk: semua user login (kepemilikan dicek di komponen)

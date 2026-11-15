@@ -6,10 +6,12 @@ use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Cpl;
 use App\Models\Cpmk;
 use App\Models\CpmkAsesmen;
+use App\Models\Dosen;
 use App\Models\Mahasiswa;
 use App\Models\Matakuliah;
 use App\Models\Prodi;
 use App\Services\ObeService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -21,7 +23,12 @@ class Kelola extends Component
     use RequiresRoles;
     use WithPagination;
 
-    public array $allowedRoles = ['superadmin', 'admin_prodi'];
+    public array $allowedRoles = ['superadmin', 'admin_prodi', 'kaprodi', 'kajur'];
+
+    protected function isAdmin(): bool
+    {
+        return (bool) Auth::user()?->hasAnyRole(['superadmin', 'admin_prodi']);
+    }
 
     public ?int $prodi_id = null;
 
@@ -106,14 +113,38 @@ class Kelola extends Component
 
     public function render()
     {
+        // RBAC batch 4: kaprodi/kajur terkunci ke prodi baris dosennya;
+        // tanpa baris dosen → kosong (konsisten BKD). Admin bebas.
+        $prodiTerkunci = null;
+        if (! $this->isAdmin()) {
+            $prodiTerkunci = Dosen::where('user_id', Auth::id())->value('prodi_id');
+
+            if (! $prodiTerkunci) {
+                return view('livewire.obe.kelola', [
+                    'prodis' => collect(), 'cpls' => collect(), 'mks' => collect(),
+                    'cpmks' => Cpmk::whereRaw('0 = 1')->paginate(10), 'rekap' => null,
+                ]);
+            }
+
+            $this->prodi_id = (int) $prodiTerkunci;
+        }
+
+        // Rekap NIM dibatasi prodi yang sama (anti-intip lintas prodi).
+        $rekap = null;
+        if ($this->nimRekap !== '') {
+            $mhsId = (int) Mahasiswa::where('nim', trim($this->nimRekap))->value('id');
+
+            if ($mhsId > 0 && ($this->isAdmin() || Mahasiswa::whereKey($mhsId)->value('prodi_id') == $this->prodi_id)) {
+                $rekap = ObeService::ketercapaian($mhsId, $this->prodi_id);
+            }
+        }
+
         return view('livewire.obe.kelola', [
-            'prodis' => Prodi::orderBy('nama')->get(),
+            'prodis' => $this->isAdmin() ? Prodi::orderBy('nama')->get() : Prodi::whereKey($this->prodi_id)->get(),
             'cpls' => $this->prodi_id ? Cpl::where('prodi_id', $this->prodi_id)->orderBy('kode')->get() : collect(),
             'mks' => $this->prodi_id ? Matakuliah::where('prodi_id', $this->prodi_id)->orderBy('kode')->get() : collect(),
             'cpmks' => Cpmk::with(['cpl', 'matakuliah', 'asesmen'])->latest('id')->paginate(10),
-            'rekap' => $this->nimRekap !== ''
-                ? ObeService::ketercapaian((int) Mahasiswa::where('nim', trim($this->nimRekap))->value('id'), $this->prodi_id)
-                : null,
+            'rekap' => $rekap,
         ]);
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Mahasiswa;
 use App\Models\Ruang;
 use App\Models\Sidang as SidangModel;
 use App\Models\SkripsiJudul;
+use App\Services\JadwalService;
 use App\Services\KalenderService;
 use App\Services\KeuanganService;
 use App\Services\SidangSyaratService;
@@ -124,10 +125,27 @@ class Pendaftaran extends Component
         }
 
         if (self::ruangBentrok($this->ruang_id, $this->tanggal)) {
-            $this->error = 'Pendaftaran ditolak: ruang sudah dibooking pada rentang ±2 jam.';
+            $this->error = 'Pendaftaran ditolak: ruang sudah dibooking sidang lain pada rentang ±2 jam.';
             $this->message = '';
 
             return;
+        }
+
+        // Kuliah di ruang yang sama diprioritaskan: cek jadwal mingguan + booking fasilitas.
+        try {
+            $waktu = new \DateTime($this->tanggal);
+            $mulai = $waktu->format('H:i');
+            $selesai = (clone $waktu)->modify('+2 hours')->format('H:i');
+            $hari = JadwalService::hariDariTanggal($waktu->format('Y-m-d'));
+
+            if ($this->ruang_id && JadwalService::ruangBentrok($this->ruang_id, $hari, $mulai, $selesai)) {
+                $this->error = 'Pendaftaran ditolak: ruang dipakai jadwal kuliah pada jam tersebut.';
+                $this->message = '';
+
+                return;
+            }
+        } catch (\Throwable) {
+            // Tanggal tak valid sudah ditolak validasi; abaikan cek tambahan.
         }
 
         $sidang = SidangModel::create([

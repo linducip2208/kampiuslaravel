@@ -14,6 +14,7 @@ use App\Models\WisudaPeserta;
 use App\Services\AkademikService;
 use App\Services\KeuanganService;
 use App\Services\SuratNomorService;
+use App\Services\WisudaService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -30,6 +31,11 @@ class Yudisium extends Component
 
     public string $message = '';
 
+    /** @var array{lolos: bool, items: list}|null pratinjau cekSyarat (baca-saja). */
+    public ?array $syaratHasil = null;
+
+    public ?int $syaratUntuk = null;
+
     public ?int $batchId = null;
 
     public string $batchNama = '';
@@ -39,6 +45,12 @@ class Yudisium extends Component
     public string $batchTanggal = '';
 
     public string $batchLokasi = '';
+
+    public function cekSyarat(int $mahasiswaId): void
+    {
+        $this->syaratUntuk = $mahasiswaId;
+        $this->syaratHasil = WisudaService::cekSyarat($mahasiswaId);
+    }
 
     public function luluskan(int $mahasiswaId): void
     {

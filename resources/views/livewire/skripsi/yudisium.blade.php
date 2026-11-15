@@ -19,7 +19,10 @@
                         <tr>
                             <td>{{ $m->nim }}</td><td>{{ $m->user->name ?? '-' }}</td>
                             <td>{{ $m->prodi->nama ?? '-' }}</td><td><span class="badge bg-secondary">{{ $m->status }}</span></td>
-                            <td class="text-end"><button wire:click="luluskan({{ $m->id }})" class="btn btn-sm btn-success" onclick="return confirm('Luluskan NIM {{ $m->nim }}?')">Luluskan</button></td>
+                            <td class="text-end">
+                                <button wire:click="cekSyarat({{ $m->id }})" class="btn btn-sm btn-outline-secondary">Cek Syarat</button>
+                                <button wire:click="luluskan({{ $m->id }})" class="btn btn-sm btn-success" onclick="return confirm('Luluskan NIM {{ $m->nim }}?')">Luluskan</button>
+                            </td>
                         </tr>
                     @empty
                         <tr><td colspan="5" class="text-secondary">Tidak ada kandidat.</td></tr>
@@ -27,6 +30,17 @@
                 </tbody>
             </table>
         </div>
+        @if($syaratHasil)
+            <div class="card-body border-top">
+                <strong>Hasil cek syarat:</strong>
+                <span class="badge bg-{{ $syaratHasil['lolos'] ? 'success' : 'warning' }}">{{ $syaratHasil['lolos'] ? 'LOLOS' : 'BELUM LOLOS' }}</span>
+                <ul class="mb-0 mt-1">
+                    @foreach($syaratHasil['items'] as $it)
+                        <li>{{ $it['lolos'] ? '✓' : '✗' }} {{ $it['label'] }} — <span class="text-secondary">{{ $it['detail'] }}</span></li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="card-footer d-flex justify-content-end">{{ $mahasiswa->links() }}</div>
     </div>
 

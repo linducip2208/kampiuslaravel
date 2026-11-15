@@ -54,7 +54,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 4. LMS & CBT (`MateriCrud`, `Tugas*`, `Kuis*`, `Forum`)
 
-- [ ] **Bank soal: impor CSV + duplikat.** CRUD manual ada; impor massal
+- [x] **Bank soal: impor CSV.** SELESAI 2026-11-15: `Lms/BankSoalImpor` di `/lms/bank-soal-impor` (`pertanyaan,jenis,opsi|,kunci,bobot`, delimiter otomatis, validasi per baris + laporan gagal). Tes: `BankSoalImporTest`.
       belum. Proposal: impor CSV (pertanyaan,opsi,kunci,bobot) dengan
       validasi baris + laporan gagal. (M; terima: 100 baris valid masuk.)
 - [ ] **Bank soal: pakai ulang lintas kelas.** Soal terikat kuis,
@@ -107,7 +107,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 9. Skripsi & sidang (`Yudisium`, `NilaiSidang`, `Pendaftaran`)
 
-- [ ] **Jadwal sidang bentrok ruang.** Sidang pakai `ruang_id` tanpa cek
+- [x] **Jadwal sidang bentrok ruang.** SELESAI 2026-11-15: cek `JadwalService::ruangBentrok` (±2 jam kuliah) saat simpan pendaftaran.
       bentrok kuliah/pinjam. Proposal: pakai `JadwalService::ruangBentrok`
       saat simpan jadwal sidang. (S; terima: bentrok ditolak.)
 - [ ] **Penguji eksternal.** Penguji harus dosen internal. Proposal:
@@ -116,7 +116,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 10. Yudisium, wisuda, alumni (`Yudisium`, batch, `Alumni`)
 
-- [ ] **Syarat wisuda otomatis.** Cek manual. Proposal: checklist otomatis
+- [x] **Syarat wisuda otomatis (pratinjau).** SELESAI 2026-11-15: `WisudaService::cekSyarat` + tombol "Cek Syarat" di Yudisium. Alur `luluskan` TIDAK diubah; SKS = info acuan.
       (SKS lulus, IPK ≥ 2.0, bebas tagihan, judul lulus) sebelum daftar.
       (M; terima: tidak lolos syarat → tombol terkunci + alasan.)
 - [ ] **Buku wisuda (PDF).** Batch ada; buku acara belum. Proposal:
@@ -221,7 +221,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 22. Keamanan (lanjutan batch RBAC)
 
-- [ ] **Audit baca data sensitif.** Tulis diaudit; baca KHS/transkrip
+- [x] **Audit baca data sensitif.** SELESAI 2026-11-15: tabel `audit_baca` + `AuditBacaService` (no-op aman, retensi 365 hari) + hook KHS/transkrip. Tes: `AuditBacaTest`.
       belum. Proposal: log baca dokumen mahasiswa (siapa,kapan).
       (M; tabel `audit_baca`, retensi 1 tahun.)
 - [ ] **Kunci akun brute-force.** Login throttle ada; lockout belum.

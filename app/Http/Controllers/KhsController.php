@@ -7,6 +7,7 @@ use App\Models\Mahasiswa;
 use App\Models\Nilai;
 use App\Models\TahunAkademik;
 use App\Services\AkademikService;
+use App\Services\AuditBacaService;
 use App\Support\DokumenTte;
 use App\Support\QrSvg;
 use Illuminate\Contracts\View\View;
@@ -20,6 +21,7 @@ class KhsController extends Controller
     public function show(int $mahasiswaId, Request $request): View
     {
         $this->authorizeMahasiswa($mahasiswaId);
+        AuditBacaService::catat(auth()->id(), 'khs', $mahasiswaId, $request->ip());
 
         $mahasiswa = Mahasiswa::with(['user', 'prodi'])->findOrFail($mahasiswaId);
         // IPK resmi tetap dari ringkasan penuh (nilai terkunci); tabel

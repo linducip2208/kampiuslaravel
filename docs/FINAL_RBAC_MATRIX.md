@@ -45,9 +45,19 @@ wiring `kaprodi`/`kajur` ke grup dosen + komponennya,
 `kasir`/`akuntansi` ke grup keuangan + komponennya,
 `rektor`/`warek`/`dekan`/`wadek` ke grup pimpinan + komponen eksekutif/tracer,
 audit `pddikti.push`, IDOR kepemilikan tetap menang atas peran.
-Belum (batch 3): jalur examiner khusus (`penguji`), halaman HR (`hrd`),
-scoping prodi (`dekan`, OBE), UI matriks di admin, histori audit penugasan,
-delegasi/ekspirasi izin.
+Batch 3 SELESAI (bukti `tests/Feature/RbacBatch4Test.php`, 7 tes):
+jalur examiner mandiri owner-scope (`Sidang/NilaiPenguji` +
+`/sidang/nilai-saya`, tanpa akses NilaiSidang penuh), halaman HRD
+(`/hrd/payroll`, `/hrd/rekrutmen`, komponen dibuka, grup keuangan tidak),
+UI matriks baca-saja (`Admin/MatriksRbac`), audit penugasan
+(`user.role.diubah` + diff), delegasi berbatas waktu (`delegasi_akses` +
+`delegasi:sinkron` harian, anti-cabut-manual) + `permission:review`,
+scoping OBE per prodi (+ anti-bocor BKD), audit baca dokumen
+(`audit_baca` + hook KHS/transkrip).
+Belum (batch berikut, bila dibutuhkan): delegasi/ekspirasi manual via UI
+(saat ini CLI terjadwal + audit cukup), scoping prodi menyeluruh
+(`dekan`, OBE penuh), audit baca dokumen yang lebih granular,
+permission review otomatis berkala.
 Catatan ronde ini: gate lapis-2 Livewire (`allowedRoles`) ikut diperbarui —
 rute saja memberi rasa aman palsu (terbukti tes merah sebelum fix);
 BKD + riset menolak akun tanpa baris dosen (anti null===null IDOR).

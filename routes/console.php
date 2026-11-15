@@ -21,6 +21,8 @@ app()->booted(function () {
     $schedule->command('akademik:rollover')->yearlyOn(8, 1, '00:30')->withoutOverlapping();
     // M-036: penyusutan aset tiap awal bulan (idempoten per bulan).
     $schedule->command('aset:susutkan')->monthlyOn(1, '02:00')->withoutOverlapping();
+    // RBAC batch 4: terapkan/cabut delegasi peran tiap pagi (idempoten).
+    $schedule->command('delegasi:sinkron')->dailyAt('00:30')->withoutOverlapping();
     // M-051: segel attempt CBT kedaluwarsa tiap jam.
     $schedule->command('kuis:seal-kedaluwarsa')->hourly()->withoutOverlapping();
 });

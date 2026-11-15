@@ -511,9 +511,12 @@ class KeuanganService
         $jatuh = $tagihan->jatuh_tempo instanceof Carbon
             ? $tagihan->jatuh_tempo->translatedFormat('d M Y')
             : (string) $tagihan->jatuh_tempo;
+        $dendaInfo = (int) $tagihan->denda > 0
+            ? ' (termasuk denda Rp '.number_format((int) $tagihan->denda, 0, ',', '.').')'
+            : '';
 
         return $arah === 'h-7'
-            ? "Yth. {$nama}, tagihan {$tagihan->jenis} Rp ".number_format($sisa, 0, ',', '.')." jatuh tempo {$jatuh} (7 hari lagi). Bayar via kampus / VA / QRIS. Terima kasih."
-            : "Yth. {$nama}, tagihan {$tagihan->jenis} Rp ".number_format($sisa, 0, ',', '.')." telah lewat jatuh tempo {$jatuh} (7 hari). Segera lunasi agar KRS/sidang tidak diblokir.";
+            ? "Yth. {$nama}, tagihan {$tagihan->jenis} Rp ".number_format($sisa, 0, ',', '.')."{$dendaInfo} jatuh tempo {$jatuh} (7 hari lagi). Bayar via kampus / VA / QRIS. Terima kasih."
+            : "Yth. {$nama}, tagihan {$tagihan->jenis} Rp ".number_format($sisa, 0, ',', '.')."{$dendaInfo} telah lewat jatuh tempo {$jatuh} (7 hari). Segera lunasi agar KRS/sidang tidak diblokir.";
     }
 }
