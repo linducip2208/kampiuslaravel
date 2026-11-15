@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Services\AkademikService;
+use App\Services\JadwalService;
 use Database\Seeders\RolesPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -114,5 +115,47 @@ class PerformanceBudgetTest extends TestCase
         $jumlah = $this->hitung(fn () => AkademikService::validasiKrs($mhs, $kelasIds, 3.5));
 
         $this->assertLessThanOrEqual(12, $jumlah, "validasiKrs mengeksekusi {$jumlah} query untuk 10 kelas (batas 12).");
+    }
+
+    /** M-025/P2: generate batch — semua terjadwal, tanpa bentrok, query datar. */
+    public function test_generate_batch_tanpa_n_plus_satu(): void
+    {
+        $fak = DB::table('fakultas')->insertGetId(['nama' => 'TG', 'kode' => 'FTG']);
+        $prodi = DB::table('prodi')->insertGetId(['fakultas_id' => $fak, 'nama' => 'G', 'jenjang' => 'S1', 'kode' => 'GG', 'slug' => 'gg']);
+        $t = DB::table('tahun_akademik')->insertGetId(['tahun' => '2027', 'semester' => 'ganjil', 'aktif' => false]);
+        $r1 = DB::table('ruang')->insertGetId(['gedung' => 'G', 'nama' => 'R1', 'kapasitas' => 40]);
+        $r2 = DB::table('ruang')->insertGetId(['gedung' => 'G', 'nama' => 'R2', 'kapasitas' => 40]);
+
+        for ($i = 1; $i <= 8; $i++) {
+            $mk = DB::table('matakuliah')->insertGetId(['prodi_id' => $prodi, 'kode' => 'GN-'.$i, 'nama' => 'GN'.$i, 'sks' => 3, 'semester' => 1]);
+            DB::table('kelas')->insert(['matakuliah_id' => $mk, 'tahun_akademik_id' => $t, 'nama' => 'A', 'kuota' => 40]);
+        }
+
+        $jumlah = $this->hitung(function () use ($t, $r1, $r2): void {
+            $hasil = JadwalService::generate($t, ['ruang_ids' => [$r1, $r2]]);
+            $this->assertSame(8, $hasil['dijadwalkan']);
+            $this->assertSame([], $hasil['gagal']);
+        });
+
+        // 3x baca + 8x tulis + margin: jauh di bawah ~2 query/sel versi lama.
+        $this->assertLessThanOrEqual(30, $jumlah, "generate() mengeksekusi {$jumlah} query (plafon 30).");
+
+        $jadwal = DB::table('kelas')->where('tahun_akademik_id', $t)->get(['ruang_id', 'hari', 'jam_mulai', 'jam_selesai'])->all();
+
+        foreach ($jadwal as $i => $a) {
+            foreach ($jadwal as $j => $b) {
+                if ($j <= $i || $a->ruang_id !== $b->ruang_id || $a->hari !== $b->hari) {
+                    continue;
+                }
+
+                $this->assertFalse(
+                    JadwalService::jamOverlap(
+                        substr((string) $a->jam_mulai, 0, 5), substr((string) $a->jam_selesai, 0, 5),
+                        substr((string) $b->jam_mulai, 0, 5), substr((string) $b->jam_selesai, 0, 5)
+                    ),
+                    'Jadwal bentrok di ruang yang sama.'
+                );
+            }
+        }
     }
 }

@@ -46,9 +46,10 @@ Ada: `..._performance_indexes:14-22` (`pembayaran(status,verified_at)`,
   periode aktif, settings) — BUKAN per-baris. Bukan klaim p95 produksi.
 
 - P1 SELESAI (Batch 2): overlap pindah ke sisi DB + normalisasi HH:MM:SS.
-- P2 BELUM: `JadwalService::generate()` masih ~2 query/sel — diterima sementara
-  (jalan batch admin-triggered, bukan request user; optimasi butuh preload
-  matriks konflik, risiko regresi jadwal).
+- P2 SELESAI (2026-11-15): `generate()` preload 1x jadwal terisi + cek
+  overlap in-memory (`bentrokDalamKoleksi`, predikat sama dengan versi DB);
+  8 kelas = 3 baca + 8 tulis (plafon 30 di tes). `ruangBentrok`/
+  `dosenBentrok` DB tidak berubah (dipakai pinjam ruang & validasi slot).
 - P3 SELESAI (Batch 2): prasyarat 1 query + kuota 2 query via `kursiTerisiBanyak`.
 - P4 SELESAI (Batch 4): `krsStatus` via subquery MAX(id).
 - P5 SELESAI (2026-11-15): dosen ter-scope kelasnya; non-dosen dibatasi 200

@@ -112,6 +112,43 @@ class JadwalService
     }
 
     /**
+     * M-025/P2: cek bentrok terhadap koleksi yang sudah dimuat (tanpa query).
+     * Predikat sama dengan versi DB (overlap setengah-terbuka).
+     */
+    private static function bentrokDalamKoleksi(Collection $jadwal, string $kolom, int|string|null $id, string $hari, string $mulai, string $selesai, ?int $ignoreId = null): bool
+    {
+        if ($id === null || $id === '' || $id === 0) {
+            return false;
+        }
+
+        $mulai = substr((string) $mulai, 0, 5);
+        $selesai = substr((string) $selesai, 0, 5);
+
+        foreach ($jadwal as $k) {
+            if ($ignoreId !== null && (int) ($k->id ?? 0) === $ignoreId) {
+                continue;
+            }
+
+            if ((string) ($k->{$kolom} ?? '') !== (string) $id || (string) ($k->hari ?? '') !== $hari) {
+                continue;
+            }
+
+            $jm = $k->jam_mulai;
+            $js = $k->jam_selesai;
+
+            if (! $jm || ! $js) {
+                continue;
+            }
+
+            if (self::jamOverlap(substr((string) $jm, 0, 5), substr((string) $js, 0, 5), $mulai, $selesai)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Auto-generate jadwal untuk kelas yang belum punya hari/jam.
      *
      * @param  array{hari?: list<string>, slot?: list<array{string,string}>, ruang_ids?: list<int>}  $opsi
@@ -133,6 +170,12 @@ class JadwalService
             ->orderBy('id')
             ->get();
 
+        // M-025/P2: 1 query untuk seluruh jadwal terisi (bukan ~2 query/sel).
+        /** @var Collection<int, Kelas> $terjadwal */
+        $terjadwal = Kelas::where('tahun_akademik_id', $tahunAkademikId)
+            ->whereNotNull('hari')
+            ->get(['id', 'hari', 'jam_mulai', 'jam_selesai', 'ruang_id', 'dosen_id']);
+
         $dijadwalkan = 0;
         $gagal = [];
 
@@ -142,14 +185,15 @@ class JadwalService
                 foreach ($slots as $slot) {
                     [$mulai, $selesai] = $slot;
                     foreach ($ruangIds as $ruangId) {
-                        if (! self::ruangBentrok($ruangId, $hari, $mulai, $selesai)
-                            && ! self::dosenBentrok($k->dosen_id, $hari, $mulai, $selesai, $k->id)) {
+                        if (! self::bentrokDalamKoleksi($terjadwal, 'ruang_id', $ruangId, $hari, $mulai, $selesai)
+                            && ! self::bentrokDalamKoleksi($terjadwal, 'dosen_id', $k->dosen_id, $hari, $mulai, $selesai, $k->id)) {
                             $k->update([
                                 'hari' => $hari,
                                 'jam_mulai' => $mulai,
                                 'jam_selesai' => $selesai,
                                 'ruang_id' => $ruangId,
                             ]);
+                            $terjadwal->push($k->fresh());
                             $dijadwalkan++;
                             $terisi = true;
                             break 3;

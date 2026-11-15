@@ -296,6 +296,15 @@ Bukan kode integrasi pura-pura — yang dikerjakan jujur bisa diuji:
   ≤ 12 query untuk 10 kelas. Hasil ukur dicatat di
   MEGA_PERFORMANCE_REPORT §E. Bukan klaim p95/skala produksi.
 
+## 2026-11-15 — P2 generate batch selesai + README asli, 304/304 hijau
+
+- `JadwalService::generate()` preload 1x jadwal terisi, cek overlap
+  in-memory (predikat identik versi DB): 8 kelas = 3 baca + 8 tulis.
+  Uji tanpa bentrok hasilnya + plafon 30 query.
+- `README.md` generik Laravel diganti dokumentasi proyek asli
+  (setup, tes, struktur, status jujur 60/66).
+- Tes: +1 di `tests/Feature/PerformanceBudgetTest.php` (4 tes).
+
 ## Status akhir: 60/66 — 6 tersisa semuanya BLOCKED eksternal
 - M-054 multi-kampus: desain di `DESAIN_MULTI_KAMPUS.md`, MENUNGGU PENGESAHAN.
 - M-061,062,063,065,066: butuh konektivitas nyata (Feeder, gateway prod,
