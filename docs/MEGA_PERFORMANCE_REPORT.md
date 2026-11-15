@@ -39,6 +39,12 @@ Ada: `..._performance_indexes:14-22` (`pembayaran(status,verified_at)`,
 
 ## E. Status perbaikan (2026-11-15, bukti `tests/Feature/PerfDebtTest.php`)
 
+- Hasil ukur budget (`tests/Feature/PerformanceBudgetTest.php`, sqlite):
+  KHS & transkrip = 19–21 query TETAP pada 5 vs 60 baris nilai (flat,
+  tanpa N+1; plafon 25), `validasiKrs` ≤ 12 query untuk 10 kelas.
+  21 query adalah overhead tetap (auth/roles, composer pengumuman+
+  periode aktif, settings) — BUKAN per-baris. Bukan klaim p95 produksi.
+
 - P1 SELESAI (Batch 2): overlap pindah ke sisi DB + normalisasi HH:MM:SS.
 - P2 BELUM: `JadwalService::generate()` masih ~2 query/sel — diterima sementara
   (jalan batch admin-triggered, bukan request user; optimasi butuh preload

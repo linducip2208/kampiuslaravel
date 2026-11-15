@@ -289,6 +289,13 @@ Bukan kode integrasi pura-pura — yang dikerjakan jujur bisa diuji:
 - P2/P6/P7: P2 ditunda sadar (batch admin), P6/P7 diterima dengan alasan
   tercatat di PERFORMANCE_REPORT §E.
 
+## 2026-11-15 — Budget query anti-N+1 terukur, 303/303 hijau
+
+- `tests/Feature/PerformanceBudgetTest.php` (3 tes): KHS & transkrip
+  query TETAP pada 5 vs 60 baris nilai (19–21, plafon 25) + `validasiKrs`
+  ≤ 12 query untuk 10 kelas. Hasil ukur dicatat di
+  MEGA_PERFORMANCE_REPORT §E. Bukan klaim p95/skala produksi.
+
 ## Status akhir: 60/66 — 6 tersisa semuanya BLOCKED eksternal
 - M-054 multi-kampus: desain di `DESAIN_MULTI_KAMPUS.md`, MENUNGGU PENGESAHAN.
 - M-061,062,063,065,066: butuh konektivitas nyata (Feeder, gateway prod,
