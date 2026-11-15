@@ -63,6 +63,7 @@ class RolesPermissionsSeeder extends Seeder
             'pimpinan' => [
                 'laporan.view',
             ],
+            'pustakawan' => [],
             // Batch 1 ekspansi RBAC (aditif; 6 peran lama di atas TIDAK diubah).
             // Pemetaan ke permission yang SUDAH ada agar langsung berfungsi
             // di gate berbasis permission; wiring berbasis role menyusul per modul.

@@ -169,6 +169,8 @@ Route::get('/tracer', fn () => view('pages.livewire-page', ['component' => 'trac
 
 // M-060: PWA portal mahasiswa — halaman fallback offline (di-cache service worker).
 Route::get('/offline', fn () => view('publik.offline'))->name('publik.offline');
+// Perpustakaan: OPAC publik (tanpa login).
+Route::get('/katalog', fn () => view('pages.livewire-page', ['component' => 'perpus.katalog', 'title' => 'Katalog Perpustakaan']))->middleware('throttle:public')->name('publik.katalog');
 // PMB publik
 Route::get('/pmb', [PmbController::class, 'create'])->middleware('throttle:public')->name('pmb.create');
 Route::post('/pmb', [PmbController::class, 'store'])->middleware('throttle:public')->name('pmb.store');
@@ -309,6 +311,11 @@ Route::middleware('auth')->group(function () {
     // OBE per prodi: admin penuh + kaprodi/kajur terkunci prodinya di komponen.
     Route::middleware('role:superadmin|admin_prodi|kaprodi|kajur')->group(function () {
         Route::get('/admin/obe', fn () => view('pages.livewire-page', ['component' => 'obe.kelola', 'title' => 'OBE / CPL-CPMK']))->name('admin.obe');
+    });
+
+    // Perpustakaan: sirkulasi staf + OPAC publik.
+    Route::middleware('role:pustakawan|superadmin|admin_prodi')->group(function () {
+        Route::get('/perpus/sirkulasi', fn () => view('pages.livewire-page', ['component' => 'perpus.sirkulasi', 'title' => 'Sirkulasi Perpustakaan']))->name('perpus.sirkulasi');
     });
 
     // Kalender & helpdesk: semua user login (kepemilikan dicek di komponen)

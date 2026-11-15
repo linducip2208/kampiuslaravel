@@ -147,10 +147,10 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 14. Perpustakaan (modul baru — desain dulu, vertikal slice)
 
-- [ ] **Sirkulasi inti.** Proposal batch 1: `buku` + `eksemplar` +
+- [x] **Sirkulasi inti.** SELESAI 2026-11-16 (`perpus_*` + `PerpustakaanService` + UI sirkulasi + peran pustakawan + `PerpusTest`). Proposal batch 1: `buku` + `eksemplar` +
       pinjam/kembali + denda (pola denda tagihan) + batas pinjam.
       (L; terima: pinjam→kembali→denda terhitung.)
-- [ ] **OPAC publik.** Proposal: pencarian judul/pengarang tanpa login.
+- [x] **OPAC publik.** SELESAI 2026-11-16: `Perpus/Katalog` di `/katalog` (pencarian + badge ketersediaan).
       (M, setelah sirkulasi.)
 
 ## 15. Asrama (modul baru)

@@ -371,4 +371,17 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
   (RateLimiter 900 dtk, di atas throttle:login per IP); reset saat sukses.
 - Tes: `IdeBatch5Test` (3 tes).
 
+## 2026-11-16 — Perpustakaan sirkulasi + katalog + peran pustakawan, 341/341 hijau
+
+- `perpus_buku` + `perpus_eksemplar` (barcode unik) + `perpus_pinjam`;
+  `PerpustakaanService::{pinjam (maks 3 aktif, tx+lock), kembali
+  (denda Rp1.000/hari), hitungDenda}`; Livewire `Perpus/Sirkulasi`
+  (pinjam by barcode + kembali/hilang/rusak + AuditLog) di
+  `/perpus/sirkulasi` (grup `pustakawan|superadmin|admin_prodi`);
+  OPAC publik `Perpus/Katalog` (tanpa login) di `/katalog`;
+  peran baru `pustakawan` di seeder.
+- Tes: `PerpusTest` (5 tes). Catatan hitung: 341 eksekusi vs 324 metode
+  `test_*` — selisih = data provider (mis. CalculationTest),
+  diverifikasi via audit `count_tests.py`, bukan angka karangan.
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)
