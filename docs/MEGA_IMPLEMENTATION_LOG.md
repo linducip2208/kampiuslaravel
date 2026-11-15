@@ -339,4 +339,17 @@ penuh (`view:cache` lolos). Bukan bukti browser/E2E — tetap 0.
 - Tes: `RbacWiringTest` 8 tes (matriks izin/tolak, IDOR menang atas peran,
   audit push, BKD anti-bocor).
 
+## 2026-11-15 — RBAC batch 3 SELESAI: examiner + HR + matriks + audit, 320/320 hijau
+
+- Jalur examiner mandiri: `Sidang/NilaiPenguji` (owner-scope ketat,
+  tanpa akses NilaiSidang penuh) di `/sidang/nilai-saya` (grup
+  `role:penguji|superadmin|admin_prodi`).
+- HRD: grup `role:hrd|...` dengan `/hrd/payroll` + `/hrd/rekrutmen`
+  (bukan grup keuangan penuh — SoD); komponen ikut dibuka untuk hrd.
+- Matriks peran baca-saja: `Admin/MatriksRbac` di `/admin/matriks-rbac`.
+- Audit penugasan: `UserData::simpan` catat `user.role.diubah` + diff.
+- Tes: `RbacBatch3Test` 4 tes (owner-scope penguji, HRD terbatas, matriks,
+  audit diff). Perilaku Livewire: `firstOrFail` gagal jadi respons 404,
+  bukan exception — asersi = data tak berubah.
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

@@ -16,7 +16,7 @@ class Kelola extends Component
     use RequiresRoles;
     use WithPagination;
 
-    public array $allowedRoles = ['superadmin', 'admin_prodi'];
+    public array $allowedRoles = ['superadmin', 'admin_prodi', 'hrd'];
 
     public ?int $editId = null;
 

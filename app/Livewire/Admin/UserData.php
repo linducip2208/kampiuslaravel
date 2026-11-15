@@ -3,7 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Livewire\Concerns\RequiresRoles;
+use App\Models\AuditLog;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -98,8 +100,23 @@ class UserData extends Component
             $data['password'] = Hash::make($this->form['password']);
         }
 
+        $sebelum = $this->editId
+            ? User::with('roles')->find($this->editId)?->roles->pluck('name')->all() ?? []
+            : [];
+
         $user = User::updateOrCreate(['id' => $this->editId ?? 0], $data);
         $user->syncRoles([$this->form['role']]);
+
+        if (array_diff([$this->form['role']], $sebelum) !== [] || array_diff($sebelum, [$this->form['role']]) !== []) {
+            AuditLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'user.role.diubah',
+                'model' => User::class,
+                'model_id' => $user->id,
+                'diff_json' => ['dari' => $sebelum, 'ke' => [$this->form['role']]],
+                'created_at' => now(),
+            ]);
+        }
 
         $this->batal();
         $this->message = 'User tersimpan.';

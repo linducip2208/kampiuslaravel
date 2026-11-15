@@ -1,5 +1,10 @@
 # PROGRESS & TECH PLAN — SIMAK Kuliah
 
+> Pembaruan Nov 2026: repo ini sekarang KAMPUS ERP (66 item MEGA, 60 selesai,
+> suite 300+ hijau). Dokumen di bawah ini adalah arsip tonggak awal proyek;
+> untuk kelanjutan, baca **`docs/DEVELOPMENT_IDEAS.md`** (bank ide per fitur,
+> siap dikerjakan) dengan sumber kebenaran **`docs/MEGA_BACKLOG.md`**.
+
 Stack: **Laravel 13 + MySQL 8 + Blade/Livewire 3/Alpine + Tabler UI + Sanctum API + Flutter**
 
 ## Milestone — Update 13 Nov 2026: R2.1–R2.7 SELESAI, 164 test passed / 1038 assertions, pint clean

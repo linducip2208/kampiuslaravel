@@ -21,10 +21,10 @@ Legenda wiring: **P** = gate `permission:`/`can:` aktif, **R** = grup
 | wadek | - | - | - | - | - | - | - | - | - | - | - | - | x | x | R+P |
 | kaprodi | x | x | x | x | x | x | x | - | x | - | - | x | x | x | R+P |
 | kajur | x | x | x | x | x | x | x | - | x | - | - | x | x | x | R+P |
-| penguji | - | - | - | - | - | - | x | - | x | - | - | - | - | - | - |
+| penguji | - | - | - | - | - | - | x | - | x | - | - | - | - | - | R (jalur mandiri owner-scope) |
 | kasir | - | - | - | - | - | - | - | - | - | - | x | - | - | - | R+P |
 | akuntansi | - | - | - | - | - | - | - | - | - | - | x | - | - | x | R+P |
-| hrd | - | - | - | - | - | - | - | - | - | - | - | - | x | x | - |
+| hrd | - | - | - | - | - | - | - | - | - | - | - | - | x | x | R (grup /hrd/*, bukan grup keuangan penuh) |
 | auditor | - | - | - | - | - | - | - | - | - | - | - | - | - | x | P |
 | alumni | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | orangtua | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |

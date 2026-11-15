@@ -18,7 +18,7 @@ class Payroll extends Component
     use RequiresRoles;
     use WithPagination;
 
-    public array $allowedRoles = ['keuangan', 'kasir', 'akuntansi', 'superadmin', 'admin_prodi'];
+    public array $allowedRoles = ['keuangan', 'kasir', 'akuntansi', 'hrd', 'superadmin', 'admin_prodi'];
 
     public ?int $periodeId = null;
 

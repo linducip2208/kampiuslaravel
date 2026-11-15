@@ -290,6 +290,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:superadmin|admin_prodi')->group(function () {
         Route::get('/admin/pmb/verifikasi', fn () => view('admin.pmb-verifikasi'))->name('admin.pmb.verifikasi');
         Route::get('/admin/users', fn () => view('pages.livewire-page', ['component' => 'admin.user-data', 'title' => 'Kelola User']))->name('admin.users');
+        Route::get('/admin/matriks-rbac', fn () => view('pages.livewire-page', ['component' => 'admin.matriks-rbac', 'title' => 'Matriks Peran']))->name('admin.matriks-rbac');
         Route::get('/admin/integrasi', fn () => view('pages.livewire-page', ['component' => 'admin.integrasi', 'title' => 'Integrasi']))->name('admin.integrasi');
         Route::get('/admin/master', fn () => view('pages.livewire-page', ['component' => 'master.data', 'title' => 'Data Master']))->name('admin.master');
         Route::get('/admin/dosen', fn () => view('pages.livewire-page', ['component' => 'admin.dosen-data', 'title' => 'Data Dosen & Tendik']))->name('admin.dosen');
@@ -329,10 +330,21 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/audit', [AuditController::class, 'index'])->name('admin.audit');
     });
 
+    // Jalur examiner mandiri (owner-scope; tanpa akses NilaiSidang penuh).
+    Route::middleware('role:penguji|superadmin|admin_prodi')->group(function () {
+        Route::get('/sidang/nilai-saya', fn () => view('pages.livewire-page', ['component' => 'sidang.nilai-penguji', 'title' => 'Nilai Sidang Saya']))->name('sidang.nilai.milikku');
+    });
+
     // Staf internal
     Route::middleware('role:superadmin|admin_prodi|keuangan|pimpinan')->group(function () {
         Route::get('/notifikasi/broadcast', fn () => view('pages.livewire-page', ['component' => 'notifikasi.broadcast', 'title' => 'Broadcast Notifikasi']))->name('notifikasi.broadcast');
         Route::get('/media/generate', fn () => view('pages.livewire-page', ['component' => 'media.generator', 'title' => 'Generate Gambar AI']))->name('media.generate');
+    });
+
+    // SDM: payroll + rekrutmen (hrd tidak masuk grup keuangan penuh — SoD).
+    Route::middleware('role:hrd|superadmin|admin_prodi')->group(function () {
+        Route::get('/hrd/payroll', fn () => view('pages.livewire-page', ['component' => 'keuangan.payroll', 'title' => 'Penggajian']))->name('hrd.payroll');
+        Route::get('/hrd/rekrutmen', fn () => view('pages.livewire-page', ['component' => 'rekrutmen.kelola', 'title' => 'Rekrutmen']))->name('hrd.rekrutmen');
     });
 
     // AI & analitik: semua user login (kepemilikan/role dicek di komponen/controller)
