@@ -86,6 +86,14 @@ class Forum extends Component
         $this->message = 'Balasan terkirim.';
     }
 
+    /** Kutip balasan ke dalam draf (format kutip sederhana). */
+    public function kutip(int $id): void
+    {
+        $target = ForumBalasan::findOrFail($id);
+        $this->threadId = $target->thread_id;
+        $this->balasan = '> '.str_replace("\n", "\n> ", trim((string) $target->isi))."\n\n".$this->balasan;
+    }
+
     public function kunci(int $id): void
     {
         $this->authorizeKunci();

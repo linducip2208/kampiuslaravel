@@ -53,7 +53,8 @@
                 @foreach($daftarBalasan as $b)
                     <div class="mb-2"><strong>{{ $b->penulis->name ?? 'Anonim' }}</strong>
                         <span class="text-secondary small">{{ $b->created_at }}</span>
-                        <div>{{ $b->isi }}</div>
+                        <button class="btn btn-sm btn-link p-0 ms-2" wire:click="kutip({{ $b->id }})">Kutip</button>
+                        <div style="white-space: pre-wrap">{{ $b->isi }}</div>
                     </div>
                 @endforeach
                 {{ $daftarBalasan->links() }}

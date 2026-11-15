@@ -48,7 +48,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [ ] **Riwayat revisi KRS.** Revisi menimpa tanpa jejak. Proposal:
       snapshot `krs_detail` tiap submit ulang + tab riwayat.
       (M; terima: 2x submit → 2 snapshot.)
-- [ ] **Notifikasi PA otomatis.** Persetujuan menunggu tanpa notif.
+- [x] **Notifikasi PA otomatis.** SELESAI 2026-11-15: notifikasi inbox ke Dosen PA tiap pengajuan lolos (`Pengajuan::ajukan`). Tes: 1 pengajuan = 1 notif. Persetujuan menunggu tanpa notif.
       Proposal: notifikasi inbox + (bila dikonfigurasi) WA/email ke PA
       saat ada pengajuan baru. (S; terima: 1 pengajuan = 1 notif PA.)
 
@@ -60,7 +60,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [ ] **Bank soal: pakai ulang lintas kelas.** Soal terikat kuis,
       belum bisa klon antar-kelas. Proposal: tombol "klon ke kuis lain".
       (S; terima: soal tercopy, kunci ikut.)
-- [ ] **Forum: semat + kunci per-thread sudah ada; kurang: kutipan balasan.**
+- [x] **Forum: kutipan balasan.** SELESAI 2026-11-15: tombol Kutip mengisi draf (`Forum::kutip`).
       Proposal: tombol kutip mengisi balasan. (S.)
 - [ ] **Materi: pratinjau PDF sebaris.** Sekarang unduhan saja. Proposal:
       embed viewer PDF di halaman materi. (S; terima: PDF tampil tanpa unduh.)
@@ -224,7 +224,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [x] **Audit baca data sensitif.** SELESAI 2026-11-15: tabel `audit_baca` + `AuditBacaService` (no-op aman, retensi 365 hari) + hook KHS/transkrip. Tes: `AuditBacaTest`.
       belum. Proposal: log baca dokumen mahasiswa (siapa,kapan).
       (M; tabel `audit_baca`, retensi 1 tahun.)
-- [ ] **Kunci akun brute-force.** Login throttle ada; lockout belum.
+- [x] **Kunci akun brute-force.** SELESAI 2026-11-15: kunci 15 menit setelah 5 gagal per email (`SessionAuthController`, RateLimiter 900 dtk). Login throttle ada; lockout belum.
       Proposal: kunci 15 menit setelah 5 gagal + notifikasi email.
       (M.)
 - [ ] **Rotasi token mobile.** Token abadi. Proposal: expiry + refresh

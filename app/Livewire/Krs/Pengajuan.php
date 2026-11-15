@@ -5,6 +5,7 @@ namespace App\Livewire\Krs;
 use App\Livewire\Concerns\RequiresRoles;
 use App\Models\KelasWaitlist;
 use App\Models\Krs;
+use App\Models\Notifikasi;
 use App\Services\AkademikService;
 use App\Services\KalenderService;
 use Illuminate\Contracts\View\View;
@@ -280,6 +281,25 @@ class Pengajuan extends Component
 
         $this->pesanBlokir = null;
         session()->flash('info', "KRS berhasil diajukan ({$this->totalSks} SKS). Menunggu persetujuan Dosen PA.");
+
+        // Notifikasi ke Dosen PA (bila mahasiswa punya PA + user login).
+        try {
+            $paDosenId = DB::table('mahasiswa')->where('id', $mahasiswaId)->value('dosen_pa_id');
+
+            if ($paDosenId) {
+                $paUserId = DB::table('dosen')->where('id', $paDosenId)->value('user_id');
+
+                if ($paUserId) {
+                    Notifikasi::create([
+                        'user_id' => $paUserId,
+                        'judul' => 'KRS baru menunggu persetujuan',
+                        'isi' => 'Mahasiswa mengajukan KRS ('.($sksMap->sum()).' SKS). Buka halaman persetujuan KRS.',
+                    ]);
+                }
+            }
+        } catch (\Throwable) {
+            // Notifikasi gagal tidak boleh menggagalkan pengajuan.
+        }
     }
 
     private function krsBerjalan(): ?Krs

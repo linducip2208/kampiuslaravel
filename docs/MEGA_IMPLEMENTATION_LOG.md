@@ -362,4 +362,13 @@ Ide bank (2 subagen paralel + integrasi): impor CSV bank soal
 pesan denda terperinci, sidang tolak bentrok kuliah,
 cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 
+## 2026-11-15 — Batch 5b ide bank: kutipan forum, notif PA, kunci brute-force (target: suite hijau)
+
+- `Forum::kutip()` mengisi draf balasan format kutip + tombol di daftar balasan.
+- `Pengajuan::ajukan()` menulis notifikasi inbox ke Dosen PA (try/catch agar
+  tidak menggagalkan pengajuan); ikut idempotensi pengajuan yang sama.
+- `SessionAuthController@login`: kunci 15 menit setelah 5 gagal per email
+  (RateLimiter 900 dtk, di atas throttle:login per IP); reset saat sukses.
+- Tes: `IdeBatch5Test` (3 tes).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)
