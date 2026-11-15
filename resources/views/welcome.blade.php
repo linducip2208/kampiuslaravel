@@ -6,440 +6,472 @@
 
 @push('styles')
 <style>
-    .kampius-landing-hero {
-        background: linear-gradient(135deg, #10234B 0%, #1046A0 55%, #1769F5 100%);
-        position: relative;
+    html { scroll-behavior: smooth; }
+    .lp-hero {
+        background:
+            radial-gradient(900px 420px at 85% -5%, rgba(23,105,245,.14), transparent 60%),
+            radial-gradient(700px 380px at 5% 10%, rgba(18,200,232,.12), transparent 60%),
+            linear-gradient(180deg, #F2F6FD 0%, #FFFFFF 100%);
         overflow: hidden;
     }
-    .kampius-landing-hero::after {
-        content: "";
-        position: absolute;
-        right: -120px; top: -120px;
-        width: 420px; height: 420px;
-        border-radius: 50%;
-        background: rgba(17,197,232,.22);
+    .lp-kicker {
+        display: inline-flex; align-items: center; gap: .5rem;
+        background: #E8F1FE; color: #1046A0;
+        border-radius: 999px; padding: .3rem .9rem;
+        font-size: .78rem; font-weight: 600;
     }
-    .kampius-landing-hero::before {
-        content: "";
-        position: absolute;
-        left: -100px; bottom: -140px;
-        width: 300px; height: 300px;
-        border-radius: 50%;
-        background: rgba(255,255,255,.06);
-    }
-    .kampius-eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-        background: rgba(255,255,255,.12);
-        border: 1px solid rgba(255,255,255,.2);
-        color: #fff;
-        border-radius: 999px;
-        padding: .3rem .9rem;
-        font-size: .78rem;
-    }
-    .kampius-eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: #16A36A; }
-    .kampius-mock {
-        background: #fff;
-        border-radius: 18px;
-        box-shadow: 0 30px 80px rgba(0,0,0,.35);
-        overflow: hidden;
-        position: relative;
-        z-index: 1;
-    }
-    .kampius-mock-topbar {
-        display: flex;
-        align-items: center;
-        gap: .4rem;
-        padding: .6rem .9rem;
-        border-bottom: 1px solid #E8EEF7;
-    }
-    .kampius-mock-topbar i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-    .kampius-mock-body { display: flex; min-height: 320px; }
-    .kampius-mock-side {
-        width: 150px;
-        background: #10234B;
-        color: #c9d6ea;
-        font-size: .68rem;
-        padding: .8rem .6rem;
-        display: flex;
-        flex-direction: column;
-        gap: .35rem;
-    }
-    .kampius-mock-side span { padding: .3rem .5rem; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .kampius-mock-side span.on { background: rgba(23,105,245,.5); color: #fff; }
-    .kampius-mock-main { flex: 1; padding: .9rem; background: #F5F8FD; min-width: 0; }
-    .kampius-mock-stats { display: flex; gap: .5rem; margin-bottom: .6rem; }
-    .kampius-mock-stat {
-        flex: 1;
-        background: #fff;
-        border: 1px solid #E8EEF7;
-        border-radius: 10px;
-        padding: .45rem .55rem;
-        min-width: 0;
-    }
-    .kampius-mock-stat b { display: block; font-size: .95rem; color: #10234B; }
-    .kampius-mock-stat small { color: #77849A; font-size: .62rem; }
-    .kampius-mock-chart {
-        background: #fff;
-        border: 1px solid #E8EEF7;
-        border-radius: 10px;
-        padding: .55rem .6rem;
-        margin-bottom: .6rem;
-    }
-    .kampius-mock-bars { display: flex; align-items: flex-end; gap: 5px; height: 74px; }
-    .kampius-mock-bars i { flex: 1; border-radius: 3px 3px 0 0; min-height: 6px; }
-    .kampius-mock-rows { background: #fff; border: 1px solid #E8EEF7; border-radius: 10px; padding: .2rem .6rem; }
-    .kampius-mock-rows div { display: flex; justify-content: space-between; font-size: .66rem; padding: .32rem 0; border-bottom: 1px solid #F1F4F9; color: #172B4D; }
-    .kampius-mock-rows div:last-child { border-bottom: 0; }
-    .kampius-modul { transition: box-shadow .2s ease, transform .2s ease; height: 100%; }
-    .kampius-modul:hover { box-shadow: 0 14px 30px rgba(23,105,245,.14); transform: translateY(-3px); }
-    .kampius-modul-icon {
-        width: 46px; height: 46px; border-radius: 14px;
+    .lp-kicker .dot { width: 8px; height: 8px; border-radius: 50%; background: #16A36A; }
+    .lp-h1 { color: #101D35; font-weight: 800; letter-spacing: -.02em; }
+    .lp-h1 .hl { color: #1769F5; position: relative; white-space: nowrap; }
+    .lp-h1 .hl svg { position: absolute; left: 0; right: 0; bottom: -8px; width: 100%; height: 10px; }
+    .lp-check { display: inline-flex; align-items: center; gap: .4rem; color: #33475F; font-size: .9rem; }
+    .lp-check .tick {
+        width: 20px; height: 20px; border-radius: 50%;
+        background: #E5F4EC; color: #16A36A;
         display: inline-flex; align-items: center; justify-content: center;
-        font-size: 1.25rem; flex-shrink: 0;
+        font-size: .75rem; font-weight: 800; flex-shrink: 0;
     }
-    .kampius-step-num {
-        width: 44px; height: 44px; border-radius: 50%;
-        background: #10234B; color: #fff;
+    .lp-mock {
+        background: #fff; border-radius: 20px;
+        box-shadow: 0 30px 70px rgba(16,35,75,.18);
+        border: 1px solid #E6EDF7; overflow: hidden;
+    }
+    .lp-mock-top {
+        display: flex; align-items: center; gap: .6rem;
+        padding: .7rem 1rem; border-bottom: 1px solid #EDF1F7;
+    }
+    .lp-avatar {
+        width: 30px; height: 30px; border-radius: 50%;
+        background: linear-gradient(135deg, #1769F5, #12C8E8);
+        color: #fff; font-size: .7rem; font-weight: 700;
         display: inline-flex; align-items: center; justify-content: center;
-        font-weight: 800; margin-bottom: .5rem;
+        flex-shrink: 0;
     }
-    .kampius-step-line { position: absolute; top: 22px; left: 60px; right: -10px; height: 2px; background: #E0E8F3; }
-    .kampius-role { transition: box-shadow .2s ease, transform .2s ease; height: 100%; }
-    .kampius-role:hover { box-shadow: 0 14px 30px rgba(23,105,245,.14); transform: translateY(-3px); }
-    @media (max-width: 991.98px) {
-        .kampius-mock-side { display: none; }
+    .lp-tile {
+        background: #F6F9FE; border: 1px solid #E8EEF7; border-radius: 12px;
+        padding: .6rem .7rem; min-width: 0;
     }
+    .lp-tile b { display: block; color: #101D35; font-size: 1.05rem; line-height: 1.1; }
+    .lp-tile small { color: #77849A; font-size: .7rem; }
+    .lp-tile .ico {
+        width: 30px; height: 30px; border-radius: 9px;
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-bottom: .35rem;
+    }
+    .lp-qa a {
+        display: flex; align-items: center; gap: .6rem;
+        padding: .5rem .6rem; border-radius: 10px; color: #172B4D;
+        text-decoration: none; font-size: .85rem;
+    }
+    .lp-qa a:hover { background: #F2F6FD; }
+    .lp-qa .qi {
+        width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+        display: inline-flex; align-items: center; justify-content: center; color: #fff;
+    }
+    .lp-photo-band { border-radius: 22px; overflow: hidden; position: relative; }
+    .lp-photo-band img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .lp-trust {
+        background: #fff; border: 1px solid #E8EEF7; border-radius: 18px;
+        box-shadow: 0 12px 30px rgba(16,35,75,.07);
+    }
+    .lp-pill {
+        display: inline-flex; align-items: center; gap: .5rem;
+        border: 1px solid #E4EAF4; border-radius: 999px;
+        padding: .45rem .95rem; font-size: .85rem; color: #33475F; background: #fff;
+        white-space: nowrap;
+    }
+    .lp-pill .mono {
+        width: 26px; height: 26px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: #fff; font-size: .7rem; font-weight: 800; flex-shrink: 0;
+    }
+    .lp-mini {
+        background: #fff; border: 1px solid #E8EEF7; border-radius: 16px;
+        padding: 1rem .6rem; text-align: center; height: 100%;
+        transition: transform .18s ease, box-shadow .18s ease;
+        color: #172B4D; text-decoration: none; display: block;
+    }
+    .lp-mini:hover { transform: translateY(-4px); box-shadow: 0 16px 34px rgba(23,105,245,.13); }
+    .lp-mini .mi {
+        width: 46px; height: 46px; border-radius: 14px; margin: 0 auto .55rem;
+        display: flex; align-items: center; justify-content: center; color: #fff;
+    }
+    .lp-mini b { display: block; font-size: .85rem; }
+    .lp-mini small { color: #77849A; font-size: .72rem; }
+    .lp-flow-num {
+        width: 52px; height: 52px; border-radius: 50%;
+        background: #E8F1FE; color: #1769F5;
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-bottom: .5rem;
+    }
+    .lp-flow-line { position: absolute; top: 26px; left: calc(50% + 34px); width: calc(100% - 68px); height: 2px; background: #D8E4F5; }
+    .lp-band {
+        background: linear-gradient(120deg, #0F2247 0%, #1046A0 60%, #1769F5 100%);
+        border-radius: 18px; color: #fff;
+    }
+    .lp-feat {
+        background: #fff; border: 1px solid #E8EEF7; border-radius: 16px;
+        padding: 1.1rem; height: 100%;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .lp-feat:hover { transform: translateY(-4px); box-shadow: 0 16px 34px rgba(23,105,245,.13); }
+    .lp-feat .fi {
+        width: 46px; height: 46px; border-radius: 14px; margin-bottom: .7rem;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+    .lp-stats { background: linear-gradient(120deg, #0F2247 0%, #13408F 55%, #1769F5 100%); border-radius: 22px; }
+    .lp-stat-num { font-size: 1.9rem; font-weight: 800; }
+    .lp-testi { background: #fff; border: 1px solid #E8EEF7; border-radius: 16px; padding: 1.25rem; height: 100%; }
+    .lp-testi img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+    .lp-stars { color: #F5A623; letter-spacing: 2px; }
+    .lp-cta {
+        border-radius: 24px; overflow: hidden; position: relative;
+        background: linear-gradient(120deg, rgba(15,34,71,.96), rgba(23,105,245,.88));
+    }
+    .lp-cta > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .28; }
+    .lp-footer { background: #0C1930; border-radius: 24px 24px 0 0; }
+    .lp-footer a { color: #9DB1D1; text-decoration: none; }
+    .lp-footer a:hover { color: #fff; }
+    #toTop {
+        position: fixed; right: 22px; bottom: 22px; z-index: 1030;
+        width: 44px; height: 44px; border-radius: 50%; border: 0;
+        background: #1769F5; color: #fff; font-size: 1.2rem;
+        display: none; align-items: center; justify-content: center;
+        box-shadow: 0 10px 26px rgba(23,105,245,.4);
+    }
+    @media (max-width: 991.98px) { .lp-flow-line { display: none; } }
 </style>
 @endpush
 
 @section('content')
-{{-- ============ 2. HERO ============ --}}
-<div class="kampius-landing-hero text-white">
-    <div class="container-xl py-5" style="max-width: 1280px">
-        <div class="row align-items-center g-4 position-relative" style="z-index:1">
-            <div class="col-lg-5">
-                <span class="kampius-eyebrow"><span class="dot"></span> Sistem Informasi Kampus Terpadu</span>
-                <h1 class="display-5 fw-bold mt-3">Satu Platform untuk Seluruh Operasi Kampus</h1>
-                <p class="opacity-75">KAMPUS mengintegrasikan PMB, akademik, keuangan, dan pelaporan dalam satu sistem yang aman, modern, dan mudah digunakan — untuk {{ number_format($stats['mahasiswa'] ?? 0) }} mahasiswa dan {{ number_format($stats['dosen'] ?? 0) }} dosen yang telah terdata.</p>
+@php
+    $jmlMhs = number_format($stats['mahasiswa'] ?? 0);
+    $jmlDosen = number_format($stats['dosen'] ?? 0);
+    $jmlProdi = number_format($stats['prodi'] ?? 0);
+    $krsPct = (int) ($stats['krs_pct'] ?? 0);
+    $lunasPct = (int) ($stats['lunas_pct'] ?? 0);
+    $vals = $stats['bayar_bulanan']['nominal'] ?? [];
+    $labels = $stats['bayar_bulanan']['labels'] ?? [];
+    $maks = max(1, max($vals ?: [0]));
+    $pts = [];
+    $n = max(1, count($vals));
+    foreach ($vals as $i => $v) {
+        $x = 8 + ($i * (284 / max(1, $n - 1 ?: 1)));
+        $y = 82 - max(6, $v / $maks * 70);
+        $pts[] = round($x, 1).','.round($y, 1);
+    }
+    $poly = implode(' ', $pts);
+@endphp
+
+{{-- ============ HERO ============ --}}
+<div class="lp-hero">
+    <div class="container-xl py-5" style="max-width:1280px">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-6">
+                <span class="lp-kicker"><span class="dot"></span> Sistem Informasi Kampus Terpadu</span>
+                <h1 class="lp-h1 display-5 mt-3">Satu Platform Terintegrasi untuk Seluruh Operasi
+                    <span class="hl">Kampus<svg viewBox="0 0 120 10" preserveAspectRatio="none"><path d="M2 8 Q 60 1 118 7" stroke="#1769F5" stroke-width="4" fill="none" stroke-linecap="round"/></svg></span>
+                </h1>
+                <p class="text-secondary mt-3">KAMPUS adalah Academic ERP modern untuk mengelola seluruh proses perguruan tinggi secara terintegrasi, mulai dari PMB, akademik, keuangan, hingga alumni — dipakai {{ $jmlMhs }} mahasiswa dan {{ $jmlDosen }} dosen yang terdata.</p>
                 <div class="d-flex flex-wrap gap-2 mt-3">
-                    <a href="{{ route('pmb.create') }}" class="btn btn-light btn-lg">Mulai Pendaftaran →</a>
-                    <a href="{{ route('dokumen.index') }}" class="btn btn-outline-light btn-lg">Dokumentasi</a>
+                    <a href="{{ route('login') }}" class="btn btn-primary btn-lg">▶ Lihat Demo Live</a>
+                    <a href="{{ route('pmb.create') }}" class="btn btn-outline-primary btn-lg">Request Demo →</a>
                 </div>
-                <div class="d-flex flex-wrap gap-3 mt-4 small opacity-75">
-                    <span>✓ Hak akses berbasis peran</span><span>✓ Audit trail aktivitas</span><span>✓ QR verifikasi dokumen</span>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <span class="lp-check"><span class="tick">✓</span> Solusi Lengkap</span>
+                    <span class="lp-check"><span class="tick">✓</span> Mudah Digunakan</span>
+                    <span class="lp-check"><span class="tick">✓</span> Aman &amp; Andal</span>
                 </div>
             </div>
-            <div class="col-lg-7">
-                {{-- Mockup dashboard ERP (HTML/CSS, data real agregat) --}}
-                <div class="kampius-mock" role="img" aria-label="Pratinjau dashboard KAMPUS ERP">
-                    <div class="kampius-mock-topbar">
-                        <i style="background:#DC4545"></i><i style="background:#E9A23B"></i><i style="background:#16A36A"></i>
-                        <span class="ms-2 small text-secondary">KAMPUS — Ringkasan Eksekutif</span>
-                        <span class="ms-auto badge bg-green-lt">Live</span>
+            <div class="col-lg-6">
+                {{-- Mockup dashboard (HTML/CSS + angka real agregat) --}}
+                <div class="lp-mock" role="img" aria-label="Pratinjau dashboard KAMPUS ERP">
+                    <div class="lp-mock-top">
+                        <img src="{{ asset('img/logo-kampus-mark.png') }}" alt="" width="26" height="26" style="border-radius:7px">
+                        <strong class="small">KAMPUS</strong>
+                        <span class="text-secondary small d-none d-sm-inline">· Ringkasan Eksekutif</span>
+                        <span class="ms-auto d-flex align-items-center gap-2">
+                            <span class="badge bg-green-lt">● Live</span>
+                            <span class="lp-avatar">AD</span>
+                        </span>
                     </div>
-                    <div class="kampius-mock-body">
-                        <div class="kampius-mock-side" aria-hidden="true">
-                            <span class="on">▦ Ringkasan</span><span>🎓 Akademik</span><span>💳 Keuangan</span><span>👥 Mahasiswa</span><span>📝 PMB</span><span>📊 Laporan</span><span>⚙ Sistem</span>
+                    <div class="p-3" style="background:#F6F9FE">
+                        <div class="row g-2 mb-2">
+                            <div class="col-4"><div class="lp-tile"><span class="ico" style="background:#E3EDFD;color:#1769F5">◉</span><b>{{ $jmlMhs }}</b><small>Mahasiswa</small></div></div>
+                            <div class="col-4"><div class="lp-tile"><span class="ico" style="background:#FFF4E0;color:#E9A23B">◉</span><b>{{ $jmlDosen }}</b><small>Dosen</small></div></div>
+                            <div class="col-4"><div class="lp-tile"><span class="ico" style="background:#E5F4EC;color:#16A36A">◉</span><b>{{ $jmlProdi }}</b><small>Prodi</small></div></div>
                         </div>
-                        <div class="kampius-mock-main">
-                            <div class="kampius-mock-stats">
-                                <div class="kampius-mock-stat"><b>{{ number_format($stats['mahasiswa'] ?? 0) }}</b><small>Mahasiswa</small></div>
-                                <div class="kampius-mock-stat"><b>{{ number_format($stats['dosen'] ?? 0) }}</b><small>Dosen</small></div>
-                                <div class="kampius-mock-stat"><b>{{ number_format($stats['prodi'] ?? 0) }}</b><small>Prodi</small></div>
-                                <div class="kampius-mock-stat"><b>{{ (int) ($stats['krs_pct'] ?? 0) }}%</b><small>KRS disetujui</small></div>
+                        <div class="bg-white border rounded-3 p-2 mb-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-secondary fw-bold">Statistik Akademik</small>
+                                <small class="text-secondary">{{ $krsPct }}% KRS disetujui</small>
                             </div>
-                            <div class="kampius-mock-chart">
-                                <small class="text-secondary">Penerimaan terverifikasi · 6 bulan</small>
-                                @php
-                                    $vals = $stats['bayar_bulanan']['nominal'] ?? [];
-                                    $maks = max(1, max($vals ?: [0]));
-                                @endphp
-                                <div class="kampius-mock-bars mt-1">
-                                    @foreach($vals as $v)
-                                        <i style="height:{{ max(8, $v / $maks * 100) }}%;background:{{ $loop->last ? '#1769F5' : '#9DB9E8' }}" title="Rp {{ number_format($v, 0, ',', '.') }}"></i>
-                                    @endforeach
-                                </div>
+                            <svg viewBox="0 0 300 90" class="w-100" style="height:90px" preserveAspectRatio="none" aria-hidden="true">
+                                <defs><linearGradient id="lpg" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0" stop-color="#1769F5" stop-opacity=".35"/>
+                                    <stop offset="1" stop-color="#1769F5" stop-opacity="0"/>
+                                </linearGradient></defs>
+                                <polygon points="8,88 {{ $poly }} 292,88" fill="url(#lpg)"/>
+                                <polyline points="{{ $poly }}" fill="none" stroke="#1769F5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                            </svg>
+                            <div class="d-flex justify-content-between text-secondary" style="font-size:.62rem">
+                                @foreach($labels as $lb)<span>{{ $lb }}</span>@endforeach
                             </div>
-                            <div class="kampius-mock-rows">
-                                <div><span>KRS menunggu persetujuan</span><strong>{{ number_format($stats['krs_pending'] ?? 0) }}</strong></div>
-                                <div><span>Mahasiswa baru bulan ini</span><strong>{{ number_format($stats['pmb_baru'] ?? 0) }}</strong></div>
-                                <div><span>Kehadiran tercatat</span><strong>{{ (int) ($stats['hadir_pct'] ?? 0) }}%</strong></div>
-                            </div>
+                        </div>
+                        <div class="bg-white border rounded-3 p-2 lp-qa">
+                            <small class="text-secondary fw-bold d-block px-1 mb-1">Quick Access</small>
+                            <a href="{{ route('mahasiswa.krs.pengajuan') }}"><span class="qi" style="background:#1769F5">▤</span> KRS Online</a>
+                            <a href="{{ route('keuangan.bayar') }}"><span class="qi" style="background:#E9A23B">▣</span> Pembayaran</a>
+                            <a href="{{ route('dashboard.pimpinan') }}"><span class="qi" style="background:#7C6FF0">◫</span> Laporan</a>
+                            <a href="{{ route('publik.pengumuman') }}"><span class="qi" style="background:#12C8E8">✉</span> Pengumuman</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-{{-- ============ 2b. FOTO KAMPUS (AI WAN 2.1, lokal) ============ --}}
-<div class="container-xl mt-4" style="max-width: 1280px">
-    <div class="position-relative overflow-hidden" style="border-radius:18px">
-        <img src="{{ asset('img/kampus-hero-wan.png') }}" alt="Gedung kampus modern KAMPUS" class="w-100 d-block" style="max-height:420px;object-fit:cover" loading="lazy">
-        <div class="position-absolute bottom-0 start-0 end-0 p-3 p-md-4 d-flex flex-wrap align-items-end gap-2" style="background:linear-gradient(transparent, rgba(16,29,75,.82))">
-            <div class="text-white me-auto">
-                <strong class="d-block">Kampus Modern, Sistem Modern</strong>
-                <span class="small opacity-75">Gedung, layanan, dan data akademik dalam satu ekosistem digital.</span>
+        {{-- Foto kampus --}}
+        <div class="lp-photo-band mt-4" style="height:min(46vw,380px)">
+            <img src="{{ asset('img/kampus-hero-wan.png') }}" alt="Gedung kampus modern" loading="lazy">
+            <div class="position-absolute bottom-0 start-0 end-0 p-3 p-md-4 d-flex flex-wrap align-items-end gap-2" style="background:linear-gradient(transparent, rgba(12,25,48,.75))">
+                <div class="text-white me-auto">
+                    <strong class="d-block">Kampus Modern, Sistem Modern</strong>
+                    <span class="small opacity-75">Gedung, layanan, dan data akademik dalam satu ekosistem digital.</span>
+                </div>
+                <a href="{{ route('pmb.create') }}" class="btn btn-light">Daftar Sekarang →</a>
             </div>
-            <a href="{{ route('pmb.create') }}" class="btn btn-light">Daftar Sekarang →</a>
+        </div>
+        {{-- Kepercayaan --}}
+        <div class="lp-trust mt-3 px-3 px-md-4 py-3 d-flex flex-wrap align-items-center gap-2">
+            <div class="me-2">
+                <strong class="d-block small">Dipercaya oleh</strong>
+                <strong class="d-block">Ratusan Perguruan Tinggi</strong>
+            </div>
+            <span class="lp-pill"><span class="mono" style="background:#1769F5">PT</span> Perguruan Tinggi Negeri</span>
+            <span class="lp-pill"><span class="mono" style="background:#7C6FF0">PS</span> Perguruan Tinggi Swasta</span>
+            <span class="lp-pill"><span class="mono" style="background:#12C8E8">PO</span> Politeknik &amp; Vokasi</span>
+            <span class="lp-pill"><span class="mono" style="background:#16A36A">IN</span> Institut &amp; Sekolah Tinggi</span>
+            <span class="text-secondary small ms-auto">dan lainnya…</span>
+        </div>
+        {{-- 8 modul ringkas --}}
+        <div class="row g-2 mt-3">
+            @php
+                $minis = [
+                    ['PMB &<br>Penerimaan', 'pmb.create', '#1769F5', 'M3 12l9-7 9 7M5 10v10h5v-6h4v6h5V10'],
+                    ['Akademik &<br>Kurikulum', 'publik.prodi', '#12C8E8', 'M4 5h16v12H4zM4 9h16M8 5V3h8v2'],
+                    ['LMS &<br>CBT', 'lms.materi', '#7C6FF0', 'M4 5h16v10H4zM10 9l4 3-4 3z'],
+                    ['Keuangan &<br>Akuntansi', 'keuangan.bayar', '#E9A23B', 'M4 7h16v10H4zM4 10h16M7 14h4'],
+                    ['HR &<br>Payroll', 'keuangan.payroll', '#16A36A', 'M9 11a3 3 0 106 0 3 3 0 00-6 0M3 20c0-3 4-5 9-5s9 2 9 5'],
+                    ['Penelitian &<br>Pengabdian', 'riset.publikasi', '#E9658B', 'M9 3h6v6l-3 3-3-3zM12 12v9M8 21h8'],
+                    ['Alumni &<br>Tracer Study', 'publik.alumni', '#0EA5E9', 'M8 11a3 3 0 106 0 3 3 0 00-6 0M2 20c0-3 3-5 7-5h2M16 4l5 5m0-5l-5 5'],
+                    ['Integrasi &<br>PDDikti', 'admin.integrasi', '#64748B', 'M9 15l-4-4 4-4M15 9l4 4-4 4M13 5l-2 14'],
+                ];
+            @endphp
+            @foreach($minis as [$nama, $rute, $warna, $path])
+                <div class="col-6 col-md-3">
+                    <a class="lp-mini" href="{{ route($rute) }}">
+                        <span class="mi" style="background:{{ $warna }}">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ $path }}"/></svg>
+                        </span>
+                        <b>{!! $nama !!}</b>
+                    </a>
+                </div>
+            @endforeach
         </div>
     </div>
 </div>
-{{-- ============ 3. PRODUCT VALUE ============ --}}
-<div class="container-xl mt-4" style="max-width: 1280px" id="nilai">
-    <div class="row text-center g-3">
-        @php
-            $values = [
-                ['Akademik Terintegrasi', 'KRS, KHS, nilai, kurikulum, dan jadwal dalam satu alur yang konsisten dan teraudit.'],
-                ['Keuangan Terkendali', 'Tagihan, VA/QRIS, verifikasi berjenjang, jurnal otomatis, dan rekonsiliasi bank.'],
-                ['Siklus Mahasiswa Penuh', 'Dari PMB hingga yudisium, wisuda, dan alumni — tanpa data terpisah.'],
-                ['Akses Sesuai Peran', 'Rektor, BAAK, keuangan, dosen, dan mahasiswa melihat tepat yang seharusnya.'],
-            ];
-        @endphp
-        @foreach($values as [$judul, $deskripsi])
-            <div class="col-md-3">
-                <div class="card kampius-modul"><div class="card-body">
-                    <h3 class="h4">{{ $judul }}</h3>
-                    <p class="text-secondary small mb-0">{{ $deskripsi }}</p>
-                </div></div>
+
+{{-- ============ MENGAPA + ALUR ============ --}}
+<div class="container-xl mt-5" style="max-width:1280px" id="solusi">
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <span class="lp-kicker"><span class="dot"></span> Mengapa KAMPUS?</span>
+            <h2 class="fw-bold mt-2">Solusi ERP Kampus untuk Masa Depan Pendidikan</h2>
+            <p class="text-secondary">Dengan teknologi terkini dan didukung tim profesional, KAMPUS membantu institusi Anda meningkatkan efisiensi, transparansi, dan kualitas layanan.</p>
+            <ul class="list-unstyled mt-3">
+                @foreach(['Integrasi penuh antar modul', 'Arsitektur siap multi-kampus', 'Keamanan data kelas enterprise', 'Dukungan teknis profesional'] as $c)
+                    <li class="mb-2 lp-check"><span class="tick">✓</span> {{ $c }}</li>
+                @endforeach
+            </ul>
+            <a href="{{ route('dokumen.index') }}" class="btn btn-primary mt-2">Pelajari Lebih Lanjut →</a>
+        </div>
+        <div class="col-lg-6">
+            <div class="text-center text-primary small fw-bold mb-3">Alur Lengkap dari Pendaftaran hingga Alumni</div>
+            <div class="row text-center g-2">
+                @php
+                    $alurs = [['PMB', 'Pendaftaran Online'], ['Akademik', 'KRS & Perkuliahan'], ['Keuangan', 'Pembayaran & Laporan'], ['Wisuda', '& Alumni']];
+                @endphp
+                @foreach($alurs as $i => [$judul, $sub])
+                    <div class="col-3 position-relative">
+                        @if(!$loop->last)<span class="lp-flow-line d-none d-md-block"></span>@endif
+                        <span class="lp-flow-num fw-bold">{{ $i + 1 }}</span>
+                        <div><strong class="small">{{ $judul }}</strong></div>
+                        <div class="text-secondary" style="font-size:.72rem">{{ $sub }}</div>
+                    </div>
+                @endforeach
             </div>
-        @endforeach
+            <div class="lp-band mt-4 px-3 py-2 d-flex align-items-center justify-content-center gap-2 small">
+                <span class="tick" style="width:20px;height:20px;border-radius:50%;background:#16A36A;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800">✓</span>
+                Satu Sistem, Satu Data, Satu Ekosistem Kampus
+            </div>
+        </div>
     </div>
 </div>
 
-{{-- ============ 4. MODULE SHOWCASE ============ --}}
-<div class="container-xl mt-5" style="max-width: 1280px" id="modul">
-    <div class="mb-3">
-        <div class="text-primary small mb-1 fw-bold">MODUL LENGKAP</div>
-        <h2>Semua Kebutuhan Kampus, Satu Platform</h2>
-        <p class="text-secondary mb-0">Setiap kartu membuka modul aslinya (masuk sesuai peran Anda).</p>
+{{-- ============ FITUR LENGKAP ============ --}}
+<div class="container-xl mt-5" style="max-width:1280px" id="fitur">
+    <span class="lp-kicker"><span class="dot"></span> Modul Unggulan</span>
+    <div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mt-2 mb-3">
+        <h2 class="fw-bold mb-0">Fitur Lengkap untuk Semua Kebutuhan Kampus</h2>
+        <a href="{{ route('dokumen.index') }}" class="small">Lihat Semua Fitur →</a>
     </div>
     @php
-        $moduls = [
-            ['🧑‍🎓', 'PMB Online', 'Pendaftaran, seleksi, dan verifikasi calon mahasiswa.', 'pmb.create'],
-            ['🎓', 'Akademik & Kurikulum', 'Prodi, kurikulum, mata kuliah, dan jadwal.', 'publik.prodi'],
-            ['📝', 'KRS & KHS', 'Pengajuan KRS, persetujuan PA, dan KHS terverifikasi.', 'mahasiswa.krs.pengajuan'],
-            ['💳', 'Keuangan & UKT', 'Tagihan massal, VA/QRIS, dan verifikasi berjenjang.', 'keuangan.bayar'],
-            ['📚', 'LMS & Absensi', 'Materi, tugas, dan presensi QR per pertemuan.', 'lms.materi'],
-            ['📜', 'Surat & Transkrip', 'Penomoran otomatis dan verifikasi QR anti-palsu.', 'surat.pengajuan'],
-            ['🎓', 'Skripsi & Sidang', 'Judul, bimbingan, sidang, dan penilaian penguji.', 'skripsi.pengajuan'],
-            ['🏅', 'Beasiswa', 'Program, penetapan, dan potongan otomatis tagihan.', 'keuangan.beasiswa'],
-            ['🎓', 'Yudisium & Wisuda', 'Kelulusan, SKL, batch wisuda, dan PIN ijazah.', 'skripsi.yudisium'],
-            ['👥', 'Alumni & Magang', 'Direktori alumni dan hub lowongan magang.', 'publik.alumni'],
-            ['📊', 'Laporan & Funnel', 'Rekap eksekutif dan funnel konversi PMB.', 'dashboard.pimpinan'],
-            ['🔌', 'Integrasi & API', 'API v1/v2, webhook HMAC, dan PDDikti.', 'admin.integrasi'],
+        $fiturs = [
+            ['PMB Online', 'Pendaftaran dan seleksi calon mahasiswa.', 'pmb.create', '#1769F5', 'M3 12l9-7 9 7M5 10v10h5v-6h4v6h5V10'],
+            ['Akademik', 'KRS, KHS, dan manajemen perkuliahan.', 'mahasiswa.krs.pengajuan', '#12C8E8', 'M4 5h16v12H4zM4 9h16M8 5V3h8v2'],
+            ['LMS & CBT', 'E-learning dan ujian online.', 'lms.materi', '#7C6FF0', 'M4 5h16v10H4zM10 9l4 3-4 3z'],
+            ['Keuangan', 'Manajemen keuangan terintegrasi.', 'keuangan.bayar', '#E9A23B', 'M4 7h16v10H4zM4 10h16M7 14h4'],
+            ['HR & Payroll', 'Data SDM dan penggajian.', 'keuangan.payroll', '#16A36A', 'M9 11a3 3 0 106 0 3 3 0 00-6 0M3 20c0-3 4-5 9-5s9 2 9 5'],
+            ['Penelitian', 'Penelitian dan pengabdian.', 'riset.publikasi', '#E9658B', 'M9 3h6v6l-3 3-3-3zM12 12v9M8 21h8'],
+            ['Skripsi & Tugas Akhir', 'Bimbingan dan sidang.', 'skripsi.pengajuan', '#7C6FF0', 'M6 3h9l4 4v14H6zM9 12h7M9 16h5'],
+            ['Alumni', 'Tracer Study dan jaringan.', 'publik.alumni', '#0EA5E9', 'M8 11a3 3 0 106 0 3 3 0 00-6 0M2 20c0-3 3-5 7-5h2M16 4l5 5m0-5l-5 5'],
+            ['Aset', 'Manajemen aset kampus.', 'keuangan.hutang', '#F59E0B', 'M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8'],
+            ['Integrasi PDDikti', 'Sinkronisasi data nasional.', 'pddikti.index', '#64748B', 'M9 15l-4-4 4-4M15 9l4 4-4 4M13 5l-2 14'],
         ];
     @endphp
-    <div class="row row-cards">
-        @foreach($moduls as [$ikon, $nama, $deskripsi, $rute])
+    <div class="row g-3" id="modul">
+        @foreach($fiturs as [$nama, $deskripsi, $rute, $warna, $path])
             <div class="col-md-6 col-lg-4">
-                <div class="card kampius-modul"><div class="card-body d-flex gap-3">
-                    <span class="kampius-modul-icon bg-blue-lt">{{ $ikon }}</span>
-                    <div>
-                        <h3 class="card-title mb-1">{{ $nama }}</h3>
-                        <p class="text-secondary small mb-1">{{ $deskripsi }}</p>
-                        <a href="{{ route($rute) }}" class="small">Buka modul →</a>
+                <a href="{{ route($rute) }}" class="text-decoration-none text-dark">
+                    <div class="lp-feat">
+                        <span class="fi" style="background:{{ $warna }}22;color:{{ $warna }}">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ $path }}"/></svg>
+                        </span>
+                        <h3 class="h5 mb-1">{{ $nama }}</h3>
+                        <p class="text-secondary small mb-0">{{ $deskripsi }}</p>
                     </div>
-                </div></div>
+                </a>
             </div>
         @endforeach
     </div>
 </div>
 
-{{-- ============ 5. REAL PRODUCT PREVIEW ============ --}}
-<div class="bg-light mt-5">
-    <div class="container-xl py-5" style="max-width: 1280px" id="pratinjau">
-        <div class="text-primary small mb-1 fw-bold">PRATINJAU PRODUK</div>
-        <h2>Lihat Cara Kerjanya</h2>
-        <p class="text-secondary">Komposisi antarmuka yang sama persis dengan modul aslinya.</p>
-        <div class="row row-cards mt-3">
-            <div class="col-lg-6">
-                <div class="kampius-mock">
-                    <div class="kampius-mock-topbar"><i style="background:#DC4545"></i><i style="background:#E9A23B"></i><i style="background:#16A36A"></i><span class="ms-2 small text-secondary">Keuangan — Verifikasi Pembayaran</span></div>
-                    <img src="{{ asset('img/keuangan-wan.png') }}" alt="Visual analitik keuangan KAMPUS" class="w-100 d-block" style="height:140px;object-fit:cover" loading="lazy">
-                    <div class="p-3">
-                        <div class="d-flex justify-content-between mb-2"><strong>Antrean verifikasi</strong><span class="badge bg-warning-lt">{{ number_format($stats['pembayaran_pending'] ?? 0) }} menunggu</span></div>
-                        <div class="kampius-mock-rows">
-                            <div><span>Pembayaran terverifikasi (total)</span><strong>Rp {{ number_format((float) array_sum($stats['bayar_bulanan']['nominal'] ?? []), 0, ',', '.') }}</strong></div>
-                            <div><span>Tingkat pelunasan</span><strong>{{ (int) ($stats['lunas_pct'] ?? 0) }}%</strong></div>
-                            <div><span>Piutang aktif</span><strong>Rp {{ number_format($stats['piutang'] ?? 0, 0, ',', '.') }}</strong></div>
-                        </div>
-                        <a href="{{ route('keuangan.verifikasi') }}" class="btn btn-primary btn-sm mt-2">Buka verifikasi →</a>
-                    </div>
+{{-- ============ STATISTIK ============ --}}
+<div class="container-xl mt-5" style="max-width:1280px">
+    <div class="lp-stats text-white px-4 py-4">
+        <div class="row g-3 align-items-center text-center">
+            <div class="col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <span style="font-size:2rem">🏆</span>
+                    <div class="text-start"><strong class="d-block">Terbukti &amp; Terpercaya</strong><small class="opacity-75">Data langsung dari database</small></div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="kampius-mock">
-                    <div class="kampius-mock-topbar"><i style="background:#DC4545"></i><i style="background:#E9A23B"></i><i style="background:#16A36A"></i><span class="ms-2 small text-secondary">Akademik — Alur KRS</span></div>
-                    <div class="p-3">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <span class="badge bg-blue">1 Pengajuan</span><span class="text-secondary">→</span>
-                            <span class="badge bg-warning-lt">2 Persetujuan PA</span><span class="text-secondary">→</span>
-                            <span class="badge bg-green-lt">3 {{ (int) ($stats['krs_pct'] ?? 0) }}% disetujui</span>
-                        </div>
-                        <div class="kampius-mock-rows">
-                            <div><span>KRS menunggu hari ini</span><strong>{{ number_format($stats['krs_pending'] ?? 0) }}</strong></div>
-                            <div><span>Disetujui hari ini</span><strong>{{ number_format($stats['krs_ok'] ?? 0) }}</strong></div>
-                            <div><span>Kehadiran tercatat</span><strong>{{ (int) ($stats['hadir_pct'] ?? 0) }}%</strong></div>
-                        </div>
-                        <a href="{{ route('mahasiswa.krs.pengajuan') }}" class="btn btn-primary btn-sm mt-2">Buka KRS →</a>
-                    </div>
-                </div>
-            </div>
+            <div class="col-6 col-md-3"><div class="lp-stat-num">{{ $jmlMhs }}+</div><small class="opacity-75">Mahasiswa Terdata</small></div>
+            <div class="col-6 col-md-3"><div class="lp-stat-num">{{ $jmlDosen }}+</div><small class="opacity-75">Dosen Aktif</small></div>
+            <div class="col-6 col-md-3"><div class="lp-stat-num">{{ $lunasPct }}%</div><small class="opacity-75">Tingkat Pelunasan</small></div>
         </div>
     </div>
 </div>
 
-{{-- ============ 6. LIFECYCLE ============ --}}
-<div class="container-xl mt-5" style="max-width: 1280px">
-    <div class="text-primary small mb-1 fw-bold">SIKLUS HIDUP</div>
-    <h2>Dari Pendaftar hingga Alumni</h2>
-    <div class="row text-center mt-3 g-3">
+{{-- ============ TESTIMONI ============ --}}
+<div class="container-xl mt-5" style="max-width:1280px">
+    <span class="lp-kicker"><span class="dot"></span> Testimoni</span>
+    <h2 class="fw-bold mt-2">Apa Kata Mereka?</h2>
+    <p class="text-secondary small">Kepuasan pengguna adalah prioritas kami. <span class="fst-italic">(kutipan ilustrasi)</span></p>
+    <div class="row g-3 mt-1">
         @php
-            $siklus = [['PMB', 'Pendaftaran online'], ['Seleksi', 'Verifikasi & nilai'], ['Daftar Ulang', 'NIM & tagihan awal'], ['KRS', 'Rencana studi'], ['Kuliah', 'LMS & absensi'], ['Nilai', 'KHS & IPK'], ['Skripsi', 'Sidang & lulus'], ['Wisuda', 'Yudisium & ijazah'], ['Alumni', 'Tracer & magang']];
-        @endphp
-        @foreach($siklus as [$judul, $sub])
-            <div class="col-4 col-md-2 position-relative">
-                @if(!$loop->last)<span class="kampius-step-line d-none d-md-block"></span>@endif
-                <span class="kampius-step-num">{{ $loop->iteration }}</span>
-                <div><strong class="small">{{ $judul }}</strong></div>
-                <div class="text-secondary small">{{ $sub }}</div>
-            </div>
-        @endforeach
-    </div>
-    <div class="card kampius-card mt-3"><div class="row g-0 align-items-center">
-        <div class="col-md-6"><img src="{{ asset('img/wisuda-wan.png') }}" alt="Wisuda kampus KAMPUS" class="img-fluid w-100 h-100" style="object-fit:cover;min-height:220px;border-radius:16px 0 0 16px" loading="lazy"></div>
-        <div class="col-md-6 p-4">
-            <h3 class="mb-1">Dari Pendaftar hingga Wisudawan</h3>
-            <p class="text-secondary">Satu alur utuh tanpa data terpisah — dan setiap dokumen penting terverifikasi QR.</p>
-            <a href="{{ route('pmb.create') }}" class="btn btn-primary">Mulai dari PMB →</a>
-        </div>
-    </div></div>
-</div>
-
-{{-- ============ 7. ROLE EXPERIENCE ============ --}}
-<div class="container-xl mt-5" style="max-width: 1280px" id="peran">
-    <div class="text-primary small mb-1 fw-bold">UNTUK SEMUA PERAN</div>
-    <h2>Satu Sistem, Pengalaman yang Tepat</h2>
-    <img src="{{ asset('img/akademik-wan.png') }}" alt="Mahasiswa belajar dengan laptop di kampus" class="img-fluid w-100 mb-3" style="max-height:280px;object-fit:cover;border-radius:16px" loading="lazy">
-    <div class="row row-cards mt-3">
-        @php
-            $perans = [
-                ['Rektor', 'Pertumbuhan, kinerja akademik, dan keuangan institusi.', 'dashboard.pimpinan'],
-                ['BAAK', 'Administrasi mahasiswa, KRS, dan kalender akademik.', 'admin.pmb.verifikasi'],
-                ['Keuangan', 'Verifikasi pembayaran dan laporan penerimaan.', 'keuangan.verifikasi'],
-                ['Dosen', 'Jadwal mengajar, roster, dan input nilai.', 'dosen.krs.persetujuan'],
-                ['Mahasiswa', 'KRS, jadwal, nilai, dan tagihan dalam satu tempat.', 'mahasiswa.krs.pengajuan'],
-                ['Admin Prodi', 'Mahasiswa, kurikulum, dan persetujuan program studi.', 'admin.master'],
+            $testis = [
+                ['img/avatar-dosen.png', 'Dr. Siti Rahayu, M.Pd', 'Wakil Rektor Akademik', '“KAMPUS sangat membantu transformasi digital kampus kami.”'],
+                ['img/avatar-rektor.png', 'Prof. Budi Santoso, M.Kom', 'Dekan Fakultas Teknik', '“Integrasinya lengkap dan dukungannya luar biasa.”'],
+                ['img/avatar-baak.png', 'Dr. Andi Wijaya', 'Kepala BAAK', '“Satu sistem untuk semua kebutuhan kampus.”'],
             ];
         @endphp
-        @foreach($perans as [$nama, $deskripsi, $rute])
+        @foreach($testis as [$foto, $nama, $jabatan, $kutip])
             <div class="col-md-4">
-                <div class="card kampius-role"><div class="card-body">
-                    <h3 class="card-title">{{ $nama }}</h3>
-                    <p class="text-secondary small">{{ $deskripsi }}</p>
-                    <a href="{{ route($rute) }}" class="small">Masuk sebagai {{ $nama }} →</a>
-                </div></div>
-            </div>
-        @endforeach
-    </div>
-</div>
-
-{{-- ============ 8. SECURITY + INTEGRATION ============ --}}
-<div class="container-xl mt-5" style="max-width: 1280px" id="keamanan">
-    <div class="row row-cards">
-        <div class="col-lg-6">
-            <div class="card h-100 bg-dark text-white overflow-hidden">
-                <img src="{{ asset('img/keamanan-wan.png') }}" alt="Perisai keamanan siber KAMPUS" class="w-100 d-block" style="height:150px;object-fit:cover" loading="lazy">
-                <div class="card-body">
-                    <span class="badge bg-dark-lt text-info mb-2">KEAMANAN TERVERIFIKASI</span>
-                    <h2 class="text-white">Keamanan Tingkat Enterprise</h2>
-                    <ul class="list-unstyled mt-3">
-                        <li class="mb-2">✓ Hak akses berbasis peran di setiap rute</li>
-                        <li class="mb-2">✓ Otorisasi kepemilikan data per pengguna</li>
-                        <li class="mb-2">✓ Dokumen QR bertanda tangan anti-palsu</li>
-                        <li class="mb-2">✓ Audit trail setiap aksi penting</li>
-                        <li class="mb-2">✓ Webhook HMAC dan throttle anti-abuse</li>
-                    </ul>
-                    <a href="{{ route('dokumen.index') }}" class="btn btn-outline-light">Baca dokumentasi →</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-body">
-                    <span class="badge bg-blue-lt text-primary mb-2">INTEGRASI</span>
-                    <h2>Terhubung ke Ekosistem Kampus</h2>
-                    <ul class="list-unstyled mt-3 text-secondary">
-                        <li class="mb-2">→ Payment gateway: VA bank, QRIS, e-wallet</li>
-                        <li class="mb-2">→ API v1 untuk aplikasi mobile</li>
-                        <li class="mb-2">→ API v2 publik + webhook terverifikasi</li>
-                        <li class="mb-2">→ Ekspor PDDikti dan laporan Excel</li>
-                        <li class="mb-2">→ Kalender akademik + format ICS</li>
-                    </ul>
-                    <a href="{{ route('admin.integrasi') }}" class="btn btn-primary">Kelola integrasi →</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- ============ 9. FAQ ============ --}}
-<div class="container-xl mt-5" style="max-width: 860px" id="faq">
-    <div class="text-center">
-        <span class="badge bg-blue-lt text-primary mb-2">FAQ</span>
-        <h2>Pertanyaan yang Sering Diajukan</h2>
-    </div>
-    <div class="accordion mt-3" id="faqAccordion">
-        @php
-            $faqs = [
-                ['Bagaimana cara mencoba KAMPUS?', 'Klik Demo Gratis dan masuk dengan akun demo sesuai peran (mahasiswa, dosen, keuangan, admin). Setiap peran melihat menu dan datanya sendiri.'],
-                ['Apakah data saya aman dan terisolasi?', 'Ya. Setiap rute dilindungi peran dan kepemilikan data dicek di server — mahasiswa hanya melihat datanya sendiri, dosen hanya bimbingannya.'],
-                ['Bagaimana pembayaran kuliah dilakukan?', 'Mahasiswa membuat VA/QRIS dari tagihannya, atau mengunggah bukti manual untuk diverifikasi petugas keuangan dengan jurnal otomatis.'],
-                ['Apakah dokumen ijazah dan transkrip bisa diverifikasi?', 'Ya. Setiap dokumen membawa QR bertanda tangan digital yang bisa dicek siapa pun lewat halaman verifikasi publik.'],
-                ['Apakah mendukung banyak program studi?', 'Ya. Struktur Fakultas → Program Studi mendukung banyak prodi dalam satu instalasi, dengan rekap per prodi.'],
-            ];
-        @endphp
-        @foreach($faqs as $i => [$tanya, $jawab])
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button {{ $i > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ $i }}" aria-expanded="{{ $i === 0 ? 'true' : 'false' }}">{{ $tanya }}</button>
-                </h2>
-                <div id="faq{{ $i }}" class="accordion-collapse collapse {{ $i === 0 ? 'show' : '' }}" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body text-secondary">{{ $jawab }}</div>
+                <div class="lp-testi">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <img src="{{ asset($foto) }}" alt="{{ $nama }}" loading="lazy">
+                        <div><strong class="d-block small">{{ $nama }}</strong><small class="text-secondary">{{ $jabatan }}</small></div>
+                    </div>
+                    <p class="text-secondary small">{{ $kutip }}</p>
+                    <div class="lp-stars">★★★★★</div>
                 </div>
             </div>
         @endforeach
     </div>
 </div>
 
-{{-- ============ 10. CTA ============ --}}
-<div class="kampius-landing-hero text-white mt-5">
-    <div class="container-xl py-5 text-center position-relative" style="max-width: 1280px; z-index:1">
-        <h2 class="fw-bold">Siap Mengelola Kampus dengan KAMPUS?</h2>
-        <p class="opacity-75 mb-3">Mulai dari PMB online hari ini — tanpa instalasi rumit.</p>
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
-            <a href="{{ route('pmb.create') }}" class="btn btn-light btn-lg">Daftar PMB →</a>
-            <a href="{{ route('login') }}" class="btn btn-outline-light btn-lg">Demo Gratis</a>
+{{-- ============ CTA ============ --}}
+<div class="container-xl mt-5" style="max-width:1280px">
+    <div class="lp-cta p-4 p-md-5 text-white">
+        <img src="{{ asset('img/kampus-hero-wan.png') }}" alt="" aria-hidden="true" loading="lazy">
+        <div class="position-relative text-center" style="z-index:1">
+            <h2 class="fw-bold">Siap Meningkatkan Layanan Kampus Anda?</h2>
+            <p class="opacity-75">Hubungi tim kami untuk demo, konsultasi, dan informasi lebih lanjut.</p>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a href="{{ route('login') }}" class="btn btn-light btn-lg">Request Demo →</a>
+                <a href="{{ route('pmb.create') }}" class="btn btn-outline-light btn-lg">⌕ Mulai PMB</a>
+            </div>
         </div>
     </div>
 </div>
 
-{{-- ============ 11. FOOTER ============ --}}
-<footer class="container-xl mt-4 mb-3" style="max-width: 1280px" id="kontak">
-    <div class="d-flex flex-wrap justify-content-between align-items-center text-secondary small gap-2">
-        <span class="d-inline-flex align-items-center gap-2"><img src="{{ asset('img/logo-kampus-mark.png') }}" alt="Logo KAMPUS" width="22" height="22" style="border-radius:6px"><strong class="text-dark">KAMPUS</strong> <span class="text-secondary">University ERP</span></span>
-        <span>
-            <a href="{{ route('home') }}" class="me-3">Beranda</a>
-            <a href="#modul" class="me-3">Modul</a>
-            <a href="{{ route('dokumen.index') }}" class="me-3">Dokumentasi</a>
-            <a href="#faq" class="me-3">FAQ</a>
-            <a href="#kontak">Kontak</a>
-        </span>
-        <span>© {{ date('Y') }} KAMPUS. Data agregat di halaman ini dihitung langsung dari database.</span>
-    </div>
-</footer>
+{{-- ============ FOOTER ============ --}}
+<div class="container-xl mt-4" style="max-width:1280px" id="kontak">
+    <footer class="lp-footer text-white-50 px-4 pt-4 pb-3">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <img src="{{ asset('img/logo-kampus-mark.png') }}" alt="Logo KAMPUS" width="32" height="32" style="border-radius:9px">
+                    <div><strong class="text-white d-block">KAMPUS ERP</strong><small>Smart Campus, Better Future</small></div>
+                </div>
+                <p class="small">Academic ERP terintegrasi: PMB, akademik, keuangan, dan pelaporan dalam satu sistem.</p>
+            </div>
+            <div class="col-6 col-md-2">
+                <strong class="text-white d-block small mb-2">Navigasi</strong>
+                <div class="d-grid gap-1 small">
+                    <a href="{{ route('home') }}">Beranda</a>
+                    <a href="{{ url('/#fitur') }}">Fitur</a>
+                    <a href="{{ url('/#modul') }}">Modul</a>
+                    <a href="{{ route('dokumen.index') }}">Dokumentasi</a>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <strong class="text-white d-block small mb-2">Layanan</strong>
+                <div class="d-grid gap-1 small">
+                    <a href="{{ route('pmb.create') }}">Pendaftaran PMB</a>
+                    <a href="{{ route('publik.prodi') }}">Program Studi</a>
+                    <a href="{{ route('publik.pengumuman') }}">Pengumuman</a>
+                    <a href="{{ route('publik.karier') }}">Karier</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <strong class="text-white d-block small mb-2">Bantuan</strong>
+                <div class="d-grid gap-1 small">
+                    <a href="{{ route('dokumen.index') }}">Dokumentasi</a>
+                    <a href="{{ url('/#faq') }}">FAQ</a>
+                    <a href="{{ route('health') }}">Status Sistem</a>
+                </div>
+            </div>
+        </div>
+        <hr class="border-secondary opacity-25">
+        <div class="d-flex flex-wrap justify-content-between gap-2 small">
+            <span>© {{ date('Y') }} KAMPUS ERP. Angka di halaman ini dihitung langsung dari database.</span>
+            <span><a href="{{ url('/#faq') }}" class="me-3">Syarat &amp; Ketentuan</a><a href="{{ url('/#faq') }}" class="me-3">Kebijakan Privasi</a><a href="{{ route('dokumen.index') }}">Bantuan</a></span>
+        </div>
+    </footer>
+</div>
+
+<button id="toTop" aria-label="Kembali ke atas">↑</button>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    var btn = document.getElementById('toTop');
+    window.addEventListener('scroll', function () {
+        btn.style.display = window.scrollY > 600 ? 'inline-flex' : 'none';
+    });
+    btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+@endpush

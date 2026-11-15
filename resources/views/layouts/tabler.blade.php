@@ -246,15 +246,18 @@
                 <div class="collapse navbar-collapse" id="public-menu">
                     <ul class="navbar-nav">
                         <li class="nav-item"><a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Beranda</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('publik.prodi*') ? 'active' : '' }}" href="{{ route('publik.prodi') }}">Program Studi</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('publik.pengumuman*') ? 'active' : '' }}" href="{{ route('publik.pengumuman') }}">Pengumuman</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('pmb.*') ? 'active' : '' }}" href="{{ route('pmb.create') }}">PMB</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url('/#fitur') }}">Fitur</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url('/#modul') }}">Modul</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url('/#keamanan') }}">Keamanan</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url('/#faq') }}">FAQ</a></li>
+                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('dokumen.*') ? 'active' : '' }}" href="{{ route('dokumen.index') }}">Dokumentasi</a></li>
                     </ul>
                     <div class="ms-auto d-flex gap-2">
                         @auth
                             <a href="{{ route('dashboard') }}" class="btn btn-outline-primary">Dashboard</a>
                         @else
-                            <a href="{{ route('login') }}" class="btn btn-primary">Masuk</a>
+                            <a href="{{ route('login') }}" class="btn btn-outline-primary">Masuk</a>
+                            <a href="{{ route('login') }}" class="btn btn-primary" title="Coba langsung dengan akun demo">Request Demo →</a>
                         @endauth
                     </div>
                 </div>

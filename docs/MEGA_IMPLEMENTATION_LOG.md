@@ -261,6 +261,21 @@ Bukan kode integrasi pura-pura — yang dikerjakan jujur bisa diuji:
   (adapter vs kredensial yang kurang).
 - Tes: `tests/Feature/WaveDReadinessTest.php` (4 tes).
 
+## 2026-11-15 — Landing page ala konsep visual (tanpa klaim palsu), 297/297 hijau
+
+- `welcome.blade.php` ditulis ulang mengikuti 7 poin konsep: hero terang +
+  mockup dashboard dominan (angka real `$stats` + grafik SVG),
+  strip kepercayaan kategori PT (tanpa logo universitas fiktif),
+  8 modul ringkas, mengapa + alur 4 tahap, grid 10 fitur SVG,
+  band statistik angka real, testimoni WAN + label ilustrasi,
+  CTA banner foto kampus, footer navy + tombol ke atas.
+- Nav publik: Beranda/Fitur/Modul/Keamanan/FAQ/Dokumentasi + Masuk/Request Demo.
+- Tes: `tests/Feature/LandingTest.php` (4 tes: 7 elemen, tanpa klaim palsu,
+  angka ikut DB, nav jangkar).
+- Aset 100% lokal (ComfyUI WAN): server ComfyUI sedang mati saat eksekusi,
+  jadi dipakai ulang `kampus-hero-wan.png` + avatar WAN yang sudah ada —
+  tanpa unduh gambar eksternal.
+
 ## Status akhir: 60/66 — 6 tersisa semuanya BLOCKED eksternal
 - M-054 multi-kampus: desain di `DESAIN_MULTI_KAMPUS.md`, MENUNGGU PENGESAHAN.
 - M-061,062,063,065,066: butuh konektivitas nyata (Feeder, gateway prod,
