@@ -75,13 +75,13 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 ## WAVE D — integrasi (6 item, semua BLOCKED sampai konektivitas nyata diuji)
 
 - M-061 PDDikti/Feeder adapter (BLOCKED). M-062 payment gateway prod (BLOCKED).
-- M-063 WhatsApp (BLOCKED). M-064 Email/FCM (PARTIAL — FCM token ada, lanjutkan).
+- M-063 WhatsApp (BLOCKED). M-064 Email/FCM (SELESAI: FCM token + channel email + inbox/WA/notifikasi).
 - M-065 SSO Google/Microsoft (BLOCKED). M-066 tanda-tangan dokumen (BLOCKED).
 
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
-Selesai=60 (2026-11-15, suite 293 hijau):
+Selesai=60 (2026-11-15, suite 300 hijau):
 Wave A 20/20, Wave B 28/28, Wave C 11/12 SELESAI (sisa M-054 BLOCKED).
 Wave D: M-061,062,063,065,066 BLOCKED + M-064 SELESAI
 (channel email `MailService`; kirim nyata butuh SMTP). Rincian batch di bawah.
@@ -139,9 +139,10 @@ ketercapaian terbobot + Livewire `Obe/Kelola` di `/admin/obe`),
 M-052 (GL penuh: `coa` + `jurnal_umum` + `jurnal_item` + `GlService`
 posting-berimbang/buku-besar/neraca-saldo + guard tutup-buku +
 `seederDasarCoa` + Livewire `Keuangan/Gl` di `/keuangan/gl`).
-Sisa: M-030/031 (SCORM/offline), M-057 (RAG knowledge-base XL),
-M-054 (multi-kampus BLOCKED).
-Wave D: 6 item BLOCKED (butuh konektivitas nyata).
+Wave C Batch 4: RAG + SCORM (bukti: `tests/Feature/WaveCBatch4Test.php` 4 tes).
+Sisa: M-054 (multi-kampus — desain di `DESAIN_MULTI_KAMPUS.md`, MENUNGGU PENGESAHAN).
+Wave D: 5 item BLOCKED (M-061,062,063,065,066 — butuh konektivitas nyata);
+M-064 SELESAI di level kode.
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →
 recheck-tx di PaymentService), M-005 (allowlist act PddiktiController::ALLOWED_ACTS,
