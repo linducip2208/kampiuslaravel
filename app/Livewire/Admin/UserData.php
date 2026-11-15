@@ -36,7 +36,13 @@ class UserData extends Component
     /** @return list<string> */
     public static function daftarRole(): array
     {
-        return ['superadmin', 'admin_prodi', 'keuangan', 'dosen', 'mahasiswa', 'pimpinan'];
+        // Dinamis dari DB agar peran baru seeder langsung bisa ditetapkan
+        // (validasi simpan() memakai daftar yang sama — selalu sinkron).
+        try {
+            return Role::orderBy('name')->pluck('name')->all();
+        } catch (\Throwable) {
+            return ['superadmin', 'admin_prodi', 'keuangan', 'dosen', 'mahasiswa', 'pimpinan'];
+        }
     }
 
     public function updatingSearch(): void

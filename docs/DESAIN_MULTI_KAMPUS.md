@@ -1,4 +1,14 @@
-# Desain Multi-Kampus — MENUNGGU PENGESAHAN (M-054 tetap BLOCKED)
+# Desain Multi-Kampus — DITOLAK (arsip, JANGAN dieksekusi)
+
+> Keputusan arsitektur (brief master: SINGLE-INSTITUTION, NO MULTI-TENANT,
+> NO TENANT ISOLATION): dokumen ini dipertahankan murni sebagai arsip
+> rancangan. M-054 = DITOLAK_WITH_EVIDENCE. Setiap kode isolasi tenant,
+> middleware tenant, billing tenant, atau `kampus_id` global scope
+> DILARANG ditambahkan ke repo ini.
+
+Dokumen asli di bawah garis hanya untuk referensi keputusan.
+
+---
 
 Dokumen ini adalah deliverable desain sesuai syarat BACKLOG M-054:
 tanpa desain yang disahkan, tidak ada kode isolasi yang ditulis.
@@ -73,5 +83,5 @@ Rollback tiap fase: migrasi `down()` + feature flag
 
 ## 7. Status
 
-**MENUNGGU PENGESAHAN** — M-054 tetap BLOCKED. Tidak ada kode isolasi
-ditulis sebelum semua kotak §6 dicentang (aturan BACKLOG).
+**DITOLAK** — keputusan arsitektur single-institution (brief master).
+Bagian 1–6 di atas adalah arsip rancangan yang tidak berlaku.

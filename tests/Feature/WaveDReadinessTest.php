@@ -29,18 +29,17 @@ class WaveDReadinessTest extends TestCase
         $this->seed(RolesPermissionsSeeder::class);
     }
 
-    /** M-054: desain ada + eksplisit MENUNGGU PENGESAHAN + tanpa kode isolasi. */
-    public function test_desain_multikampus_menunggu_pengesahan(): void
+    /** M-054: DITOLAK per arsitektur single-institution + tanpa kode isolasi. */
+    public function test_desain_multikampus_ditolak_tanpa_kode(): void
     {
         $path = base_path('docs/DESAIN_MULTI_KAMPUS.md');
         $this->assertFileExists($path);
 
         $doc = (string) file_get_contents($path);
-        $this->assertStringContainsString('MENUNGGU PENGESAHAN', $doc);
-        $this->assertStringContainsString('Opsi A', $doc);
-        $this->assertStringContainsString('KampusScope', $doc);
+        $this->assertStringContainsString('DITOLAK', $doc);
+        $this->assertStringNotContainsString('MENUNGGU PENGESAHAN', $doc);
 
-        // Aturan BACKLOG: tanpa kode isolasi sebelum pengesahan.
+        // Aturan arsitektur: tidak ada kode isolasi tenant di repo.
         $this->assertFalse(class_exists(KampusScope::class));
         $this->assertFalse(class_exists(Kampus::class));
     }

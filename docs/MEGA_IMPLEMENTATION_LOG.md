@@ -250,9 +250,8 @@ Kode:
 Bukan kode integrasi pura-pura — yang dikerjakan jujur bisa diuji:
 - M-054: `docs/DESAIN_MULTI_KAMPUS.md` (Opsi A shared-schema+kampus_id
   direkomendasikan, matriks permission, resolusi tenant, migrasi 5 fase +
-  rollback, checklist pengesahan). Status MENUNGGU PENGESAHAN — tetap
-  BLOCKED, dan diverifikasi tes bahwa BELUM ADA kode isolasi
-  (`KampusScope`/`Kampus` tidak ada).
+  rollback, checklist pengesahan). [SUPERSEDED 2026-11-15: M-054 DITOLAK
+  per keputusan single-institution; lihat entri RBAC batch 1.]
 - M-064: `Mail/TagihanReminderMail` + `Services/MailService`
   (`terkonfigurasi()`: smtp+host, selain itu no-op) + hook di
   `tagihan:ingatkan` (ikut idempotensi H-7/HP7, try/catch report).
@@ -313,12 +312,18 @@ Bukan kode integrasi pura-pura — yang dikerjakan jujur bisa diuji:
 `/api/v2/status` (db up, 0 pending) — semua 200. Blade terkompilasi
 penuh (`view:cache` lolos). Bukan bukti browser/E2E — tetap 0.
 
-## Status akhir: 60/66 — 6 tersisa semuanya BLOCKED eksternal
-- M-054 multi-kampus: desain di `DESAIN_MULTI_KAMPUS.md`, MENUNGGU PENGESAHAN.
-- M-061,062,063,065,066: butuh konektivitas nyata (Feeder, gateway prod,
-  WA gateway, SSO creds, TTE BSrE) — nol kredensial di repo.
-  M-064 selesai di level kode (FCM + email); kirim nyata butuh SMTP/FCM creds.
+## 2026-11-15 — RBAC batch 1 + Tabler lokal + pensiun M-054 (target: suite hijau)
 
-1. Wave A M-001..M-004 (callback & lock keuangan) + tes red-green.
-2. Wave A M-007..M-010 (IPS/IPK) + tes.
-3. Wave A M-015 (Policy pertama: Tagihan + KHS) sebagai pola migrasi `can:`.
+- M-054: DITOLAK_WITH_EVIDENCE per keputusan arsitektur single-institution
+  (brief master §1-6); `DESAIN_MULTI_KAMPUS.md` jadi arsip bertanda
+  JANGAN-dieksekusi; larangan kode isolasi tenant.
+- Frontend: Tabler 1.7.5 di-vendor lokal (`public/vendor/tabler-1.7.5/`,
+  tercatat di package.json) — CDN `@latest` dihapus dari layout +
+  halaman login; tanpa ubah tampilan (aset identik).
+- RBAC: 13 peran baru di seeder (aditif; 6 lama utuh, teruji),
+  `UserData::daftarRole()` dinamis dari DB, `docs/FINAL_RBAC_MATRIX.md` v1,
+  `tests/Feature/RbacExpansionTest.php` (4 tes: matriks, regresi,
+  penetapan via UI, gate permission vs denial).
+- Tes WaveDReadiness yang basi diperbarui mengikuti status DITOLAK.
+
+## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

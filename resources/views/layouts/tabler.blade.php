@@ -17,7 +17,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/tabler-1.7.5/css/tabler.min.css') }}">
     <style>
         :root {
             --kampius-primary: #1769F5;
@@ -507,7 +507,7 @@
     document.addEventListener('keydown', onKey);
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js" defer></script>
+<script src="{{ asset('vendor/tabler-1.7.5/js/tabler.min.js') }}" defer></script>
 <script>
 // M-060: daftarkan service worker portal mahasiswa.
 if ('serviceWorker' in navigator) {

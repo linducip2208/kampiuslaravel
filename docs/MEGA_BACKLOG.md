@@ -65,8 +65,10 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 - M-049 OBE/CPL/CPMK + pemetaan asesmen (P1/XL). M-050 akreditasi evidence (P1/L).
 - M-051 CBT session: timer, autosave, recovery (P0/XL, di atas M-027+ mesin kuis).
 - M-052 GL akuntansi penuh (P1/XL). M-053 BKD lanjut (P2/L).
-- M-054 multi-kampus: DESAIN DULU (isolasi, permission, migrasi) — tanpa desain
-  yang disahkan status BLOCKED (P0/XL).
+- M-054 multi-kampus: DITOLAK_WITH_EVIDENCE (keputusan arsitektur
+  SINGLE-INSTITUTION, brief master §keputusan 1-6).
+  `docs/DESAIN_MULTI_KAMPUS.md` dipertahankan sebagai arsip rancangan
+  yang TIDAK BOLEH dieksekusi; tanpa isolasi/tenant/billing tenant.
 - M-055 alumni+karier (P2/M, tracer sudah ada). M-056 analitik eksekutif+KPI (P2/L).
 - M-057 RAG knowledge-base + guardrail AI (P1/XL). M-058 kuota/biaya AI (P1/M).
 - M-059 kontrak mobile Flutter per dokumen Fase 6 (P1/L).
@@ -82,7 +84,7 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
 Selesai=60 (2026-11-15, suite 304 hijau):
-Wave A 20/20, Wave B 28/28, Wave C 11/12 SELESAI (sisa M-054 BLOCKED).
+Wave A 20/20, Wave B 28/28, Wave C 11/12 SELESAI (M-054 DITOLAK — single-institution).
 Wave D: M-061,062,063,065,066 BLOCKED + M-064 SELESAI
 (channel email `MailService`; kirim nyata butuh SMTP). Rincian batch di bawah.
 Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
@@ -140,7 +142,7 @@ M-052 (GL penuh: `coa` + `jurnal_umum` + `jurnal_item` + `GlService`
 posting-berimbang/buku-besar/neraca-saldo + guard tutup-buku +
 `seederDasarCoa` + Livewire `Keuangan/Gl` di `/keuangan/gl`).
 Wave C Batch 4: RAG + SCORM (bukti: `tests/Feature/WaveCBatch4Test.php` 4 tes).
-Sisa: M-054 (multi-kampus — desain di `DESAIN_MULTI_KAMPUS.md`, MENUNGGU PENGESAHAN).
+Sisa Wave C: tidak ada (M-054 DITOLAK — single-institution, tanpa multi-tenant).
 Wave D: 5 item BLOCKED (M-061,062,063,065,066 — butuh konektivitas nyata);
 M-064 SELESAI di level kode.
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),

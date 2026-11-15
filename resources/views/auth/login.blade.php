@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('img/icon-192.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('img/logo-kampus-mark.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/tabler-1.7.5/css/tabler.min.css') }}">
 </head>
 <body class="d-flex flex-column">
 <div class="page page-center">
