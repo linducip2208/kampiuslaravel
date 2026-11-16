@@ -536,4 +536,13 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - KHS: snapshot localStorage + banner luring.
 - Tes: `Batch18Test` (3 tes: auto-isi 750rb, 3 item + toggle, cache key).
 
+## 2026-11-16 — Ide bank batch 19: asrama (kamar + iuran)
+
+- Asrama: tabel kamar + hunian + `Kelola` (CRUD kamar, huni/keluar,
+  audit, tarik iuran idempoten) di `/asrama`.
+- Tagihan: jenis `asrama` (MySQL MODIFY + rebuild SQLite paritas index;
+  ImporCsv ikut).
+- Tes: `Batch19Test` (3 tes: ganda/penuh ditolak, iuran 750rb
+  idempoten, halaman admin).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

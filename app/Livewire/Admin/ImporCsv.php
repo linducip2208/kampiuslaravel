@@ -233,8 +233,8 @@ class ImporCsv extends Component
             throw new \RuntimeException('nim/nominal wajib valid.');
         }
 
-        if (! in_array($jenis, ['UKT', 'SPP', 'PMB', 'lain'], true)) {
-            throw new \RuntimeException('jenis harus UKT/SPP/PMB/lain.');
+        if (! in_array($jenis, ['UKT', 'SPP', 'PMB', 'asrama', 'lain'], true)) {
+            throw new \RuntimeException('jenis harus UKT/SPP/PMB/asrama/lain.');
         }
 
         $mahasiswa = Mahasiswa::where('nim', $nim)->firstOrFail();

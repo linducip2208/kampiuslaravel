@@ -338,6 +338,8 @@ Route::middleware('auth')->group(function () {
         })->name('admin.pmb.arsip')->middleware('throttle:5,1');
         // Opname aset: kondisi fisik vs buku + terapkan.
         Route::get('/aset/opname', fn () => view('pages.livewire-page', ['component' => 'aset.opname', 'title' => 'Opname Aset']))->name('aset.opname');
+        // Asrama: alokasi kamar + iuran.
+        Route::get('/asrama', fn () => view('pages.livewire-page', ['component' => 'asrama.kelola', 'title' => 'Asrama']))->name('asrama.kelola');
         Route::get('/admin/users', fn () => view('pages.livewire-page', ['component' => 'admin.user-data', 'title' => 'Kelola User']))->name('admin.users');
         Route::get('/admin/delegasi', fn () => view('pages.livewire-page', ['component' => 'admin.delegasi', 'title' => 'Delegasi Peran']))->name('admin.delegasi');
         Route::get('/admin/matriks-rbac', fn () => view('pages.livewire-page', ['component' => 'admin.matriks-rbac', 'title' => 'Matriks Peran']))->name('admin.matriks-rbac');

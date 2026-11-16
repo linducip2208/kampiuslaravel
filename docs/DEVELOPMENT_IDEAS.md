@@ -108,10 +108,8 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 15. Asrama (modul baru)
 
-- [ ] **Alokasi kamar.** Proposal: gedung→kamar→bed, isi dari mahasiswa
-      aktif, cek ganda 1 bed 1 penghuni. (L.)
-- [ ] **Iuran asrama.** Proposal: tagihan jenis baru + flow bayar existing.
-      (M, setelah alokasi.)
+- [x] **Alokasi kamar.** SELESAI 2026-11-16: `Asrama/Kelola` — kamar (gedung/kode/kapasitas/iuran) + hunikan by NIM + keluarkan + audit; 1 bed 1 penghuni (kapasitas), 1 mhs 1 kamar (unique). Tes: ganda + penuh ditolak.
+- [x] **Iuran asrama.** SELESAI 2026-11-16: jenis tagihan `asrama` (enum MySQL + rebuild SQLite, ImporCsv ikut) + `tarikIuran` (firstOrCreate per penghuni aktif, periode berjalan) — flow bayar existing langsung bisa dipakai. Tes: 1 tagihan 750rb + idempoten.
 
 ## 16. Klinik (modul baru — data sensitif!)
 
