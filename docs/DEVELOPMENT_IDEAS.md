@@ -23,9 +23,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
       ada, tapi belum ada lama-studi/semester-ke. Proposal: hitung dari
       `angkatan` × periode aktif; tampilkan di `transkrip.cetak`.
       (S, tanpa dependensi; terima: tampil benar untuk angkatan 2020–2026.)
-- [ ] **Arsip KRS per semester (PDF).** KRS detail sudah ada; belum ada
-      unduhan arsip per periode. Proposal: tombol unduh di riwayat KRS
-      (mirip `KwitansiController`). (S; terima: PDF berisi detail + QR.)
+- [x] **Arsip KRS.** SELESAI 2026-11-16: riwayat 10 pengajuan terakhir + tautan unduh `krs.cetak` di halaman pengajuan (tanpa PDF baru, cetak existing dipakai ulang).
 - [ ] **Peringatan SKS di pengajuan (bukan cuma blokir).** `validasiKrs`
       sudah blokir; tambahkan pesan dini "sisa SKS X" di UI pengajuan.
       (S; terima: teks muncul sebelum submit.)
@@ -70,9 +68,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [ ] **Ekspor rekap piutang aging.** Piutang ada, aging bucket belum.
       Proposal: kolom 0-30/31-60/61-90/>90 hari di ekspor tagihan.
       (M; terima: total per bucket = total piutang.)
-- [ ] **Pengingat denda otomatis.** Denda dihitung (`denda:terapkan`),
-      tapi pengingat manual. Proposal: sertakan denda berjalan di pesan
-      `tagihan:ingatkan`. (S; terima: pesan memuat nominal denda.)
+- [x] **Pengingat denda otomatis.** SELESAI 2026-11-16: rincian denda di `pesanPengingat` (`termasuk denda RpX`). Tes: pesan memuat nominal.
 - [ ] **Kuitansi gabungan multi-tagihan.** Kwitansi per pembayaran saja.
       Proposal: cetak gabungan per mahasiswa per periode. (M.)
 
@@ -119,8 +115,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [x] **Syarat wisuda otomatis (pratinjau).** SELESAI 2026-11-15: `WisudaService::cekSyarat` + tombol "Cek Syarat" di Yudisium. Alur `luluskan` TIDAK diubah; SKS = info acuan.
       (SKS lulus, IPK ≥ 2.0, bebas tagihan, judul lulus) sebelum daftar.
       (M; terima: tidak lolos syarat → tombol terkunci + alasan.)
-- [ ] **Buku wisuda (PDF).** Batch ada; buku acara belum. Proposal:
-      ekspor daftar wisudawan + NIM + predikat. (S.)
+- [x] **Buku wisuda (CSV, bukan PDF).** SELESAI 2026-11-16: ekspor CSV per batch via `Yudisium::eksporCsv` (tanpa dependensi PDF baru). Tes: file terunduh.
 
 ## 11. Tracer & karier (`Tracer/*`, `Admin/Tracer`)
 
@@ -142,8 +137,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 - [ ] **Opname aset.** Tanpa stok fisik vs buku. Proposal: sesi opname
       (cocok/hilang/rusak) + selisih ke jurnal penyesuaian. (M.)
-- [ ] **Kalender pemakaian ruang.** Daftar doang. Proposal: tampilan
-      kalender mingguan per ruang. (M; bisa pakai ulang pola KHS grid.)
+- [x] **Kalender pemakaian ruang.** SELESAI 2026-11-16: `Jadwal/KalenderRuang` (mingguan, kuliah + booking, geser pekan, filter ruang) di `/fasilitas/kalender`. Temuan: `whereIn(tanggal)` gagal di SQLite, wajib `whereDate` (pola sama seperti `ai_kuota`).
 
 ## 14. Perpustakaan (modul baru — desain dulu, vertikal slice)
 

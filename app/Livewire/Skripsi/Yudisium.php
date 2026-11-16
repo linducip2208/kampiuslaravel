@@ -217,6 +217,34 @@ class Yudisium extends Component
         $this->message = "Batch {$batch->nama} ditutup.";
     }
 
+    /** Unduh CSV buku wisuda batch terpilih (tanpa dependensi PDF). */
+    public function eksporCsv()
+    {
+        abort_unless($this->batchId, 422);
+
+        $rows = WisudaPeserta::with('mahasiswa.user')
+            ->where('batch_id', $this->batchId)
+            ->orderBy('no_kursi')
+            ->get()
+            ->map(fn ($p) => [
+                $p->no_kursi, $p->mahasiswa->nim ?? '-', $p->mahasiswa->user->name ?? '-',
+                $p->no_ijazah ?? '-', $p->pin_ijazah ?? '-', $p->status_toga,
+            ]);
+
+        $nama = 'buku-wisuda-'.$this->batchId.'-'.now()->format('Ymd-His').'.csv';
+
+        return response()->streamDownload(function () use ($rows): void {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['kursi', 'nim', 'nama', 'no_ijazah', 'pin', 'toga'], ';');
+
+            foreach ($rows as $r) {
+                fputcsv($out, $r, ';');
+            }
+
+            fclose($out);
+        }, $nama);
+    }
+
     public function render()
     {
         $query = Mahasiswa::with(['user', 'prodi'])

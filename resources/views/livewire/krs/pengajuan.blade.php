@@ -73,4 +73,18 @@
             </div>
         </div>
     @endif
+
+    @if (isset($this->riwayatSaya) && $this->riwayatSaya->count() > 0)
+        <div class="card kampius-card mt-3">
+            <div class="card-header"><h3 class="card-title">Arsip Pengajuan Saya</h3></div>
+            <div class="list-group list-group-flush">
+                @foreach ($this->riwayatSaya as $r)
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>TA {{ $r->tahunAkademik->tahun ?? '-' }} {{ ucfirst((string) ($r->tahunAkademik->semester ?? '')) }} — {{ $r->total_sks }} SKS <span class="badge bg-info-lt ms-1">{{ $r->status }}</span></span>
+                        <a class="btn btn-sm btn-outline-primary" href="{{ route('krs.cetak', $r->id) }}">Unduh</a>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
 </div>

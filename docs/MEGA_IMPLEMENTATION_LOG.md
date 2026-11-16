@@ -384,4 +384,23 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
   `test_*` — selisih = data provider (mis. CalculationTest),
   diverifikasi via audit `count_tests.py`, bukan angka karangan.
 
+## 2026-11-16 — Ide bank batch 6: kalender ruang, arsip KRS, buku wisuda CSV, pesan denda
+
+- `Jadwal/KalenderRuang` (mingguan kuliah + booking disetujui/diajukan,
+  geser pekan, filter ruang) di `/fasilitas/kalender` (semua login,
+  baca-saja; pengajuan tetap via `PinjamRuang`).
+  Temuan: `whereIn('tanggal', ...)` gagal di SQLite karena kolom date
+  tersimpan `'Y-m-d H:i:s'` — wajib `whereDate` rentang (pola sama
+  seperti bug `ai_kuota`).
+- Arsip KRS: `Pengajuan::getRiwayatSayaProperty` (10 pengajuan terakhir
+  + `tahunAkademik`) + blok "Arsip Pengajuan Saya" dengan tautan unduh
+  `krs.cetak` (cetak existing dipakai ulang, tanpa PDF baru).
+- Buku wisuda CSV: `Yudisium::eksporCsv` (stream CSV `;`-separated
+  kursi/nim/nama/no_ijazah/pin/toga per batch, tanpa dependensi PDF)
+  + tombol "Unduh CSV".
+- Pengingat denda: `KeuanganService::pesanPengingat` sudah merinci denda
+  (`termasuk denda RpX`) — dikunci oleh tes agar tidak regresi.
+- Tes: `Batch6Test` (4 tes: kalender tampil + tamu ditolak, arsip muncul
+  setelah pengajuan, CSV terunduh, pesan memuat denda).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

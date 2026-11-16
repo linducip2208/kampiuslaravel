@@ -63,6 +63,7 @@
                 </select>
                 @if($batchId)
                     <button wire:click="tutupBatch" class="btn btn-sm btn-outline-secondary">Tutup batch</button>
+                    <button wire:click="eksporCsv" class="btn btn-sm btn-outline-primary">Unduh CSV</button>
                 @endif
             </div>
         </div>

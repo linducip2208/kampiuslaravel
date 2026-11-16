@@ -108,6 +108,27 @@ class Pengajuan extends Component
     }
 
     /**
+     * Riwayat pengajuan KRS milik sendiri (arsip + unduh ulang).
+     */
+    public function getRiwayatSayaProperty(): Collection
+    {
+        if (! Schema::hasTable('krs')) {
+            return collect();
+        }
+
+        try {
+            return Krs::query()
+                ->where('mahasiswa_id', $this->mahasiswaId())
+                ->with('tahunAkademik')
+                ->latest('id')
+                ->take(10)
+                ->get();
+        } catch (\Throwable) {
+            return collect();
+        }
+    }
+
+    /**
      * @return Collection<int, int> peta kelas_id => sks
      */
     private function sksPerKelas(): Collection
