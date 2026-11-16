@@ -553,4 +553,10 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Operasi: runbook restore triwulan (manual pertama pending staging).
 - Tes: `Batch20Test` (2 tes: 403 dua lapis, simpan + resep + audit).
 
+## 2026-11-16 — Ide bank batch 21: kontrak paging API v1
+
+- Helper `ApiPaging` + 3 endpoint disamakan (q/sort/per_page + meta).
+  Perubahan kontrak dicatat jujur (tugas limit→paginasi).
+- Tes: `Batch21Test` (3 kontrak).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

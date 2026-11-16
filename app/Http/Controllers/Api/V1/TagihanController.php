@@ -7,6 +7,7 @@ use App\Http\Resources\TagihanResource;
 use App\Models\Mahasiswa;
 use App\Models\Tagihan;
 use App\Services\Payment\PaymentService;
+use App\Support\ApiPaging;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -31,13 +32,22 @@ class TagihanController extends Controller
                 ]);
             }
 
-            $tagihan = Tagihan::with(['tahunAkademik', 'cicilan', 'beasiswa'])->where('mahasiswa_id', $mhs->id)->latest('id')->get();
+            $query = ApiPaging::search(
+                Tagihan::with(['tahunAkademik', 'cicilan', 'beasiswa'])->where('mahasiswa_id', $mhs->id),
+                $request->string('q')->toString(),
+                'jenis'
+            );
 
-            $total = (float) $tagihan->sum('nominal');
-            $terbayar = (float) $tagihan->sum('terbayar');
+            // Ringkasan dihitung dari keseluruhan hasil filter (bukan halaman).
+            $semua = (clone $query)->get();
+            $total = (float) $semua->sum('nominal');
+            $terbayar = (float) $semua->sum('terbayar');
+
+            $result = ApiPaging::paginate($query, $request, ['id', 'nominal', 'jatuh_tempo']);
 
             return response()->json([
-                'data' => TagihanResource::collection($tagihan),
+                'data' => TagihanResource::collection($result),
+                'meta' => ApiPaging::meta($result),
                 'ringkasan' => [
                     'total_tagihan' => $total,
                     'total_terbayar' => $terbayar,

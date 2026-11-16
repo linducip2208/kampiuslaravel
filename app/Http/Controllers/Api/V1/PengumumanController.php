@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PengumumanResource;
 use App\Models\Pengumuman;
+use App\Support\ApiPaging;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,6 @@ class PengumumanController extends Controller
     {
         $validated = $request->validate([
             'target' => ['nullable', 'string', 'max:50'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
 
         if (! class_exists(Pengumuman::class)) {
@@ -22,25 +22,25 @@ class PengumumanController extends Controller
         }
 
         try {
-            $query = Pengumuman::query()
-                ->where(function ($q): void {
-                    $q->whereNull('published_at')->orWhere('published_at', '<=', now());
-                })
-                ->latest('published_at');
+            $query = ApiPaging::search(
+                Pengumuman::query()
+                    ->where(function ($q): void {
+                        $q->whereNull('published_at')->orWhere('published_at', '<=', now());
+                    }),
+                $request->string('q')->toString(),
+                'judul',
+                'isi'
+            );
 
             if (! empty($validated['target'])) {
                 $query->whereIn('target', ['semua', $validated['target']]);
             }
 
-            $result = $query->paginate($validated['per_page'] ?? 15);
+            $result = ApiPaging::paginate($query, $request, ['id', 'published_at'], '-published_at');
 
             return response()->json([
                 'data' => PengumumanResource::collection($result),
-                'meta' => [
-                    'current_page' => $result->currentPage(),
-                    'last_page' => $result->lastPage(),
-                    'total' => $result->total(),
-                ],
+                'meta' => ApiPaging::meta($result),
             ]);
         } catch (\Throwable) {
             return response()->json(['data' => [], 'meta' => ['total' => 0]]);

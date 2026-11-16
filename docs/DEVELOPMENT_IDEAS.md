@@ -133,9 +133,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 19. API & mobile (`api.php`, `mobile/`, OpenAPI)
 
-- [ ] **Filter/sort/paging konsisten.** v2 paginasi; v1 campur aduk.
-      Proposal: samakan envelope + `?sort=&q=` di 3 endpoint inti
-      (tugas, tagihan, pengumuman) + tes kontrak. (M.)
+- [x] **Filter/sort/paging konsisten.** SELESAI 2026-11-16: helper `ApiPaging` (`?q=&sort=&per_page=` + envelope `{data, meta}`) dipakai tugas + tagihan + pengumuman. Catatan kontrak: tugas yang dulu `limit(20)` kini paginasi; ringkasan tagihan dari full filter; meta pengumuman + `per_page`. Tes: `Batch21Test` (3 kontrak).
 - [x] **API orangtua (read-only).** SELESAI 2026-11-16: pivot `wali_mahasiswa` + `WaliController` (daftar anak, nilai terkunci, tagihan) + command `wali:tautkan`; 403 tanpa tautan/anak orang lain. Tes: siklus taut → baca → tolak.
 - [ ] **Push topik per prodi.** Token ada; segmentasi belum dipakai.
       Proposal: kirim pengumuman ke topik prodi saat publish. (M;

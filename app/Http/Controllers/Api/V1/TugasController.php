@@ -10,6 +10,7 @@ use App\Models\KrsDetail;
 use App\Models\Mahasiswa;
 use App\Models\Tugas;
 use App\Models\TugasKumpul;
+use App\Support\ApiPaging;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,12 +20,16 @@ class TugasController extends Controller
     public function index(Request $request): JsonResponse
     {
         if (! class_exists(Tugas::class)) {
-            return response()->json(['data' => []]);
+            return response()->json(['data' => [], 'meta' => ['total' => 0]]);
         }
 
         try {
             $user = $request->user();
-            $query = Tugas::query()->with('kelas')->latest('id');
+            $query = ApiPaging::search(
+                Tugas::query()->with('kelas'),
+                $request->string('q')->toString(),
+                'judul'
+            );
 
             if ($user && ! $user->hasAnyRole(['superadmin', 'admin_prodi', 'pimpinan', 'keuangan'])) {
                 if ($user->hasRole('mahasiswa') && class_exists(Mahasiswa::class)) {
@@ -39,9 +44,11 @@ class TugasController extends Controller
                 }
             }
 
-            return response()->json(['data' => $query->limit(20)->get()]);
+            $result = ApiPaging::paginate($query, $request, ['id', 'judul', 'deadline']);
+
+            return response()->json(['data' => $result->items(), 'meta' => ApiPaging::meta($result)]);
         } catch (\Throwable) {
-            return response()->json(['data' => []]);
+            return response()->json(['data' => [], 'meta' => ['total' => 0]]);
         }
     }
 
