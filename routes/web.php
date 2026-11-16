@@ -57,7 +57,17 @@ Route::get('/health', function () {
             $pending = -1;
         }
 
-        return response()->json(['ok' => $pending === 0, 'db' => 'up', 'pending_migrations' => $pending, 'time' => now()->toIso8601String(), 'checks' => ['database' => 'up', 'migrations' => $pending === 0 ? 'ok' : $pending.' pending']], $pending === 0 ? 200 : 503);
+        // Antrean: ukuran jobs + yang gagal (tabel ada bila driver database dipakai).
+        $jobs = 0;
+        $failed = 0;
+        try {
+            $jobs = Schema::hasTable('jobs') ? DB::table('jobs')->count() : 0;
+            $failed = Schema::hasTable('failed_jobs') ? DB::table('failed_jobs')->count() : 0;
+        } catch (Throwable) {
+            // Metrik antrean tidak boleh menggagalkan health check.
+        }
+
+        return response()->json(['ok' => $pending === 0, 'db' => 'up', 'pending_migrations' => $pending, 'queue' => $jobs, 'queue_failed' => $failed, 'time' => now()->toIso8601String(), 'checks' => ['database' => 'up', 'migrations' => $pending === 0 ? 'ok' : $pending.' pending', 'queue' => $failed === 0 ? "ok ({$jobs} antre)" : "{$failed} gagal, {$jobs} antre"]], $pending === 0 ? 200 : 503);
     } catch (Throwable $e) {
         return response()->json(['ok' => false, 'db' => 'down'], 503);
     }

@@ -19,6 +19,7 @@
                     <div class="d-flex gap-4">
                         <div><span class="kampius-muted small d-block">Total SKS dipilih</span><strong class="h3 mb-0">{{ $totalSks }}</strong></div>
                         <div><span class="kampius-muted small d-block">Maksimal SKS</span><strong class="h3 mb-0">{{ $sksMaks }}</strong></div>
+                        <div><span class="kampius-muted small d-block">Sisa SKS</span><strong class="h3 mb-0">{{ $this->sisaSks }}</strong></div>
                         <div class="ms-auto align-self-center">
                             <span class="badge bg-{{ $totalSks > $sksMaks ? 'danger' : 'green' }}-lt">{{ $totalSks > $sksMaks ? 'Melebihi batas' : 'Dalam batas' }}</span>
                         </div>

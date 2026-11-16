@@ -24,9 +24,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
       `angkatan` × periode aktif; tampilkan di `transkrip.cetak`.
       (S, tanpa dependensi; terima: tampil benar untuk angkatan 2020–2026.)
 - [x] **Arsip KRS.** SELESAI 2026-11-16: riwayat 10 pengajuan terakhir + tautan unduh `krs.cetak` di halaman pengajuan (tanpa PDF baru, cetak existing dipakai ulang).
-- [ ] **Peringatan SKS di pengajuan (bukan cuma blokir).** `validasiKrs`
-      sudah blokir; tambahkan pesan dini "sisa SKS X" di UI pengajuan.
-      (S; terima: teks muncul sebelum submit.)
+- [x] **Peringatan SKS di pengajuan.** SELESAI 2026-11-16: kolom "Sisa SKS" (`getSisaSksProperty = sksMaks - totalSks`) di kartu ringkasan pengajuan. Tes: teks tampil sebelum submit.
 
 ## 2. PMB (`PmbController`, `PmbVaService`, `PmbFunnelController`)
 
@@ -178,9 +176,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
       (S.)
 - [ ] **Evaluasi RAG.** Tanpa metrik. Proposal: set Q/A emas + skor
       kecocokan berkala (command). (M.)
-- [ ] **At-risk: notifikasi wali.** Prediksi ada; tindak lanjut manual.
-      Proposal: notifikasi otomatis ke dosen PA bila risiko tinggi.
-      (S; guard kuota AI.)
+- [x] **At-risk: notifikasi wali.** SELESAI 2026-11-16: tombol "Kirim ke PA" per baris level tinggi di `Analitik/AtRisk` → notifikasi inbox ke Dosen PA (try/catch, tanpa gagalkan halaman). Perbaikan penghalang: `daftarBerisiko` memilih kolom `nama` yang tak ada di tabel mahasiswa + query `is_late` atas kolom yang belum ada → daftar selalu kosong; diperbaiki via nama dari relasi `user` + migrasi `add_is_late_to_tugas_kumpul_table`. Tes: 61 skor → notif PA tercatat.
 - [ ] **Batas konteks materi RAG.** Ingest teks panjang utuh. Proposal:
       potong per N kalimat + tautan sumber di jawaban. (S.)
 
@@ -204,9 +200,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 21. Observability & operasi (`/health`, scheduler, backup)
 
-- [ ] **Cek antrean di /health.** Health cek DB+migrasi; queue gagal
-      tak terpantau. Proposal: tambah `queue:failed` count + ukuran
-      antrean. (S.)
+- [x] **Cek antrean di /health.** SELESAI 2026-11-16: `queue` + `queue_failed` + `checks.queue` di respons `/health` (tabel `jobs`/`failed_jobs` diguard `Schema::hasTable`; metrik tak boleh gagalkan health). Tes: struktur JSON + `queue_failed: 0`.
 - [ ] **Uji restore terjadwal.** Backup teruji; restore belum pernah
       dicoba di staging. Proposal: runbook + checklist + jadwal
       triwulan (manual, catat buktinya). (S, non-kode.)

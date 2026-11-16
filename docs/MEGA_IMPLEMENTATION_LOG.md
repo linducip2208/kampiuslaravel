@@ -403,4 +403,23 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch6Test` (4 tes: kalender tampil + tamu ditolak, arsip muncul
   setelah pengajuan, CSV terunduh, pesan memuat denda).
 
+## 2026-11-16 — Ide bank batch 7: peringatan SKS, antrean /health, notif PA at-risk
+
+- Peringatan SKS: kolom "Sisa SKS" (`getSisaSksProperty = sksMaks -
+  totalSks`) di kartu ringkasan `Krs/Pengajuan` (peringatan dini, bukan
+  cuma blokir saat submit).
+- `/health`: tambah `queue` + `queue_failed` + `checks.queue`
+  (guard `Schema::hasTable('jobs'/'failed_jobs')`; metrik tak boleh
+  menggagalkan health; status `ok` tetap berbasis migrasi).
+- At-risk → PA: tombol "Kirim ke PA" per baris level tinggi di
+  `Analitik/AtRisk` → `Notifikasi` inbox ke Dosen PA (try/catch).
+- Perbaikan penghalang (jujur: fitur at-risk selama ini mati total):
+  `daftarBerisiko` memilih kolom `nama` yang tidak ada di tabel
+  mahasiswa + query `is_late` atas kolom yang belum pernah dibuat →
+  exception ditelan `catch` → daftar selalu kosong. Diperbaiki via nama
+  dari relasi `user` + migrasi `add_is_late_to_tugas_kumpul_table`
+  (+ fillable/cast `TugasKumpul`).
+- Tes: `Batch7Test` (3 tes: sisa SKS tampil, health memuat antrean,
+  skor 61 → tombol + notif PA tercatat).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

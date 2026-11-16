@@ -89,6 +89,12 @@ class Pengajuan extends Component
         return AkademikService::batasSks($this->ipk);
     }
 
+    /** Sisa SKS yang masih bisa diambil (peringatan dini sebelum submit). */
+    public function getSisaSksProperty(): int
+    {
+        return $this->sksMaks - $this->totalSks;
+    }
+
     /**
      * Entri waiting list milik mahasiswa pada tahun akademik berjalan.
      */

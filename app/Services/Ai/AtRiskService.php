@@ -94,10 +94,11 @@ class AtRiskService
         $out = [];
 
         try {
-            foreach (Mahasiswa::where('status', 'aktif')->take(200)->get(['id', 'nim', 'nama']) as $mhs) {
+            // Catatan: tabel mahasiswa TIDAK punya kolom nama (nama ada di users).
+            foreach (Mahasiswa::with('user')->where('status', 'aktif')->take(200)->get(['id', 'nim', 'user_id']) as $mhs) {
                 $p = $this->prediksi($mhs->id);
                 if ($p['level'] !== 'rendah') {
-                    $out[] = ['mahasiswa_id' => $mhs->id, 'nim' => (string) $mhs->nim, 'nama' => (string) $mhs->nama, 'skor' => $p['skor'], 'level' => $p['level']];
+                    $out[] = ['mahasiswa_id' => $mhs->id, 'nim' => (string) $mhs->nim, 'nama' => (string) ($mhs->user->name ?? $mhs->nim), 'skor' => $p['skor'], 'level' => $p['level']];
                 }
             }
         } catch (\Throwable) {
