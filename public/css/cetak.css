@@ -1,0 +1,66 @@
+/* Mode cetak rapor (KHS, transkrip, slip, kwitansi, SK): rapi di kertas. */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+
+  /* Layout aplikasi disembunyikan walau lupa d-print-none. */
+  .kampius-sidebar,
+  .kampius-topbar,
+  .page-header,
+  .navbar,
+  footer.footer,
+  .d-print-none {
+    display: none !important;
+  }
+
+  .page-wrapper,
+  .page-body,
+  .container-xl,
+  .card {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+  }
+
+  .card-body {
+    padding: 0 0 12pt !important;
+  }
+
+  /* Tabel tidak terpotong di tengah baris; header diulang tiap halaman. */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 10pt;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  th,
+  td {
+    border: 1pt solid #999 !important;
+    padding: 3pt 5pt !important;
+  }
+
+  /* Badge tanpa warna latar agar hemat tinta namun tetap terbaca. */
+  .badge {
+    border: 1pt solid #000 !important;
+    background: none !important;
+    color: #000 !important;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+}

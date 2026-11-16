@@ -18,6 +18,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="stylesheet" href="{{ asset('vendor/tabler-1.7.5/css/tabler.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/cetak.css') }}" media="print">
     <style>
         :root {
             --kampius-primary: #1769F5;

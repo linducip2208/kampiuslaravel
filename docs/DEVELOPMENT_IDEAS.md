@@ -117,9 +117,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 17. SPMI & akreditasi lanjutan (`Admin/Akreditasi`, `Obe/*`)
 
-- [ ] **Siklus PPEMPMTI.** Dokumen ada; siklus belum. Proposal: tabel
-      siklus (penetapan→pelaksanaan→evaluasi→pengendalian→peningkatan)
-      + status per standar. (L.)
+- [x] **Siklus PPEMPMTI.** SELESAI 2026-11-16: tabel `spmi_siklus` (unik prodi+tahun+tahap, 5 tahap + status) + kartu di halaman Akreditasi (idempoten via updateOrCreate). Tes: simpan → tampil; simpan ulang tak ganda.
 - [x] **Sub-CPMK.** SELESAI 2026-11-16: tabel `sub_cpmk` (unik per CPMK) + `simpanSubCpmk` + kartu form + kolom badge di daftar OBE. Tes: SUB-1 tersimpan + tampil.
 - [ ] **Borang otomatis.** Proposal: isi borang dari rekap OBE + tracer
       (ekspor, bukan klaim akreditasi). (L.)
@@ -169,9 +167,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
       (M; checklist manual + screenshot.)
 - [ ] **Aksesibilitas keyboard.** Tab order + fokus terlihat + label
       form. (M; uji manual tab-only.)
-- [ ] **Mode cetak rapor.** Beberapa cetak belum rapi di kertas.
-      Proposal: stylesheet print per dokumen (KHS, transkrip, slip).
-      (S.)
+- [x] **Mode cetak rapor.** SELESAI 2026-11-16: `public/css/cetak.css` (`@media print`: sembunyikan layout, tabel anti-potong + header berulang, badge hemat tinta) dimuat layout Tabler (`media=print`) sehingga berlaku di KHS/transkrip/slip/kwitansi/SK. Tes: link tampil + aturan kunci ada.
 
 ---
 

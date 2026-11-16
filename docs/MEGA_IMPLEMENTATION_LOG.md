@@ -559,4 +559,10 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
   Perubahan kontrak dicatat jujur (tugas limit→paginasi).
 - Tes: `Batch21Test` (3 kontrak).
 
+## 2026-11-16 — Ide bank batch 22: siklus SPMI + cetak rapor
+
+- SPMI: tabel + kartu PPEMPMTI di halaman Akreditasi (idempoten).
+- Cetak: `css/cetak.css` + link print di layout (berlaku semua dokumen).
+- Tes: `Batch22Test` (2 tes: idempoten + badge, link + aturan CSS).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)
