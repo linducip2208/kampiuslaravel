@@ -24,7 +24,7 @@
             </select>
         </div>
         <div class="col-md-2">
-            <input type="number" wire:model="ambang" class="form-control" min="0" max="100" step="0.5" aria-label="Ambang kelulusan">
+            <input type="number" wire:model="ambang" class="form-control" min="0" max="100" step="0.5" aria-label="Ambang kelulusan perangkingan">
         </div>
         <div class="col-md-1">
             <button type="button" class="btn btn-primary w-100" wire:click="prosesRanking" wire:confirm="Jalankan perangkingan gelombang terpilih?">Ranking</button>

@@ -573,4 +573,12 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
   (butuh kontrak Flutter) ditandai DITUNDA, bukan dikerjakan buta.
 - Tes: `Batch23Test` (1 tes: angka ringkasan + header unduhan).
 
+## 2026-11-16 — Ide bank batch 24: empty-state + aksesibilitas (halaman baru)
+
+- Empty-state informatif di 7 titik halaman batch 6–23 (batas cakupan
+  dicatat jujur).
+- Aksesibilitas: verifikasi fondasi layout + asosiasi label checkbox +
+  aria-label; uji tab-only manual penuh belum dilakukan.
+- Tes: `Batch24Test` (2 tes: pesan kosong tampil, asosiasi label).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

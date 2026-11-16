@@ -84,6 +84,9 @@
                             </td>
                         </tr>
                     @endforeach
+                    @if($organisasis->isEmpty())
+                        <tr><td colspan="6" class="text-secondary">Belum ada organisasi.</td></tr>
+                    @endif
                 </tbody>
             </table>
         </div>

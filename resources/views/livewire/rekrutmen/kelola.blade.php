@@ -63,6 +63,9 @@
                             </td>
                         </tr>
                     @endforeach
+                    @if($lowongans->isEmpty())
+                        <tr><td colspan="5" class="text-secondary">Belum ada lowongan.</td></tr>
+                    @endif
                 </tbody>
             </table>
         </div>
@@ -85,8 +88,8 @@
                                     @if($p->status === 'diterima')
                                         @foreach($p->onboarding as $o)
                                             <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" wire:change="toggleOnboarding({{ $o->id }})" @checked($o->selesai)>
-                                                <label class="form-check-label {{ $o->selesai ? 'text-decoration-line-through text-secondary' : '' }}">{{ $o->item }}</label>
+                                                <input type="checkbox" class="form-check-input" id="onb-{{ $o->id }}" wire:change="toggleOnboarding({{ $o->id }})" @checked($o->selesai)>
+                                                <label class="form-check-label {{ $o->selesai ? 'text-decoration-line-through text-secondary' : '' }}" for="onb-{{ $o->id }}">{{ $o->item }}</label>
                                             </div>
                                         @endforeach
                                     @else
@@ -99,6 +102,9 @@
                                 </td>
                             </tr>
                         @endforeach
+                        @if($pelamar->isEmpty())
+                            <tr><td colspan="6" class="text-secondary">Belum ada pelamar untuk lowongan ini.</td></tr>
+                        @endif
                     </tbody>
                 </table>
             </div>

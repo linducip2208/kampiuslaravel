@@ -48,6 +48,9 @@
                             <td><span class="badge bg-{{ $r->cocok() ? 'green' : 'red' }}-lt">{{ $r->cocok() ? 'cocok' : 'selisih' }}</span></td>
                         </tr>
                     @endforeach
+                    @if($riwayat->isEmpty())
+                        <tr><td colspan="5" class="text-secondary">Belum ada opname. Catat kondisi fisik pertama di atas.</td></tr>
+                    @endif
                 </tbody>
             </table>
         </div>

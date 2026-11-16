@@ -29,14 +29,16 @@
             <table class="table table-vcenter mb-0">
                 <thead><tr><th>Gedung</th><th>Kode</th><th>Terisi</th><th>Iuran</th></tr></thead>
                 <tbody>
-                    @foreach($kamars as $k)
+                    @forelse($kamars as $k)
                         <tr>
                             <td>{{ $k->gedung }}</td>
                             <td>{{ $k->kode }}</td>
                             <td>{{ $k->penghuni_count }}/{{ $k->kapasitas }}</td>
                             <td>{{ number_format($k->iuran, 0, ',', '.') }}</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr><td colspan="4" class="text-secondary">Belum ada kamar. Tambahkan di atas.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -69,7 +71,7 @@
             <table class="table table-vcenter mb-0">
                 <thead><tr><th>NIM</th><th>Nama</th><th>Kamar</th><th>Masuk</th><th>Aksi</th></tr></thead>
                 <tbody>
-                    @foreach($hunian as $h)
+                    @forelse($hunian as $h)
                         <tr>
                             <td>{{ $h->mahasiswa->nim ?? '-' }}</td>
                             <td>{{ $h->mahasiswa->user->name ?? '-' }}</td>
@@ -77,7 +79,9 @@
                             <td>{{ $h->masuk_at?->format('d M Y') }}</td>
                             <td><button class="btn btn-sm btn-outline-danger" wire:click="keluarkan({{ $h->id }})" wire:confirm="Keluarkan penghuni ini?">Keluarkan</button></td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr><td colspan="5" class="text-secondary">Belum ada penghuni.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

@@ -67,6 +67,9 @@
                             <td><button class="btn btn-sm btn-outline-primary" wire:click="lihat({{ $a->id }})">Buka</button></td>
                         </tr>
                     @endforeach
+                    @if($antrean->isEmpty())
+                        <tr><td colspan="5" class="text-secondary">Belum ada kunjungan.</td></tr>
+                    @endif
                 </tbody>
             </table>
         </div>

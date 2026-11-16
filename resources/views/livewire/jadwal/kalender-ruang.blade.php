@@ -7,6 +7,9 @@
                 <button class="btn btn-sm btn-outline-secondary" wire:click="geser(1)">Minggu depan ›</button>
             </div>
         </div>
+        @if($ruangs->isEmpty())
+            <div class="card-body"><div class="alert alert-info mb-0">Belum ada data ruangan.</div></div>
+        @else
         <div class="card-body">
             <select class="form-select mb-3" wire:model.live="ruangId" style="max-width:280px">
                 <option value="">Semua ruangan</option>
@@ -48,5 +51,6 @@
             </div>
             <div class="text-secondary small">Kuliah = jadwal mingguan tetap. Booking = pengajuan disetujui/diajukan. Pengajuan baru via <a href="{{ route('fasilitas.pinjam') }}">Pinjam Ruang</a>.</div>
         </div>
+        @endif
     </div>
 </div>

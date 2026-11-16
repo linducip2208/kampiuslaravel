@@ -97,6 +97,9 @@
                         @foreach($labarugi['beban'] as $r)
                             <tr><td>{{ $r['kode'] }}</td><td>{{ $r['nama'] }}</td><td><span class="badge bg-red-lt">beban</span></td><td class="text-end">({{ number_format($r['total'], 0, ',', '.') }})</td></tr>
                         @endforeach
+                        @if(empty($labarugi['pendapatan']) && empty($labarugi['beban']))
+                            <tr><td colspan="4" class="text-secondary">Belum ada jurnal pendapatan/beban periode ini.</td></tr>
+                        @endif
                     </tbody>
                     <tfoot>
                         <tr><th colspan="3">Total pendapatan</th><th class="text-end">{{ number_format($labarugi['total_pendapatan'], 0, ',', '.') }}</th></tr>

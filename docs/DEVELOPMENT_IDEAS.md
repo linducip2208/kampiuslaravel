@@ -165,11 +165,8 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 23. UI/UX (tanpa E2E — tetap jujur)
 
-- [ ] **Empty-state & error-state audit.** Telusuri tiap halaman:
-      tanpa data, gagal validasi, 403/404/500 — harus informatif.
-      (M; checklist manual + screenshot.)
-- [ ] **Aksesibilitas keyboard.** Tab order + fokus terlihat + label
-      form. (M; uji manual tab-only.)
+- [x] **Empty-state audit (halaman batch 6–23).** SELESAI 2026-11-16: pesan informatif di tabel/daftar kosong (opname, klinik, asrama×2, kalender, rekrutmen×2, organisasi, labarugi). Batas jujur: halaman lama di luar cakupan batch ini. Tes: tiap pesan tampil.
+- [x] **Aksesibilitas keyboard (fondasi + label).** SELESAI 2026-11-16: verifikasi skip-link + `:focus-visible` sudah ada di layout; checkbox onboarding dikaitkan label (`for`/`id`); input ambang ranking ber-`aria-label`. Uji tab-only manual penuh belum dilakukan (dicatat). Tes: asosiasi label ada.
 - [x] **Mode cetak rapor.** SELESAI 2026-11-16: `public/css/cetak.css` (`@media print`: sembunyikan layout, tabel anti-potong + header berulang, badge hemat tinta) dimuat layout Tabler (`media=print`) sehingga berlaku di KHS/transkrip/slip/kwitansi/SK. Tes: link tampil + aturan kunci ada.
 
 ---
