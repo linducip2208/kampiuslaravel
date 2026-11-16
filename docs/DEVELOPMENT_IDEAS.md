@@ -25,13 +25,8 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 2. PMB (`PmbController`, `PmbVaService`, `PmbFunnelController`)
 
-- [ ] **Kedaluwarsa VA otomatis.** VA simulasi/prod tanpa expiry.
-      Proposal: kolom `va_expires_at` + cron menandai kedaluwarsa +
-      tombol "buat ulang VA". (M; terima: VA lama ditolak callback.)
-- [ ] **Skoring seleksi otomatis.** Nilai seleksi ada
-      (`pmb_nilai_seleksis`), belum ada perangkingan. Proposal: ranking
-      per gelombang + ambang lulus di halaman verifikasi. (M; terima:
-      tombol "proses perangkingan" mengisi status lulus/cadangan.)
+- [x] **Kedaluwarsa VA otomatis.** SELESAI 2026-11-16: `va_expires_at` (+7 hari, config `payment.defaults.va_expiry_days`) — VA lama dipakai ulang hanya bila berlaku, kedaluwarsa → terbit ulang; `settleByReference` menolak lewat tempo. Tes: reuse → regenerate → settle lama false → settle baru lunas.
+- [x] **Skoring seleksi otomatis.** SELESAI 2026-11-16: status baru `cadangan` + `Verifikasi::prosesRanking` (urut nilaiAkhir, dalam kuota + ambang → lulus, luar kuota → cadangan, di bawah ambang → tidak; hanya status belum final) + filter gelombang + ambang + tombol Ranking. Tes: kuota 1 → 90 lulus, 80 cadangan.
 - [ ] **Arsip berkas pendaftar.** Berkas di `storage/app/public/pmb/*`
       tanpa retensi. Proposal: tombol arsip per gelombang (ZIP) +
       hapus aman setelah N tahun. (M; terima: ZIP terunduh + audit.)
@@ -115,8 +110,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 12. Organisasi & kemahasiswaan (`Organisasi/Kelola`, `Cuti`)
 
-- [ ] **SK kepengurusan.** Organisasi tanpa dokumen. Proposal: nomor SK
-      + cetak (pola Surat). (M.)
+- [x] **SK kepengurusan.** SELESAI 2026-11-16: kolom `nomor_sk` + input manual (otomatis `SK-ORG/tahun/id` bila kosong) + kolom di daftar. Tes: simpan tanpa nomor → nomor terisi + tampil.
 - [x] **Cuti: lampiran + histori.** SELESAI 2026-11-16: kolom `lampiran_path` (migrasi) + unggah opsional PDF/gambar ≤10MB saat ajukan + kolom Lampiran (tautan Lihat) di riwayat; histori daftar sudah ada. Tes: file tersimpan di disk + tautan tampil.
 
 ## 13. Aset & fasilitas (`AsetService`, `PeminjamanRuang`)

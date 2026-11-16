@@ -10,7 +10,7 @@ class Organisasi extends Model
 {
     protected $table = 'organisasi';
 
-    protected $fillable = ['nama', 'jenis', 'deskripsi', 'pembina_dosen_id', 'aktif'];
+    protected $fillable = ['nama', 'nomor_sk', 'jenis', 'deskripsi', 'pembina_dosen_id', 'aktif'];
 
     public const JENIS = ['bem', 'hima', 'ukm', 'komunitas'];
 

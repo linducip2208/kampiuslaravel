@@ -20,7 +20,9 @@ class PmbVaService
     {
         $pendaftar->loadMissing(['gelombang', 'beasiswa']);
 
-        if ($pendaftar->va_reference && $pendaftar->va_number) {
+        // VA lama dipakai ulang hanya bila belum bayar DAN belum kedaluwarsa;
+        // bila kedaluwarsa, terbitkan ulang (reference baru).
+        if ($pendaftar->va_reference && $pendaftar->va_number && ! $this->kedaluwarsa($pendaftar)) {
             return [
                 'reference' => (string) $pendaftar->va_reference,
                 'va_number' => (string) $pendaftar->va_number,
@@ -35,9 +37,16 @@ class PmbVaService
         $pendaftar->update([
             'va_reference' => $reference,
             'va_number' => $vaNumber,
+            // Kedaluwarsa 7 hari sejak diterbitkan (dapat dipersingkat via config).
+            'va_expires_at' => now()->addDays((int) config('payment.defaults.va_expiry_days', 7)),
         ]);
 
         return ['reference' => $reference, 'va_number' => $vaNumber, 'nominal' => $this->nominal($pendaftar)];
+    }
+
+    public function kedaluwarsa(PmbPendaftar $pendaftar): bool
+    {
+        return $pendaftar->va_expires_at !== null && now()->greaterThan($pendaftar->va_expires_at);
     }
 
     public function nominal(PmbPendaftar $pendaftar): int
@@ -60,6 +69,13 @@ class PmbVaService
             $pendaftar = PmbPendaftar::query()->where('va_reference', $reference)->lockForUpdate()->first();
 
             if (! $pendaftar || $pendaftar->bayar_status === 'lunas') {
+                return false;
+            }
+
+            // VA kedaluwarsa tidak bisa dilunasi — pendaftar harus terbitkan ulang.
+            if ($this->kedaluwarsa($pendaftar)) {
+                Log::warning('PMB VA kedaluwarsa ditolak', ['reference' => $reference]);
+
                 return false;
             }
 

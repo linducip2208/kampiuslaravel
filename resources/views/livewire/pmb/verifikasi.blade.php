@@ -4,16 +4,30 @@
     @endif
 
     <div class="row g-2 mb-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <input type="text" wire:model.live="search" placeholder="Cari nama / no. daftar / email" class="form-control">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <select wire:model.live="filterStatus" class="form-select">
                 <option value="">Semua status</option>
                 @foreach ($statuses as $status)
                     <option value="{{ $status }}">{{ $status }}</option>
                 @endforeach
             </select>
+        </div>
+        <div class="col-md-3">
+            <select wire:model.live="filterGelombang" class="form-select" aria-label="Filter gelombang">
+                <option value="">Semua gelombang</option>
+                @foreach ($gelombangs as $g)
+                    <option value="{{ $g->id }}">{{ $g->nama }} (kuota {{ $g->kuota }})</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="number" wire:model="ambang" class="form-control" min="0" max="100" step="0.5" aria-label="Ambang kelulusan">
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-primary w-100" wire:click="prosesRanking" wire:confirm="Jalankan perangkingan gelombang terpilih?">Ranking</button>
         </div>
     </div>
 

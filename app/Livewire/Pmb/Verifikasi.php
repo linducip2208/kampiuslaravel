@@ -35,6 +35,10 @@ class Verifikasi extends Component
 
     public string $catatan = '';
 
+    public ?int $filterGelombang = null;
+
+    public float $ambang = 60.0;
+
     public ?float $nilaiCbt = null;
 
     public ?float $nilaiWawancara = null;
@@ -131,8 +135,56 @@ class Verifikasi extends Component
     }
 
     /**
-     * Tentukan kelulusan dari rata-rata CBT+wawancara (ambang 60).
+     * Perangkingan per gelombang: urut nilaiAkhir desc; yang ≥ ambang dalam
+     * kuota → lulus, yang ≥ ambang di luar kuota → cadangan, sisanya → tidak.
+     * Hanya menyentuh status belum final (diajukan/diverifikasi/tidak/cadangan).
      */
+    public function prosesRanking(): void
+    {
+        abort_unless($this->filterGelombang, 422, 'Pilih gelombang dulu.');
+
+        $this->validate(['ambang' => ['required', 'numeric', 'min:0', 'max:100']]);
+
+        $gelombang = PmbGelombang::findOrFail($this->filterGelombang);
+
+        $calon = PmbPendaftar::query()
+            ->with('nilaiSeleksi')
+            ->where('gelombang_id', $gelombang->id)
+            ->whereIn('status', [PmbPendaftar::STATUS_DIAJUKAN, PmbPendaftar::STATUS_DIVERIFIKASI, PmbPendaftar::STATUS_TIDAK, PmbPendaftar::STATUS_CADANGAN])
+            ->get()
+            ->map(fn ($p) => ['p' => $p, 'nilai' => $p->nilaiAkhir()])
+            ->filter(fn ($r) => $r['nilai'] !== null)
+            ->sortByDesc('nilai')
+            ->values();
+
+        $kuota = (int) $gelombang->kuota;
+        $sudahLulus = $gelombang->lulusCount();
+        $slot = $kuota > 0 ? max(0, $kuota - $sudahLulus) : PHP_INT_MAX;
+
+        $hasil = ['lulus' => 0, 'cadangan' => 0, 'tidak' => 0];
+
+        DB::transaction(function () use ($calon, $slot, &$hasil): void {
+            foreach ($calon as $i => $row) {
+                /** @var PmbPendaftar $p */
+                $p = PmbPendaftar::whereKey($row['p']->id)->lockForUpdate()->firstOrFail();
+                $statusBaru = $row['nilai'] >= $this->ambang
+                    ? ($i < $slot ? PmbPendaftar::STATUS_LULUS : PmbPendaftar::STATUS_CADANGAN)
+                    : PmbPendaftar::STATUS_TIDAK;
+
+                if ($p->status !== $statusBaru) {
+                    $p->update([
+                        'status' => $statusBaru,
+                        'catatan_verifikasi' => "Perangkingan: nilai {$row['nilai']} (ambang {$this->ambang}).",
+                    ]);
+                }
+
+                $hasil[$statusBaru === PmbPendaftar::STATUS_LULUS ? 'lulus' : ($statusBaru === PmbPendaftar::STATUS_CADANGAN ? 'cadangan' : 'tidak')]++;
+            }
+        });
+
+        session()->flash('info', "Perangkingan {$gelombang->nama}: {$hasil['lulus']} lulus, {$hasil['cadangan']} cadangan, {$hasil['tidak']} tidak.");
+    }
+
     public function tentukanKelulusan(int $id, float $ambang = 60.0): void
     {
         $pendaftar = PmbPendaftar::query()->with(['gelombang', 'nilaiSeleksi'])->findOrFail($id);
@@ -243,6 +295,7 @@ class Verifikasi extends Component
     {
         $pendaftars = PmbPendaftar::query()
             ->with(['gelombang', 'nilaiSeleksi', 'prodi1'])
+            ->when($this->filterGelombang, fn ($query) => $query->where('gelombang_id', $this->filterGelombang))
             ->when($this->search !== '', function ($query): void {
                 $query->where(function ($sub): void {
                     $sub->where('nama', 'like', "%{$this->search}%")
@@ -257,6 +310,7 @@ class Verifikasi extends Component
         return view('livewire.pmb.verifikasi', [
             'pendaftars' => $pendaftars,
             'statuses' => PmbPendaftar::STATUSES,
+            'gelombangs' => PmbGelombang::orderByDesc('id')->get(['id', 'nama', 'kuota']),
         ]);
     }
 }

@@ -28,6 +28,10 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="col-md-2">
+                    <label class="form-label">Nomor SK (otomatis bila kosong)</label>
+                    <input type="text" class="form-control" wire:model="nomorSk" placeholder="SK-ORG/...">
+                </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button class="btn btn-primary" wire:click="simpan">Simpan</button>
                 </div>
@@ -66,11 +70,12 @@
     <div class="card">
         <div class="table-responsive">
             <table class="table table-vcenter">
-                <thead><tr><th>Nama</th><th>Jenis</th><th>Anggota</th><th>Status</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>Nama</th><th>Nomor SK</th><th>Jenis</th><th>Anggota</th><th>Status</th><th>Aksi</th></tr></thead>
                 <tbody>
                     @foreach($organisasis as $o)
                         <tr>
                             <td>{{ $o->nama }}</td>
+                            <td>{{ $o->nomor_sk ?? '—' }}</td>
                             <td>{{ strtoupper($o->jenis) }}</td>
                             <td>{{ $o->anggota_count }}</td>
                             <td>{{ $o->aktif ? 'aktif' : 'nonaktif' }}</td>

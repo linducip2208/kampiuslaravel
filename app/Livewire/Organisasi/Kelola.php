@@ -26,6 +26,8 @@ class Kelola extends Component
 
     public string $nama = '';
 
+    public string $nomorSk = '';
+
     public string $jenis = 'ukm';
 
     public string $deskripsi = '';
@@ -42,19 +44,26 @@ class Kelola extends Component
     {
         $this->validate([
             'nama' => 'required|string|max:150',
+            'nomorSk' => 'nullable|string|max:60',
             'jenis' => 'required|in:'.implode(',', Organisasi::JENIS),
             'deskripsi' => 'nullable|string|max:500',
             'pembina_dosen_id' => 'nullable|exists:dosen,id',
         ]);
 
-        Organisasi::updateOrCreate(['id' => $this->editId ?? 0], [
+        $org = Organisasi::updateOrCreate(['id' => $this->editId ?? 0], [
             'nama' => $this->nama,
+            'nomor_sk' => $this->nomorSk ?: null,
             'jenis' => $this->jenis,
             'deskripsi' => $this->deskripsi ?: null,
             'pembina_dosen_id' => $this->pembina_dosen_id,
         ]);
 
-        $this->reset(['editId', 'nama', 'jenis', 'deskripsi', 'pembina_dosen_id']);
+        // Nomor SK dibuat otomatis bila kosong (format tahun + id).
+        if (! $org->nomor_sk) {
+            $org->update(['nomor_sk' => 'SK-ORG/'.date('Y').'/'.str_pad((string) $org->id, 4, '0', STR_PAD_LEFT)]);
+        }
+
+        $this->reset(['editId', 'nama', 'nomorSk', 'jenis', 'deskripsi', 'pembina_dosen_id']);
         $this->message = 'Organisasi tersimpan.';
     }
 

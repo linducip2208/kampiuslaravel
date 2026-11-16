@@ -460,4 +460,18 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch10Test` (4 tes: rumus semester-7, tampil di transkrip,
   file tersimpan + tautan, agregat 6 SKS/1 dosen).
 
+## 2026-11-16 — Ide bank batch 11: VA expiry, ranking seleksi, SK organisasi
+
+- PMB VA: `va_expires_at` (+7 hari via `issueFor`, config
+  `payment.defaults.va_expiry_days`) — reuse bila berlaku, regenerate
+  bila lewat; settle menolak kedaluwarsa (log warning). Kompatibel:
+  VA lama tanpa expiry dianggap berlaku.
+- Seleksi: status `cadangan` (string, tanpa ubah enum DB) +
+  `prosesRanking` per gelombang + filter gelombang + ambang editable +
+  tombol Ranking (confirm). Menghormati kuota lulus yang sudah terisi.
+- Organisasi: `nomor_sk` (input manual; otomatis `SK-ORG/tahun/id`
+  bila kosong) + kolom di daftar.
+- Tes: `Batch11Test` (3 tes: siklus VA lengkap, ranking kuota-1,
+  SK otomatis + tampil).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

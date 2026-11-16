@@ -38,6 +38,9 @@ class PmbPendaftar extends Model
 
     public const STATUS_TIDAK = 'tidak';
 
+    /** Cadangan: nilai ≥ ambang tapi di luar kuota (hasil perangkingan). */
+    public const STATUS_CADANGAN = 'cadangan';
+
     /** @var list<string> */
     public const STATUSES = [
         self::STATUS_DRAFT,
@@ -46,6 +49,7 @@ class PmbPendaftar extends Model
         self::STATUS_DITOLAK,
         self::STATUS_LULUS,
         self::STATUS_TIDAK,
+        self::STATUS_CADANGAN,
     ];
 
     /** @var list<string> */
@@ -62,6 +66,7 @@ class PmbPendaftar extends Model
         'beasiswa_id',
         'va_reference',
         'va_number',
+        'va_expires_at',
         'bayar_status',
         'berkas_json',
         'status',
@@ -78,6 +83,7 @@ class PmbPendaftar extends Model
         return [
             'berkas_json' => 'array',
             'last_follow_up_at' => 'datetime',
+            'va_expires_at' => 'datetime',
         ];
     }
 
