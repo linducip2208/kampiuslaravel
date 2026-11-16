@@ -71,8 +71,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 8. BKD & SK (`BkdService`, `Bkd/Kelola`)
 
-- [ ] **Cetak SK mengajar.** Nomor SK ada, dokumen SK belum. Proposal:
-      template SK + QR verifikasi (pola Surat). (M.)
+- [x] **Cetak SK mengajar.** SELESAI 2026-11-16: `SkMengajarController::cetak` (generateSk idempoten + template + QR bertanda + stamp, print-CSS tanpa PDF baru) + verifikasi publik + otorisasi owner (dosen sendiri / admin). Tes: cetak OK + verify VALID + tanda palsu 403.
 - [x] **Rekap beban fakultas.** SELESAI 2026-11-16: `BkdService::rekapPerProdi` (SKS disetujui + jumlah dosen per prodi, hanya admin) di halaman BKD. Tes: agregat 6 SKS / 1 dosen.
 
 ## 9. Skripsi & sidang (`Yudisium`, `NilaiSidang`, `Pendaftaran`)
@@ -101,8 +100,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 13. Aset & fasilitas (`AsetService`, `PeminjamanRuang`)
 
-- [ ] **Opname aset.** Tanpa stok fisik vs buku. Proposal: sesi opname
-      (cocok/hilang/rusak) + selisih ke jurnal penyesuaian. (M.)
+- [x] **Opname aset.** SELESAI 2026-11-16: tabel `aset_opname` + `Aset/Opname` (catat fisik vs buku, terapkan kondisi ke aset, badge cocok/selisih + audit) di `/aset/opname`. Batas jujur: jurnal penyesuaian GL belum otomatis (butuh pemetaan COA). Tes: fisik hilang → aset hilang + selisih tercatat.
 - [x] **Kalender pemakaian ruang.** SELESAI 2026-11-16: `Jadwal/KalenderRuang` (mingguan, kuliah + booking, geser pekan, filter ruang) di `/fasilitas/kalender`. Temuan: `whereIn(tanggal)` gagal di SQLite, wajib `whereDate` (pola sama seperti `ai_kuota`).
 
 ## 14. Perpustakaan (modul baru — desain dulu, vertikal slice)
@@ -171,8 +169,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [ ] **Uji restore terjadwal.** Backup teruji; restore belum pernah
       dicoba di staging. Proposal: runbook + checklist + jadwal
       triwulan (manual, catat buktinya). (S, non-kode.)
-- [ ] **Log lambat.** Tanpa pencatatan query lambat. Proposal: listener
-      query >500ms → log + ringkasan harian di audit. (M.)
+- [x] **Log lambat.** SELESAI 2026-11-16: `DB::listen` di `AppServiceProvider` (> `config(app.slow_query_ms, 500)` → `Log::warning` + sql/bindings; ambang 0 = nonaktif; try/catch anti-ganggu). Tes: ambang raksasa → tidak ada warning (jalur positif tak deterministik di sqlite, dicatat jujur).
 
 ## 22. Keamanan (lanjutan batch RBAC)
 

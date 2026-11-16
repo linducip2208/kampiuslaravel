@@ -15,6 +15,7 @@ use App\Http\Controllers\PmbController;
 use App\Http\Controllers\PmbFunnelController;
 use App\Http\Controllers\PublikController;
 use App\Http\Controllers\SessionAuthController;
+use App\Http\Controllers\SkMengajarController;
 use App\Http\Controllers\SuratController;
 use App\Http\Controllers\TranskripController;
 use App\Models\Absensi;
@@ -190,6 +191,8 @@ Route::get('/pmb/cek', [PmbController::class, 'cek'])->middleware('throttle:publ
 
 // Verifikasi surat publik (QR) — nomor mengandung slash, tangkap semua segmen
 Route::get('/surat/verifikasi/{nomor}', [SuratController::class, 'verify'])->where('nomor', '.*')->middleware('throttle:public')->name('surat.verify');
+// Verifikasi SK mengajar publik (QR) — pola sama.
+Route::get('/sk-mengajar/verifikasi/{nomor}', [SkMengajarController::class, 'verify'])->where('nomor', '.*')->middleware('throttle:public')->name('sk-mengajar.verify');
 // Verifikasi publik dokumen akademik & KTM digital (QR)
 Route::get('/khs/{mahasiswa}/verifikasi', [KhsController::class, 'verify'])->middleware('throttle:public')->name('khs.verify');
 Route::get('/transkrip/{mahasiswa}/verifikasi', [TranskripController::class, 'verify'])->middleware('throttle:public')->name('transkrip.verify');
@@ -210,6 +213,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/kwitansi/{pembayaran}/cetak', [KwitansiController::class, 'cetak'])->name('kwitansi.cetak');
     // Kuitansi gabungan: semua pembayaran terverifikasi 1 mhs + 1 periode.
     Route::get('/kwitansi/gabungan', [KwitansiController::class, 'gabungan'])->name('kwitansi.gabungan');
+    // SK mengajar: dokumen + verifikasi QR (pola Surat, print-CSS).
+    Route::get('/sk-mengajar/{dosen}/{tahun}/cetak', [SkMengajarController::class, 'cetak'])->name('sk-mengajar.cetak');
     Route::get('/surat/{surat}/cetak', [SuratController::class, 'cetak'])->name('surat.cetak');
 
     // Mahasiswa (+ staf pendamping)
@@ -329,6 +334,8 @@ Route::middleware('auth')->group(function () {
 
             return response()->download($path, basename($path))->deleteFileAfterSend(true);
         })->name('admin.pmb.arsip')->middleware('throttle:5,1');
+        // Opname aset: kondisi fisik vs buku + terapkan.
+        Route::get('/aset/opname', fn () => view('pages.livewire-page', ['component' => 'aset.opname', 'title' => 'Opname Aset']))->name('aset.opname');
         Route::get('/admin/users', fn () => view('pages.livewire-page', ['component' => 'admin.user-data', 'title' => 'Kelola User']))->name('admin.users');
         Route::get('/admin/delegasi', fn () => view('pages.livewire-page', ['component' => 'admin.delegasi', 'title' => 'Delegasi Peran']))->name('admin.delegasi');
         Route::get('/admin/matriks-rbac', fn () => view('pages.livewire-page', ['component' => 'admin.matriks-rbac', 'title' => 'Matriks Peran']))->name('admin.matriks-rbac');

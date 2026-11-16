@@ -507,4 +507,12 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
   (masuk/keluar/bersih/bulanan) + kartu di halaman Hutang.
 - Tes: `Batch14Test` (3 tes: idempoten + neraca, 2jt−800rb, skema enum).
 
+## 2026-11-16 — Ide bank batch 15: SK mengajar, opname aset, log lambat
+
+- SK: controller cetak + verify (QR bertanda, owner-scope, print-CSS).
+- Aset: tabel + komponen opname + audit; GL penyesuaian belum otomatis.
+- Observability: listener query lambat (ambang config, anti-ganggu).
+- Tes: `Batch15Test` (3 tes: cetak + VALID + 403 palsu, selisih
+  diterapkan, sunyi saat ambang raksasa).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)
