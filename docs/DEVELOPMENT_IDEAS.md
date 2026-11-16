@@ -132,11 +132,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 - [x] **Filter/sort/paging konsisten.** SELESAI 2026-11-16: helper `ApiPaging` (`?q=&sort=&per_page=` + envelope `{data, meta}`) dipakai tugas + tagihan + pengumuman. Catatan kontrak: tugas yang dulu `limit(20)` kini paginasi; ringkasan tagihan dari full filter; meta pengumuman + `per_page`. Tes: `Batch21Test` (3 kontrak).
 - [x] **API orangtua (read-only).** SELESAI 2026-11-16: pivot `wali_mahasiswa` + `WaliController` (daftar anak, nilai terkunci, tagihan) + command `wali:tautkan`; 403 tanpa tautan/anak orang lain. Tes: siklus taut → baca → tolak.
-- [ ] **Push topik per prodi.** Token ada; segmentasi belum dipakai.
-      Proposal: kirim pengumuman ke topik prodi saat publish. (M;
-      butuh kredensial FCM — kaitkan M-064.)
-      ⏸ DITUNDA 2026-11-16: butuh kredensial FCM server (eksternal);
-      implementasi tanpa kredensial tak bisa diverifikasi.
+- [x] **Push topik per prodi.** SELESAI 2026-11-16: `NotifikasiService::broadcastTopik` (pesan topic `prodi_{id}` FCM HTTP v1, guard kredensial → dilewati + log) + command `push:topik`. Tanpa kredensial tetap teruji (dilewati); payload topic teruji deterministik via `kirimPesanTopik` + Http::fake. Tes: guard + payload (+ full-path bila OpenSSL sehat).
 
 ## 20. PWA & offline (`sw.js`, `manifest`, `ScormService`)
 
@@ -157,10 +153,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [x] **Kunci akun brute-force.** SELESAI 2026-11-15: kunci 15 menit setelah 5 gagal per email (`SessionAuthController`, RateLimiter 900 dtk). Login throttle ada; lockout belum.
       Proposal: kunci 15 menit setelah 5 gagal + notifikasi email.
       (M.)
-- [ ] **Rotasi token mobile.** Token abadi. Proposal: expiry + refresh
-      endpoint (lihat kontrak Flutter dulu). (M.)
-      ⏸ DITUNDA 2026-11-16: menyentuh kontrak auth aplikasi mobile;
-      butuh keputusan expiry/refresh dari tim Flutter sebelum kode.
+- [x] **Rotasi token mobile (opt-in, kontrak aman).** SELESAI 2026-11-16: expiry via `MOBILE_TOKEN_EXPIRY_DAYS` (default null = abadi, kontrak lama utuh) + `POST /api/v1/token/refresh` (cabut token pemakai + terbitkan baru, abilities ikut). Tanpa expiry yang dikonfigurasi, perilaku lama 1:1. Tes: default abadi, opt-in expiry, refresh memutar (dengan `forgetGuards` — guard singleton me-memo user antar-call dalam satu test).
 - [x] **Review permission tahunan.** SELESAI 2026-11-16 (verifikasi, tanpa kode baru): `permission:review` sudah mencakup peran-tanpa-user + permission-tanpa-peran + delegasi kedaluwarsa; tercakup `RbacBatch4Test`, berjalan bersih di dev. Dikunci `Batch8Test`.
 
 ## 23. UI/UX (tanpa E2E — tetap jujur)

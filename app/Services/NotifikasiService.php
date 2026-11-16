@@ -44,6 +44,42 @@ class NotifikasiService
         return $count;
     }
 
+    /**
+     * Broadcast ke topik FCM prodi (`prodi_{id}`) — satu request untuk
+     * semua device ber-topic, tanpa iterasi user. Tanpa kredensial:
+     * tercatat 'dilewati', return false (inbox tetap jalan via broadcast()).
+     */
+    public function broadcastTopik(int $prodiId, string $judul, string $isi): bool
+    {
+        $projectId = Setting::get('fcm.project_id', '');
+        $serviceAccount = Setting::get('fcm.service_account_path', '');
+
+        if ($projectId === '' || $serviceAccount === '' || ! is_file($serviceAccount)) {
+            Log::info('FCM topik dilewati (belum dikonfigurasi)', ['topic' => "prodi_{$prodiId}"]);
+
+            return false;
+        }
+
+        $accessToken = $this->googleAccessToken($serviceAccount);
+
+        if (! $accessToken) {
+            return false;
+        }
+
+        return $this->kirimPesanTopik($projectId, $accessToken, $prodiId, $judul, $isi);
+    }
+
+    /** POST pesan ke topik FCM (dipisah agar dapat diuji tanpa kredensial). */
+    public function kirimPesanTopik(string $projectId, string $accessToken, int $prodiId, string $judul, string $isi): bool
+    {
+        $res = Http::withToken($accessToken)->timeout(15)->post(
+            "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
+            ['message' => ['topic' => "prodi_{$prodiId}", 'notification' => ['title' => $judul, 'body' => $isi]]]
+        );
+
+        return $res->successful();
+    }
+
     private function pushFcm(User $user, string $judul, string $isi, ?int $notifikasiId = null): void
     {
         $projectId = Setting::get('fcm.project_id', '');

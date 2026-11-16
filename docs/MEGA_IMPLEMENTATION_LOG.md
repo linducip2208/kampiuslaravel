@@ -581,4 +581,17 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
   aria-label; uji tab-only manual penuh belum dilakukan.
 - Tes: `Batch24Test` (2 tes: pesan kosong tampil, asosiasi label).
 
+## 2026-11-16 — Ide bank batch 25: push topik + rotasi token (buka 2 tertunda)
+
+- FCM: `broadcastTopik` (topic `prodi_{id}`, guard kredensial) +
+  `kirimPesanTopik` teruji deterministik + command `push:topik`.
+- Auth: expiry opt-in (`MOBILE_TOKEN_EXPIRY_DAYS`, default abadi) +
+  `POST /api/v1/token/refresh`. Kontrak lama utuh tanpa konfigurasi.
+- Temuan uji: guard Sanctum me-memo user antar-call dalam satu test
+  (RequestGuard singleton) → `forgetGuards()` sebelum asersi rotasi;
+  OpenSSL Windows tak bisa buat kunci RSA (full-path FCM di-skip jujur
+  di env ini).
+- Tes: `Batch25Test` (4 tes: guard, payload, default abadi, rotasi).
+- **Bank ide TUNTAS 60/60** — tak ada lagi item terbuka/ditunda.
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

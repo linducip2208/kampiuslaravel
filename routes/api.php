@@ -26,6 +26,8 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware(['auth:sanctum', 'abilities:mobile'])->group(function (): void {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        // Rotasi token: cabut token pemakai + terbitkan baru.
+        Route::post('/token/refresh', [AuthController::class, 'refresh'])->middleware('throttle:10,1');
 
         Route::get('/jadwal-hari-ini', [JadwalController::class, 'hariIni']);
         Route::get('/krs-aktif', [KrsController::class, 'aktif']);

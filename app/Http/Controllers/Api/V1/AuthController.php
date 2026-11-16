@@ -28,12 +28,35 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('mobile', ['mobile'])->plainTextToken;
+        $token = $user->createToken('mobile', ['mobile'], self::expiry())->plainTextToken;
 
         return response()->json([
             'token' => $token,
             'user' => new UserResource($user),
         ]);
+    }
+
+    /**
+     * Rotasi token: cabut token pemakai + terbitkan baru (abilities sama).
+     * Opt-in via MOBILE_TOKEN_EXPIRY_DAYS; default null = abadi (kontrak
+     * mobile lama tak berubah).
+     */
+    public function refresh(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $abilities = $request->user()->currentAccessToken()?->abilities ?? ['mobile'];
+        $request->user()->currentAccessToken()?->delete();
+
+        $token = $user->createToken('mobile', $abilities, self::expiry())->plainTextToken;
+
+        return response()->json(['token' => $token]);
+    }
+
+    private static function expiry(): ?\DateTimeInterface
+    {
+        $hari = (int) (env('MOBILE_TOKEN_EXPIRY_DAYS', 0) ?: 0);
+
+        return $hari > 0 ? now()->addDays($hari) : null;
     }
 
     public function me(Request $request): UserResource
