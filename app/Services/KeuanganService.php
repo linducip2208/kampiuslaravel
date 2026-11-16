@@ -180,6 +180,53 @@ class KeuanganService
     }
 
     /**
+     * Rekap piutang aging: sisa tagihan belum lunas per bucket umur
+     * (0-30 / 31-60 / 61-90 / >90 hari dari jatuh tempo).
+     *
+     * @return array{rows: list<array{nim: string, nama: string, jenis: string, jatuh_tempo: ?string, hari: int, sisa: int, bucket: string}>, total: array<string, int>}
+     */
+    public static function piutangAging(?int $tahunId = null): array
+    {
+        $rows = [];
+        $total = ['0-30' => 0, '31-60' => 0, '61-90' => 0, '>90' => 0];
+
+        try {
+            $tagihan = Tagihan::with(['mahasiswa.user'])
+                ->when($tahunId, fn ($q) => $q->where('tahun_akademik_id', $tahunId))
+                ->whereIn('status', ['belum_bayar', 'sebagian'])
+                ->orderBy('jatuh_tempo')
+                ->orderBy('id')
+                ->get();
+        } catch (\Throwable) {
+            return ['rows' => [], 'total' => $total];
+        }
+
+        foreach ($tagihan as $t) {
+            $sisa = $t->sisa();
+
+            if ($sisa <= 0) {
+                continue;
+            }
+
+            $hari = $t->hariTerlambat();
+            $bucket = $hari > 90 ? '>90' : ($hari > 60 ? '61-90' : ($hari > 30 ? '31-60' : '0-30'));
+            $total[$bucket] += $sisa;
+
+            $rows[] = [
+                'nim' => (string) ($t->mahasiswa->nim ?? '-'),
+                'nama' => (string) ($t->mahasiswa->user->name ?? '-'),
+                'jenis' => (string) $t->jenis,
+                'jatuh_tempo' => $t->jatuh_tempo?->toDateString(),
+                'hari' => $hari,
+                'sisa' => $sisa,
+                'bucket' => $bucket,
+            ];
+        }
+
+        return ['rows' => $rows, 'total' => $total];
+    }
+
+    /**
      * Terapkan denda otomatis (idempoten: nilai denda ditimpa, bukan diakumulasi).
      *
      * @return array{updated: int, total_denda: int}

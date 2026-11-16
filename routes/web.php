@@ -34,6 +34,7 @@ use App\Models\PmbPendaftar;
 use App\Models\Prodi;
 use App\Models\Tagihan;
 use App\Models\Tugas;
+use App\Services\KeuanganService;
 use App\Services\PmbArsipService;
 use App\Services\ScormService;
 use Illuminate\Http\Request;
@@ -275,6 +276,23 @@ Route::middleware('auth')->group(function () {
         Route::get('/keuangan/payroll', fn () => view('pages.livewire-page', ['component' => 'keuangan.payroll', 'title' => 'Penggajian']))->name('keuangan.payroll');
         Route::get('/keuangan/gl', fn () => view('pages.livewire-page', ['component' => 'keuangan.gl', 'title' => 'Buku Besar']))->name('keuangan.gl');
         Route::get('/keuangan/anggaran', fn () => view('pages.livewire-page', ['component' => 'keuangan.anggaran', 'title' => 'Anggaran']))->name('keuangan.anggaran');
+        // Ekspor rekap piutang aging (CSV per bucket umur).
+        Route::get('/keuangan/piutang-aging', function (Request $request) {
+            $laporan = KeuanganService::piutangAging($request->integer('tahun') ?: null);
+            $nama = 'piutang-aging-'.now()->format('Ymd-His').'.csv';
+
+            return response()->streamDownload(function () use ($laporan): void {
+                $out = fopen('php://output', 'w');
+                fputcsv($out, ['nim', 'nama', 'jenis', 'jatuh_tempo', 'hari', 'sisa', 'bucket'], ';');
+
+                foreach ($laporan['rows'] as $r) {
+                    fputcsv($out, [$r['nim'], $r['nama'], $r['jenis'], $r['jatuh_tempo'], $r['hari'], $r['sisa'], $r['bucket']], ';');
+                }
+
+                fputcsv($out, ['TOTAL', '', '', '', '', array_sum($laporan['total']), json_encode($laporan['total'])], ';');
+                fclose($out);
+            }, $nama);
+        })->name('keuangan.piutang-aging')->middleware('throttle:10,1');
         Route::get('/surat/nomor', fn () => view('pages.livewire-page', ['component' => 'surat.nomor-otomatis', 'title' => 'Nomor Surat']))->name('surat.nomor');
     });
 

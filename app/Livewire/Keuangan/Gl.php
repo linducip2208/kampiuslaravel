@@ -109,6 +109,7 @@ class Gl extends Component
                 : null,
             'buku' => $this->bukuCoaId && $this->tahunId ? GlService::bukuBesar($this->bukuCoaId, $this->tahunId) : null,
             'neraca' => $this->tahunId ? GlService::neracaSaldo($this->tahunId) : null,
+            'labarugi' => $this->tahunId ? GlService::labaRugi($this->tahunId) : null,
             'tahuns' => TahunAkademik::orderByDesc('id')->get(),
         ]);
     }

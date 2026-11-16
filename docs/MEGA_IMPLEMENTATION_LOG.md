@@ -485,4 +485,17 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch12Test` (3 tes: ZIP + manifest + unduhan, rata 80,
   total 1.500.000).
 
+## 2026-11-16 — Ide bank batch 13: aging piutang, laba-rugi, tracer email
+
+- Keuangan: `piutangAging` (bucket dari `hariTerlambat`, hanya sisa>0;
+  total bucket = total piutang) + CSV. Catatan tes: badan stream tak
+  tertangkap TestResponse → verifikasi via header + service.
+- GL: `labaRugi` (per akun tipe pendapatan/beban + surplus) + kartu di
+  halaman GL.
+- Tracer: `tracer:ingatkan` + mailable + view; guard konfigurasi →
+  dry-run. Proxy tanggal lulus = `updated_at` (jujur: kolom khusus
+  belum ada).
+- Tes: `Batch13Test` (3 tes: bucket + total, surplus 600rb, dry-run
+  memuat NIM).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

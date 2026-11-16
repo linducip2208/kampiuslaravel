@@ -48,9 +48,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 5. Keuangan (`KeuanganService`, `Bayar*`, `TagihanMassal`)
 
-- [ ] **Ekspor rekap piutang aging.** Piutang ada, aging bucket belum.
-      Proposal: kolom 0-30/31-60/61-90/>90 hari di ekspor tagihan.
-      (M; terima: total per bucket = total piutang.)
+- [x] **Ekspor rekap piutang aging.** SELESAI 2026-11-16: `KeuanganService::piutangAging` (bucket 0-30/31-60/61-90/>90 dari `hariTerlambat`, hanya sisa>0) + rute CSV `/keuangan/piutang-aging`. Tes: bucket benar + total bucket = total piutang.
 - [x] **Pengingat denda otomatis.** SELESAI 2026-11-16: rincian denda di `pesanPengingat` (`termasuk denda RpX`). Tes: pesan memuat nominal.
 - [x] **Kuitansi gabungan multi-tagihan.** SELESAI 2026-11-16: `KwitansiController::gabungan` + view `cetak.kwitansi-gabungan` (semua pembayaran verified 1 mhs + 1 periode, otorisasi owner-scope). Tes: 2 bayar → total 1.500.000 tampil.
 
@@ -59,8 +57,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [ ] **Saldo awal periode.** Neraca tanpa opening balance. Proposal:
       impor saldo awal per CoA per tahun + tampil di buku besar.
       (M; terima: saldo awal + mutasi = saldo akhir.)
-- [ ] **Laporan laba-rugi.** Buku besar + neraca ada; L/R belum.
-      Proposal: agregat pendapatan−beban per tipe CoA. (M.)
+- [x] **Laporan laba-rugi.** SELESAI 2026-11-16: `GlService::labaRugi` (pendapatan vs beban per akun tipe COA + surplus) + kartu Laba-Rugi di halaman GL. Tes: 1jt − 400rb = surplus 600rb.
 - [ ] **Arus kas sederhana.** Belum ada. Proposal: kas masuk (penerimaan)
       vs keluar (hutang lunas + payroll) per bulan. (M; terima: angka
       cocok dengan jurnal.)
@@ -99,9 +96,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 ## 11. Tracer & karier (`Tracer/*`, `Admin/Tracer`)
 
 - [x] **Grafik serapan di dashboard.** SELESAI 2026-11-16: tabel tren di `Admin/Tracer` (responden vs terserap bekerja/wirausaha + bar % per `tahun_lulus`). Tes: 2024 = 2 responden/1 terserap/50%.
-- [ ] **Pengingat tracer via email.** Hanya form pasif. Proposal: kirim
-      undangan tracer ke email alumni 6 bulan pasca-lulus (ikut pola
-      `MailService`, guard konfigurasi). (M.)
+- [x] **Pengingat tracer via email.** SELESAI 2026-11-16: command `tracer:ingatkan` (target = lulus ~6 bulan tanpa isian; proxy tanggal lulus = updated_at — kolom khusus belum ada) + `TracerUndanganMail`; guard `MailService::terkonfigurasi` → dry-run daftar target. Tes: dry-run memuat NIM target.
 
 ## 12. Organisasi & kemahasiswaan (`Organisasi/Kelola`, `Cuti`)
 

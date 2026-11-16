@@ -84,6 +84,29 @@
             </div>
         @endif
     </div>
+    <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title">Laba-Rugi @if($labarugi) — Surplus: Rp {{ number_format($labarugi['surplus'], 0, ',', '.') }} @endif</h3></div>
+        @if($labarugi)
+            <div class="table-responsive">
+                <table class="table table-vcenter">
+                    <thead><tr><th>Kode</th><th>Akun</th><th>Kelompok</th><th class="text-end">Total</th></tr></thead>
+                    <tbody>
+                        @foreach($labarugi['pendapatan'] as $r)
+                            <tr><td>{{ $r['kode'] }}</td><td>{{ $r['nama'] }}</td><td><span class="badge bg-green-lt">pendapatan</span></td><td class="text-end">{{ number_format($r['total'], 0, ',', '.') }}</td></tr>
+                        @endforeach
+                        @foreach($labarugi['beban'] as $r)
+                            <tr><td>{{ $r['kode'] }}</td><td>{{ $r['nama'] }}</td><td><span class="badge bg-red-lt">beban</span></td><td class="text-end">({{ number_format($r['total'], 0, ',', '.') }})</td></tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr><th colspan="3">Total pendapatan</th><th class="text-end">{{ number_format($labarugi['total_pendapatan'], 0, ',', '.') }}</th></tr>
+                        <tr><th colspan="3">Total beban</th><th class="text-end">{{ number_format($labarugi['total_beban'], 0, ',', '.') }}</th></tr>
+                        <tr><th colspan="3">Surplus / (Defisit)</th><th class="text-end">{{ number_format($labarugi['surplus'], 0, ',', '.') }}</th></tr>
+                    </tfoot>
+                </table>
+            </div>
+        @endif
+    </div>
     <div class="card">
         <div class="card-header"><h3 class="card-title">Buku Besar</h3></div>
         <div class="card-body d-flex gap-2">

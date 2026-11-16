@@ -111,6 +111,56 @@ class GlService
     }
 
     /**
+     * Laba-rugi: total pendapatan vs beban per tahun + surplus/defisit.
+     *
+     * @return array{pendapatan: list<array{kode: string, nama: string, total: int}>, beban: list<array{kode: string, nama: string, total: int}>, total_pendapatan: int, total_beban: int, surplus: int}
+     */
+    public static function labaRugi(int $tahunId): array
+    {
+        try {
+            $rows = Coa::leftJoin('jurnal_item', 'jurnal_item.coa_id', '=', 'coa.id')
+                ->leftJoin('jurnal_umum', function ($j) use ($tahunId): void {
+                    $j->on('jurnal_umum.id', '=', 'jurnal_item.jurnal_id')
+                        ->where('jurnal_umum.tahun_akademik_id', $tahunId);
+                })
+                ->where('coa.aktif', true)
+                ->whereIn('coa.tipe', ['pendapatan', 'beban'])
+                ->groupBy(['coa.id', 'coa.kode', 'coa.nama', 'coa.tipe'])
+                ->selectRaw('coa.kode, coa.nama, coa.tipe, COALESCE(SUM(jurnal_item.debet), 0) AS debet, COALESCE(SUM(jurnal_item.kredit), 0) AS kredit')
+                ->havingRaw('COALESCE(SUM(jurnal_item.debet), 0) + COALESCE(SUM(jurnal_item.kredit), 0) > 0')
+                ->orderBy('coa.kode')
+                ->get();
+        } catch (\Throwable) {
+            return ['pendapatan' => [], 'beban' => [], 'total_pendapatan' => 0, 'total_beban' => 0, 'surplus' => 0];
+        }
+
+        $pendapatan = [];
+        $beban = [];
+        $totP = 0;
+        $totB = 0;
+
+        foreach ($rows as $r) {
+            // Pendapatan bersaldo normal kredit, beban bersaldo normal debet.
+            $total = $r->tipe === 'pendapatan'
+                ? (int) $r->kredit - (int) $r->debet
+                : (int) $r->debet - (int) $r->kredit;
+
+            if ($r->tipe === 'pendapatan') {
+                $pendapatan[] = ['kode' => (string) $r->kode, 'nama' => (string) $r->nama, 'total' => $total];
+                $totP += $total;
+            } else {
+                $beban[] = ['kode' => (string) $r->kode, 'nama' => (string) $r->nama, 'total' => $total];
+                $totB += $total;
+            }
+        }
+
+        return [
+            'pendapatan' => $pendapatan, 'beban' => $beban,
+            'total_pendapatan' => $totP, 'total_beban' => $totB, 'surplus' => $totP - $totB,
+        ];
+    }
+
+    /**
      * Neraca saldo: total debet/kredit per akun + cek seimbang.
      *
      * @return array{rows: list<array{kode: string, nama: string, debet: int, kredit: int}>, total_debet: int, total_kredit: int, seimbang: bool}
