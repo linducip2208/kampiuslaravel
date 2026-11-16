@@ -338,6 +338,12 @@ Route::middleware('auth')->group(function () {
 
         return response()->download($path, basename($path))->deleteFileAfterSend(true);
     })->name('lms.paket')->middleware('throttle:10,1');
+    // Ide bank: paket massal per kelas (semua pertemuan dalam satu ZIP).
+    Route::get('/lms/paket-kelas/{kelas}', function (int $kelas) {
+        $path = ScormService::paketKelas($kelas);
+
+        return response()->download($path, basename($path))->deleteFileAfterSend(true);
+    })->name('lms.paket.kelas')->middleware('throttle:10,1');
     Route::get('/cari', [PencarianController::class, 'index'])->name('pencarian');
     Route::get('/kalender', fn () => view('pages.livewire-page', ['component' => 'kalender.kelola', 'title' => 'Kalender Akademik']))->name('kalender.index');
     Route::get('/kalender.ics', [KalenderController::class, 'ics'])->name('kalender.ics');

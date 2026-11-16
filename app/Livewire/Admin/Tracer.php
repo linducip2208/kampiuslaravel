@@ -27,6 +27,18 @@ class Tracer extends Component
                 ->latest('id')
                 ->paginate(10),
             'ringkasan' => TracerAlumni::selectRaw('status_kerja, COUNT(*) as total')->groupBy('status_kerja')->pluck('total', 'status_kerja')->all(),
+            // Tren serapan per tahun lulus: responden vs terserap (bekerja/wirausaha).
+            'tren' => TracerAlumni::selectRaw("tahun_lulus, COUNT(*) as responden, SUM(CASE WHEN status_kerja IN ('bekerja','wirausaha') THEN 1 ELSE 0 END) as terserap")
+                ->groupBy('tahun_lulus')
+                ->orderBy('tahun_lulus')
+                ->get()
+                ->map(fn ($r) => [
+                    'tahun' => $r->tahun_lulus,
+                    'responden' => (int) $r->responden,
+                    'terserap' => (int) $r->terserap,
+                    'persen' => $r->responden > 0 ? round($r->terserap / $r->responden * 100, 1) : 0.0,
+                ])
+                ->all(),
         ]);
     }
 }

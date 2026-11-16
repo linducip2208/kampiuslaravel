@@ -117,9 +117,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 11. Tracer & karier (`Tracer/*`, `Admin/Tracer`)
 
-- [ ] **Grafik serapan di dashboard.** Angka ada di eksekutif; tren
-      tahunan belum. Proposal: grafik lulusan vs bekerja per tahun lulus.
-      (S.)
+- [x] **Grafik serapan di dashboard.** SELESAI 2026-11-16: tabel tren di `Admin/Tracer` (responden vs terserap bekerja/wirausaha + bar % per `tahun_lulus`). Tes: 2024 = 2 responden/1 terserap/50%.
 - [ ] **Pengingat tracer via email.** Hanya form pasif. Proposal: kirim
       undangan tracer ke email alumni 6 bulan pasca-lulus (ikut pola
       `MailService`, guard konfigurasi). (M.)
@@ -195,8 +193,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 - [ ] **Halaman KHS offline.** SW cache shell; data belum. Proposal:
       cache respons KHS terakhir + badge "data offline". (M.)
-- [ ] **Unduhan massal materi.** ZIP per pertemuan ada; per MK belum.
-      Proposal: paket per matakuliah (semua pertemuan). (S.)
+- [x] **Unduhan massal materi.** SELESAI 2026-11-16: `ScormService::paketKelas` (ZIP per kelas: folder per pertemuan + manifest gabungan + metadata) + rute `/lms/paket-kelas/{kelas}` (throttle 10/menit). Tes: ZIP memuat 2 materi + metadata benar.
 
 ## 21. Observability & operasi (`/health`, scheduler, backup)
 
@@ -217,8 +214,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
       (M.)
 - [ ] **Rotasi token mobile.** Token abadi. Proposal: expiry + refresh
       endpoint (lihat kontrak Flutter dulu). (M.)
-- [ ] **Review permission tahunan.** Proposal: command daftar permission
-      tak terpakai vs gate + laporan. (S.)
+- [x] **Review permission tahunan.** SELESAI 2026-11-16 (verifikasi, tanpa kode baru): `permission:review` sudah mencakup peran-tanpa-user + permission-tanpa-peran + delegasi kedaluwarsa; tercakup `RbacBatch4Test`, berjalan bersih di dev. Dikunci `Batch8Test`.
 
 ## 23. UI/UX (tanpa E2E — tetap jujur)
 

@@ -9,6 +9,30 @@
             @endforelse
         </div>
     </div>
+    <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title">Tren serapan per tahun lulus</h3></div>
+        <div class="table-responsive">
+            <table class="table table-vcenter mb-0">
+                <thead><tr><th>Tahun</th><th>Responden</th><th>Terserap</th><th style="min-width:220px">%</th></tr></thead>
+                <tbody>
+                    @forelse($tren as $t)
+                        <tr>
+                            <td>{{ $t['tahun'] }}</td>
+                            <td>{{ $t['responden'] }}</td>
+                            <td>{{ $t['terserap'] }}</td>
+                            <td>
+                                <div class="progress" style="min-width:160px">
+                                    <div class="progress-bar" style="width: {{ min(100, $t['persen']) }}%">{{ $t['persen'] }}%</div>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4" class="text-secondary">Belum ada data tren.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div class="card">
         <div class="card-header"><h3 class="card-title">Tracer Study</h3></div>
         <div class="card-body">

@@ -422,4 +422,17 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch7Test` (3 tes: sisa SKS tampil, health memuat antrean,
   skor 61 → tombol + notif PA tercatat).
 
+## 2026-11-16 — Ide bank batch 8: paket materi massal, tren tracer, kunci review permission
+
+- LMS: `ScormService::paketKelas` — ZIP per kelas (folder per pertemuan,
+  manifest gabungan, metadata jumlah pertemuan/materi) + rute
+  `/lms/paket-kelas/{kelas}` (`throttle:10,1`, pola sama dgn paket
+  pertemuan; `deleteFileAfterSend`).
+- Tracer admin: tabel "Tren serapan per tahun lulus" (responden vs
+  terserap bekerja/wirausaha + bar %) dari kolom `tahun_lulus`.
+- Review permission: tanpa kode baru — `permission:review` sudah mencakup
+  semua yang diminta ide; diverifikasi jalan bersih di dev + dikunci tes.
+- Tes: `Batch8Test` (3 tes: isi ZIP + metadata, tren 2024 2/1/50%,
+  `permission:review` exit 0).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)
