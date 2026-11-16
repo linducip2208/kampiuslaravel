@@ -22,6 +22,9 @@ class NilaiSidang extends Component
 
     public ?int $dosen_id = null;
 
+    /** Nama penguji eksternal (non-dosen); salah satu dari dosen/nama wajib. */
+    public string $namaEksternal = '';
+
     public string $peran = 'penguji';
 
     public ?float $nilai = null;
@@ -40,17 +43,44 @@ class NilaiSidang extends Component
     {
         $this->validate([
             'sidang_id' => 'required|exists:sidang,id',
-            'dosen_id' => 'required|exists:dosen,id',
+            'dosen_id' => 'nullable|exists:dosen,id',
+            'namaEksternal' => 'nullable|string|max:150',
             'peran' => 'required|string|max:30',
             'nilai' => 'nullable|numeric|min:0|max:100',
         ]);
 
-        SidangPenguji::updateOrCreate(
-            ['sidang_id' => $this->sidang_id, 'dosen_id' => $this->dosen_id],
-            ['peran' => $this->peran, 'nilai' => $this->nilai]
-        );
+        if (! $this->dosen_id && trim($this->namaEksternal) === '') {
+            $this->addError('dosen_id', 'Pilih dosen internal atau isi nama penguji eksternal.');
 
-        $this->reset(['dosen_id', 'nilai']);
+            return;
+        }
+
+        if ($this->dosen_id) {
+            SidangPenguji::updateOrCreate(
+                ['sidang_id' => $this->sidang_id, 'dosen_id' => $this->dosen_id],
+                ['peran' => $this->peran, 'nilai' => $this->nilai, 'nama_eksternal' => null]
+            );
+        } else {
+            // Eksternal: cocokkan by nama (unique DB hanya (sidang,dosen)).
+            $nama = trim($this->namaEksternal);
+            $ada = SidangPenguji::where('sidang_id', $this->sidang_id)
+                ->where('nama_eksternal', $nama)
+                ->first();
+
+            if ($ada) {
+                $ada->update(['peran' => $this->peran, 'nilai' => $this->nilai]);
+            } else {
+                SidangPenguji::create([
+                    'sidang_id' => $this->sidang_id,
+                    'dosen_id' => null,
+                    'nama_eksternal' => $nama,
+                    'peran' => $this->peran,
+                    'nilai' => $this->nilai,
+                ]);
+            }
+        }
+
+        $this->reset(['dosen_id', 'namaEksternal', 'nilai']);
         $this->message = 'Nilai penguji tersimpan.';
         $this->recalc();
     }

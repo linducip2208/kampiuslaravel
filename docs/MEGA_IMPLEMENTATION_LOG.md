@@ -474,4 +474,15 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch11Test` (3 tes: siklus VA lengkap, ranking kuota-1,
   SK otomatis + tampil).
 
+## 2026-11-16 — Ide bank batch 12: arsip PMB, penguji eksternal, kuitansi gabungan
+
+- PMB: `PmbArsipService::arsipGelombang` + rute admin + audit.
+  Retensi/hapus fisik tetap manual (keputusan admin).
+- Sidang: `nama_eksternal` + `dosen_id` nullable (SQLite: rebuild tabel
+  + salin data; MySQL: MODIFY) + input di `NilaiSidang`. Input mandiri
+  tetap dosen berakun (tanpa akun tak bisa login — batas wajar).
+- Keuangan: `gabungan` + view + rute (owner-scope ikut).
+- Tes: `Batch12Test` (3 tes: ZIP + manifest + unduhan, rata 80,
+  total 1.500.000).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

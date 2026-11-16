@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\AuthorizesMahasiswaData;
 use App\Models\Pembayaran;
 use App\Models\Setting;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class KwitansiController extends Controller
@@ -32,6 +33,34 @@ class KwitansiController extends Controller
                 'ppn' => $bruto - $dpp,
                 'bruto' => $bruto,
             ],
+        ]);
+    }
+
+    /**
+     * Kuitansi gabungan: satu dokumen untuk semua pembayaran terverifikasi
+     * milik mahasiswa pada tahun akademik tertentu.
+     */
+    public function gabungan(Request $request): View
+    {
+        $mahasiswaId = $request->integer('mahasiswa_id');
+        $tahunId = $request->integer('tahun_akademik_id');
+
+        abort_unless($mahasiswaId > 0 && $tahunId > 0, 422, 'mahasiswa_id dan tahun_akademik_id wajib diisi.');
+        $this->authorizeMahasiswa($mahasiswaId);
+
+        $bayar = Pembayaran::with(['tagihan.tahunAkademik'])
+            ->where('status', 'verified')
+            ->whereHas('tagihan', fn ($q) => $q->where('mahasiswa_id', $mahasiswaId)->where('tahun_akademik_id', $tahunId))
+            ->orderBy('verified_at')
+            ->orderBy('id')
+            ->get();
+
+        abort_if($bayar->isEmpty(), 404, 'Tidak ada pembayaran terverifikasi pada periode tersebut.');
+
+        return view('cetak.kwitansi-gabungan', [
+            'bayar' => $bayar,
+            'mahasiswa' => $bayar->first()->tagihan->mahasiswa,
+            'total' => $bayar->sum('nominal'),
         ]);
     }
 }

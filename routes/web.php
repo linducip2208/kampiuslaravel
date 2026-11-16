@@ -34,6 +34,7 @@ use App\Models\PmbPendaftar;
 use App\Models\Prodi;
 use App\Models\Tagihan;
 use App\Models\Tugas;
+use App\Services\PmbArsipService;
 use App\Services\ScormService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -206,6 +207,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/transkrip/{mahasiswaId}/cetak', [TranskripController::class, 'cetak'])->name('transkrip.cetak');
     Route::get('/ktm/{mahasiswa}/cetak', [KtmController::class, 'cetak'])->name('ktm.cetak');
     Route::get('/kwitansi/{pembayaran}/cetak', [KwitansiController::class, 'cetak'])->name('kwitansi.cetak');
+    // Kuitansi gabungan: semua pembayaran terverifikasi 1 mhs + 1 periode.
+    Route::get('/kwitansi/gabungan', [KwitansiController::class, 'gabungan'])->name('kwitansi.gabungan');
     Route::get('/surat/{surat}/cetak', [SuratController::class, 'cetak'])->name('surat.cetak');
 
     // Mahasiswa (+ staf pendamping)
@@ -302,6 +305,12 @@ Route::middleware('auth')->group(function () {
     // Admin platform
     Route::middleware('role:superadmin|admin_prodi')->group(function () {
         Route::get('/admin/pmb/verifikasi', fn () => view('admin.pmb-verifikasi'))->name('admin.pmb.verifikasi');
+        // Arsip berkas pendaftar per gelombang (ZIP + manifest + audit).
+        Route::get('/admin/pmb/arsip/{gelombang}', function (int $gelombang) {
+            $path = PmbArsipService::arsipGelombang($gelombang, Auth::id());
+
+            return response()->download($path, basename($path))->deleteFileAfterSend(true);
+        })->name('admin.pmb.arsip')->middleware('throttle:5,1');
         Route::get('/admin/users', fn () => view('pages.livewire-page', ['component' => 'admin.user-data', 'title' => 'Kelola User']))->name('admin.users');
         Route::get('/admin/delegasi', fn () => view('pages.livewire-page', ['component' => 'admin.delegasi', 'title' => 'Delegasi Peran']))->name('admin.delegasi');
         Route::get('/admin/matriks-rbac', fn () => view('pages.livewire-page', ['component' => 'admin.matriks-rbac', 'title' => 'Matriks Peran']))->name('admin.matriks-rbac');

@@ -22,13 +22,18 @@
                     </select>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">Dosen</label>
+                    <label class="form-label">Dosen (internal)</label>
                     <select wire:model="dosen_id" class="form-select">
                         <option value="">— Pilih dosen —</option>
                         @foreach($dosens as $dosen)
                             <option value="{{ $dosen->id }}">{{ $dosen->nidn }}</option>
                         @endforeach
                     </select>
+                    @error('dosen_id')<div class="text-danger">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">atau Penguji eksternal (nama)</label>
+                    <input type="text" wire:model="namaEksternal" class="form-control" placeholder="Nama penguji luar kampus">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Peran</label>

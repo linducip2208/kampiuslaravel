@@ -12,7 +12,13 @@ class SidangPenguji extends Model
 
     protected $table = 'sidang_penguji';
 
-    protected $fillable = ['sidang_id', 'dosen_id', 'peran', 'nilai'];
+    protected $fillable = ['sidang_id', 'dosen_id', 'nama_eksternal', 'peran', 'nilai'];
+
+    /** Nama tampil: dosen internal atau nama eksternal. */
+    public function namaTampil(): string
+    {
+        return (string) ($this->nama_eksternal ?? $this->dosen->user->name ?? $this->dosen->nidn ?? "Dosen #{$this->dosen_id}");
+    }
 
     protected function casts(): array
     {

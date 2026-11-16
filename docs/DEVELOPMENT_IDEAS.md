@@ -27,9 +27,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 - [x] **Kedaluwarsa VA otomatis.** SELESAI 2026-11-16: `va_expires_at` (+7 hari, config `payment.defaults.va_expiry_days`) — VA lama dipakai ulang hanya bila berlaku, kedaluwarsa → terbit ulang; `settleByReference` menolak lewat tempo. Tes: reuse → regenerate → settle lama false → settle baru lunas.
 - [x] **Skoring seleksi otomatis.** SELESAI 2026-11-16: status baru `cadangan` + `Verifikasi::prosesRanking` (urut nilaiAkhir, dalam kuota + ambang → lulus, luar kuota → cadangan, di bawah ambang → tidak; hanya status belum final) + filter gelombang + ambang + tombol Ranking. Tes: kuota 1 → 90 lulus, 80 cadangan.
-- [ ] **Arsip berkas pendaftar.** Berkas di `storage/app/public/pmb/*`
-      tanpa retensi. Proposal: tombol arsip per gelombang (ZIP) +
-      hapus aman setelah N tahun. (M; terima: ZIP terunduh + audit.)
+- [x] **Arsip berkas pendaftar.** SELESAI 2026-11-16: `PmbArsipService::arsipGelombang` (ZIP per gelombang + manifest ada/hilang + AuditLog `pmb.arsip`) + rute `/admin/pmb/arsip/{gelombang}` (throttle 5/menit). Retensi/hapus fisik tetap manual. Tes: ZIP + manifest + audit + unduhan.
 
 ## 3. KRS & persetujuan (`Pengajuan`, `PersetujuanPa`, `WaliList`)
 
@@ -54,8 +52,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
       Proposal: kolom 0-30/31-60/61-90/>90 hari di ekspor tagihan.
       (M; terima: total per bucket = total piutang.)
 - [x] **Pengingat denda otomatis.** SELESAI 2026-11-16: rincian denda di `pesanPengingat` (`termasuk denda RpX`). Tes: pesan memuat nominal.
-- [ ] **Kuitansi gabungan multi-tagihan.** Kwitansi per pembayaran saja.
-      Proposal: cetak gabungan per mahasiswa per periode. (M.)
+- [x] **Kuitansi gabungan multi-tagihan.** SELESAI 2026-11-16: `KwitansiController::gabungan` + view `cetak.kwitansi-gabungan` (semua pembayaran verified 1 mhs + 1 periode, otorisasi owner-scope). Tes: 2 bayar → total 1.500.000 tampil.
 
 ## 6. GL & anggaran (`GlService`, `AnggaranService`, `TutupBuku`)
 
@@ -90,9 +87,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [x] **Jadwal sidang bentrok ruang.** SELESAI 2026-11-15: cek `JadwalService::ruangBentrok` (±2 jam kuliah) saat simpan pendaftaran.
       bentrok kuliah/pinjam. Proposal: pakai `JadwalService::ruangBentrok`
       saat simpan jadwal sidang. (S; terima: bentrok ditolak.)
-- [ ] **Penguji eksternal.** Penguji harus dosen internal. Proposal:
-      izinkan penguji non-dosen (nama bebas) di `sidang_penguji`.
-      (M; terima: nilai penguji eksternal masuk rata-rata.)
+- [x] **Penguji eksternal.** SELESAI 2026-11-16: `sidang_penguji.nama_eksternal` + `dosen_id` nullable (rebuild tabel utk SQLite, MODIFY utk MySQL) + input nama di `NilaiSidang` (wajib salah satu) + nilai eksternal masuk rata-rata. Cakupan jujur: input mandiri (`NilaiPenguji`) tetap khusus dosen berakun. Tes: nilai 80 eksternal → rata sidang 80.
 
 ## 10. Yudisium, wisuda, alumni (`Yudisium`, batch, `Alumni`)
 
