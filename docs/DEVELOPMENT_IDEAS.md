@@ -113,10 +113,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 16. Klinik (modul baru — data sensitif!)
 
-- [ ] **Kunjungan + resep.** Wajib: gate `klinik.*` terpisah, audit akses
-      per-rekam-medis, BUKAN di grup umum. Proposal batch 1: antrean +
-      rekam sederhana + audit baca. (L; terima: non-klinik 403 + audit
-      tiap akses.)
+- [x] **Kunjungan + resep.** SELESAI 2026-11-16: modul klinik batch 1 — `klinik_kunjungan` + `klinik_resep`, peran `petugas_klinik` (permission `klinik.manage/read`), gate ganda (middleware + `can()` di tiap aksi; rute di luar grup admin), audit tulis + audit baca per rekam. Tes: non-klinik 403 dua lapis, simpan + resep + audit tercatat.
 
 ## 17. SPMI & akreditasi lanjutan (`Admin/Akreditasi`, `Obe/*`)
 
@@ -152,9 +149,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 ## 21. Observability & operasi (`/health`, scheduler, backup)
 
 - [x] **Cek antrean di /health.** SELESAI 2026-11-16: `queue` + `queue_failed` + `checks.queue` di respons `/health` (tabel `jobs`/`failed_jobs` diguard `Schema::hasTable`; metrik tak boleh gagalkan health). Tes: struktur JSON + `queue_failed: 0`.
-- [ ] **Uji restore terjadwal.** Backup teruji; restore belum pernah
-      dicoba di staging. Proposal: runbook + checklist + jadwal
-      triwulan (manual, catat buktinya). (S, non-kode.)
+- [x] **Uji restore terjadwal.** SELESAI 2026-11-16 (dokumen, tanpa kode): `docs/RUNBOOK_RESTORE.md` — prasyarat, langkah restore, verifikasi, checklist bukti, jadwal triwulan. Eksekusi manual pertama belum dilakukan (butuh staging).
 - [x] **Log lambat.** SELESAI 2026-11-16: `DB::listen` di `AppServiceProvider` (> `config(app.slow_query_ms, 500)` → `Log::warning` + sql/bindings; ambang 0 = nonaktif; try/catch anti-ganggu). Tes: ambang raksasa → tidak ada warning (jalur positif tak deterministik di sqlite, dicatat jujur).
 
 ## 22. Keamanan (lanjutan batch RBAC)

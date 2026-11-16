@@ -29,6 +29,8 @@ class RolesPermissionsSeeder extends Seeder
             'surat.manage',
             'pengumuman.manage',
             'laporan.view',
+            'klinik.manage',
+            'klinik.read',
         ];
 
         foreach ($permissions as $name) {
@@ -104,6 +106,8 @@ class RolesPermissionsSeeder extends Seeder
             'auditor' => ['laporan.view'],
             'alumni' => [],
             'orangtua' => [],
+            // Klinik (aditif): petugas khusus + superadmin (semua permission).
+            'petugas_klinik' => ['klinik.manage', 'klinik.read'],
         ];
 
         foreach ($roles as $roleName => $perms) {

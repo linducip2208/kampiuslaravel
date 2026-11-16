@@ -545,4 +545,12 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch19Test` (3 tes: ganda/penuh ditolak, iuran 750rb
   idempoten, halaman admin).
 
+## 2026-11-16 — Ide bank batch 20: klinik + runbook restore
+
+- Klinik batch 1: kunjungan + resep, peran/permission terpisah, gate
+  ganda, audit tulis + baca. Rute sempat salah grup (dalam admin) —
+  diperbaiki keluar + tes dua lapis.
+- Operasi: runbook restore triwulan (manual pertama pending staging).
+- Tes: `Batch20Test` (2 tes: 403 dua lapis, simpan + resep + audit).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

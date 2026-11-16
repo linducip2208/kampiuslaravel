@@ -366,6 +366,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/perpus/sirkulasi', fn () => view('pages.livewire-page', ['component' => 'perpus.sirkulasi', 'title' => 'Sirkulasi Perpustakaan']))->name('perpus.sirkulasi');
     });
 
+    // Klinik: data sensitif — gate permission terpisah (BUKAN grup admin),
+    // + can() di komponen + audit akses per rekam medis.
+    Route::middleware('permission:klinik.manage')->group(function () {
+        Route::get('/klinik/kunjungan', fn () => view('pages.livewire-page', ['component' => 'klinik.kunjungan', 'title' => 'Klinik']))->name('klinik.kunjungan');
+    });
+
     // Kalender & helpdesk: semua user login (kepemilikan dicek di komponen)
     Route::get('/profil', fn () => view('pages.livewire-page', ['component' => 'profil', 'title' => 'Profil Saya']))->name('profil');
     Route::get('/lms/forum', fn (Request $r) => view('lms.forum', ['kelasId' => $r->integer('kelas') ?: null]))->name('lms.forum');

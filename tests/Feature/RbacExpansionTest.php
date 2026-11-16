@@ -39,8 +39,11 @@ class RbacExpansionTest extends TestCase
     /** 6 peran lama TIDAK berubah (kontrak existing). */
     public function test_enam_peran_lama_utuh(): void
     {
+        // superadmin = SEMUA permission (bertambah aditif saat permission
+        // baru ditambahkan, mis. 2 klinik.* batch 20 → 17). Peran lain
+        // angkanya beku.
         $ekspektasi = [
-            'superadmin' => 15,
+            'superadmin' => 17,
             'admin_prodi' => 9,
             'keuangan' => 2,
             'dosen' => 3,
