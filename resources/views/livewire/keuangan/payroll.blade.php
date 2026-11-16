@@ -56,7 +56,7 @@
         <div class="card-header"><h3 class="card-title">Slip — Total Rp{{ number_format($total, 0, ',', '.') }}</h3></div>
         <div class="table-responsive">
             <table class="table table-vcenter">
-                <thead><tr><th>Pegawai</th><th>Pokok</th><th>Tunjangan</th><th>Potongan</th><th>Bersih</th><th>Status</th></tr></thead>
+                <thead><tr><th>Pegawai</th><th>Pokok</th><th>Tunjangan</th><th>Potongan</th><th>Bersih</th><th>Status</th><th class="d-print-none">Aksi</th></tr></thead>
                 <tbody>
                     @foreach($slips ?? [] as $s)
                         <tr>
@@ -66,6 +66,7 @@
                             <td>{{ number_format($s->potongan, 0, ',', '.') }}</td>
                             <td><strong>{{ number_format($s->total_bersih, 0, ',', '.') }}</strong></td>
                             <td>{{ $s->status }}</td>
+                            <td class="d-print-none"><a href="{{ route('keuangan.slip.cetak', $s->id) }}" target="_blank" class="btn btn-sm btn-outline-primary">Cetak</a></td>
                         </tr>
                     @endforeach
                 </tbody>

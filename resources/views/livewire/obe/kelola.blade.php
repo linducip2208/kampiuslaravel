@@ -109,16 +109,44 @@
             @endif
         </div>
     </div>
+    <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title">Sub-CPMK per CPMK</h3></div>
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <label class="form-label">CPMK induk (ID)</label>
+                    <input type="number" class="form-control" wire:model="sub_cpmk_id" min="1" placeholder="ID CPMK">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Kode Sub</label>
+                    <input type="text" class="form-control" wire:model="sub_kode" placeholder="SUB-1">
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Deskripsi</label>
+                    <input type="text" class="form-control" wire:model="sub_deskripsi">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Bobot</label>
+                    <input type="number" class="form-control" wire:model="sub_bobot" min="0.1" step="0.1">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" wire:click="simpanSubCpmk">Simpan Sub-CPMK</button>
+                    @error('sub_kode')<span class="text-danger">{{ $message }}</span>@enderror
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card">
         <div class="table-responsive">
             <table class="table table-vcenter">
-                <thead><tr><th>MK</th><th>CPMK</th><th>CPL</th><th>Asesmen</th></tr></thead>
+                <thead><tr><th>MK</th><th>CPMK</th><th>CPL</th><th>Sub</th><th>Asesmen</th></tr></thead>
                 <tbody>
                     @foreach($cpmks as $c)
                         <tr>
                             <td>{{ $c->matakuliah->kode ?? '-' }}</td>
                             <td>{{ $c->kode }}</td>
                             <td>{{ $c->cpl->kode ?? '-' }}</td>
+                            <td>@foreach($c->subCpmk as $s)<span class="badge bg-blue-lt me-1">{{ $s->kode }}</span>@endforeach</td>
                             <td>{{ $c->asesmen->count() }} pemetaan</td>
                         </tr>
                     @endforeach

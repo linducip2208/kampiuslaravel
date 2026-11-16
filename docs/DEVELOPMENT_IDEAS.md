@@ -60,8 +60,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 7. Payroll & HR (`PayrollService`, `Kelola` rekrutmen/organisasi)
 
-- [ ] **Slip PDF.** Slip hanya di layar. Proposal: cetak slip PDF per
-      pegawai (mirip kwitansi). (S.)
+- [x] **Slip gaji cetak (bukan PDF).** SELESAI 2026-11-16: `SlipController::cetak` + view print-CSS + tombol Cetak per baris (tanpa dependensi PDF baru, pola transkrip). Tes: nama + total tampil.
 - [ ] **Tunjangan per jabatan.** Komponen manual per slip. Proposal:
       template tunjangan per peran (dosen/tendik) sebagai default.
       (M; terima: slip baru terisi default template.)
@@ -130,16 +129,13 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [ ] **Siklus PPEMPMTI.** Dokumen ada; siklus belum. Proposal: tabel
       siklus (penetapan→pelaksanaan→evaluasi→pengendalian→peningkatan)
       + status per standar. (L.)
-- [ ] **Sub-CPMK.** CPMK ada; breakdown belum. Proposal: `sub_cpmk`
-      di bawah CPMK + bobot waris di ketercapaian. (M.)
+- [x] **Sub-CPMK.** SELESAI 2026-11-16: tabel `sub_cpmk` (unik per CPMK) + `simpanSubCpmk` + kartu form + kolom badge di daftar OBE. Tes: SUB-1 tersimpan + tampil.
 - [ ] **Borang otomatis.** Proposal: isi borang dari rekap OBE + tracer
       (ekspor, bukan klaim akreditasi). (L.)
 
 ## 18. AI (`ChatbotService`, `RagService`, `AiKuotaService`, `AtRiskService`)
 
-- [ ] **Sumber RAG per prodi.** RAG global; belum ada filter prodi.
-      Proposal: kolom `prodi_id` knowledge + filter saat retrieval.
-      (S.)
+- [x] **Sumber RAG per prodi.** SELESAI 2026-11-16: `knowledge_base.prodi_id` (null = global) + filter di `RagGuardrail::relevan` + `ingest/jawab` ber-parameter + API meneruskan prodi penanya (mahasiswa/dosen). Kompatibel: pemanggil tanpa prodi tak berubah. Tes: dokumen prodi A tak bocor ke prodi B.
 - [ ] **Evaluasi RAG.** Tanpa metrik. Proposal: set Q/A emas + skor
       kecocokan berkala (command). (M.)
 - [x] **At-risk: notifikasi wali.** SELESAI 2026-11-16: tombol "Kirim ke PA" per baris level tinggi di `Analitik/AtRisk` → notifikasi inbox ke Dosen PA (try/catch, tanpa gagalkan halaman). Perbaikan penghalang: `daftarBerisiko` memilih kolom `nama` yang tak ada di tabel mahasiswa + query `is_late` atas kolom yang belum ada → daftar selalu kosong; diperbaiki via nama dari relasi `user` + migrasi `add_is_late_to_tugas_kumpul_table`. Tes: 61 skor → notif PA tercatat.

@@ -17,11 +17,12 @@ class RagService
     public const CHUNK = 800;
 
     /** Pecah konten menjadi chunk ±800 karakter per batas kalimat. */
-    public static function ingest(string $judul, string $konten, ?string $sumber = null): KnowledgeBase
+    public static function ingest(string $judul, string $konten, ?string $sumber = null, ?int $prodiId = null): KnowledgeBase
     {
-        return DB::transaction(function () use ($judul, $konten, $sumber): KnowledgeBase {
+        return DB::transaction(function () use ($judul, $konten, $sumber, $prodiId): KnowledgeBase {
             $dok = KnowledgeBase::create([
                 'judul' => $judul, 'konten' => $konten, 'sumber' => $sumber, 'aktif' => true,
+                'prodi_id' => $prodiId,
             ]);
 
             $potong = preg_split('/(?<=[.!?\n])\s+/u', $konten) ?: [$konten];
@@ -53,7 +54,7 @@ class RagService
     /**
      * @return array{jawaban: string, sumber: list<string>, ditolak: bool, alasan: string}
      */
-    public static function jawab(string $pertanyaan, ?int $userId = null): array
+    public static function jawab(string $pertanyaan, ?int $userId = null, ?int $prodiId = null): array
     {
         $saring = RagGuardrail::saringMasukan($pertanyaan);
 
@@ -61,7 +62,7 @@ class RagService
             return ['jawaban' => 'Maaf, pertanyaan ditolak guardrail: '.$saring['alasan'], 'sumber' => [], 'ditolak' => true, 'alasan' => $saring['alasan']];
         }
 
-        $relevan = RagGuardrail::relevan($pertanyaan);
+        $relevan = RagGuardrail::relevan($pertanyaan, 3, $prodiId);
 
         if ($relevan === []) {
             $jawaban = 'Basis pengetahuan belum memuat jawaban untuk pertanyaan itu. Hubungi admin akademik.';

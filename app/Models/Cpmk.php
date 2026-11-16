@@ -31,4 +31,9 @@ class Cpmk extends Model
     {
         return $this->hasMany(CpmkAsesmen::class, 'cpmk_id');
     }
+
+    public function subCpmk(): HasMany
+    {
+        return $this->hasMany(SubCpmk::class, 'cpmk_id');
+    }
 }

@@ -16,6 +16,7 @@ use App\Http\Controllers\PmbFunnelController;
 use App\Http\Controllers\PublikController;
 use App\Http\Controllers\SessionAuthController;
 use App\Http\Controllers\SkMengajarController;
+use App\Http\Controllers\SlipController;
 use App\Http\Controllers\SuratController;
 use App\Http\Controllers\TranskripController;
 use App\Models\Absensi;
@@ -279,6 +280,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/keuangan/tutup-buku', fn () => view('pages.livewire-page', ['component' => 'keuangan.tutup-buku', 'title' => 'Tutup Buku']))->name('keuangan.tutup-buku');
         Route::get('/keuangan/hutang', fn () => view('pages.livewire-page', ['component' => 'keuangan.hutang', 'title' => 'Utang Usaha']))->name('keuangan.hutang');
         Route::get('/keuangan/payroll', fn () => view('pages.livewire-page', ['component' => 'keuangan.payroll', 'title' => 'Penggajian']))->name('keuangan.payroll');
+        Route::get('/keuangan/slip/{slip}/cetak', [SlipController::class, 'cetak'])->name('keuangan.slip.cetak');
         Route::get('/keuangan/gl', fn () => view('pages.livewire-page', ['component' => 'keuangan.gl', 'title' => 'Buku Besar']))->name('keuangan.gl');
         Route::get('/keuangan/anggaran', fn () => view('pages.livewire-page', ['component' => 'keuangan.anggaran', 'title' => 'Anggaran']))->name('keuangan.anggaran');
         // Ekspor rekap piutang aging (CSV per bucket umur).

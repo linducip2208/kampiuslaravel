@@ -82,13 +82,21 @@ class RagGuardrail
     /**
      * @return list<array{id: int, judul: string, teks: string, skor: int}>
      */
-    public static function relevan(string $pertanyaan, int $limit = 3): array
+    public static function relevan(string $pertanyaan, int $limit = 3, ?int $prodiId = null): array
     {
         $limit = max(1, min($limit, 5));
         $hasil = [];
 
         foreach (KnowledgeChunk::with('dokumen')->cursor() as $chunk) {
             if (! $chunk->dokumen || ! $chunk->dokumen->aktif) {
+                continue;
+            }
+
+            // Filter prodi: dokumen global (null) terlihat semua; dokumen
+            // ber-prodi hanya untuk prodi yang sama.
+            $dokProdi = $chunk->dokumen->prodi_id;
+
+            if ($dokProdi !== null && $prodiId !== null && (int) $dokProdi !== $prodiId) {
                 continue;
             }
 

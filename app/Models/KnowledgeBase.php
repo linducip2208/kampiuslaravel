@@ -9,7 +9,7 @@ class KnowledgeBase extends Model
 {
     protected $table = 'knowledge_base';
 
-    protected $fillable = ['judul', 'sumber', 'konten', 'aktif'];
+    protected $fillable = ['judul', 'sumber', 'konten', 'aktif', 'prodi_id'];
 
     protected function casts(): array
     {

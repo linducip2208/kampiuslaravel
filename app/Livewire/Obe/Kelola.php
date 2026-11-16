@@ -10,6 +10,7 @@ use App\Models\Dosen;
 use App\Models\Mahasiswa;
 use App\Models\Matakuliah;
 use App\Models\Prodi;
+use App\Models\SubCpmk;
 use App\Services\ObeService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -54,6 +55,14 @@ class Kelola extends Component
 
     public float $asesmen_bobot = 1;
 
+    public ?int $sub_cpmk_id = null;
+
+    public string $sub_kode = '';
+
+    public string $sub_deskripsi = '';
+
+    public float $sub_bobot = 1;
+
     public string $nimRekap = '';
 
     public string $message = '';
@@ -92,6 +101,24 @@ class Kelola extends Component
 
         $this->reset(['cpmk_kode', 'cpmk_deskripsi', 'cpmk_bobot']);
         $this->message = 'CPMK tersimpan.';
+    }
+
+    public function simpanSubCpmk(): void
+    {
+        $this->validate([
+            'sub_cpmk_id' => 'required|exists:cpmk,id',
+            'sub_kode' => 'required|string|max:20',
+            'sub_deskripsi' => 'required|string',
+            'sub_bobot' => 'required|numeric|min:0.1|max:100',
+        ]);
+
+        SubCpmk::updateOrCreate(
+            ['cpmk_id' => $this->sub_cpmk_id, 'kode' => $this->sub_kode],
+            ['deskripsi' => $this->sub_deskripsi, 'bobot' => $this->sub_bobot]
+        );
+
+        $this->reset(['sub_kode', 'sub_deskripsi', 'sub_bobot']);
+        $this->message = 'Sub-CPMK tersimpan.';
     }
 
     public function petakan(): void
@@ -143,7 +170,7 @@ class Kelola extends Component
             'prodis' => $this->isAdmin() ? Prodi::orderBy('nama')->get() : Prodi::whereKey($this->prodi_id)->get(),
             'cpls' => $this->prodi_id ? Cpl::where('prodi_id', $this->prodi_id)->orderBy('kode')->get() : collect(),
             'mks' => $this->prodi_id ? Matakuliah::where('prodi_id', $this->prodi_id)->orderBy('kode')->get() : collect(),
-            'cpmks' => Cpmk::with(['cpl', 'matakuliah', 'asesmen'])->latest('id')->paginate(10),
+            'cpmks' => Cpmk::with(['cpl', 'matakuliah', 'asesmen', 'subCpmk'])->latest('id')->paginate(10),
             'rekap' => $rekap,
         ]);
     }

@@ -515,4 +515,12 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch15Test` (3 tes: cetak + VALID + 403 palsu, selisih
   diterapkan, sunyi saat ambang raksasa).
 
+## 2026-11-16 — Ide bank batch 16: RAG prodi, slip cetak, sub-CPMK
+
+- AI: `prodi_id` di knowledge base + filter relevansi + API teruskan
+  prodi penanya (kompatibel ke belakang).
+- Payroll: slip cetak print-CSS + tombol per baris.
+- OBE: tabel + CRUD sub-CPMK + badge di daftar.
+- Tes: `Batch16Test` (3 tes: no-bocor relevance, slip tampil, SUB-1).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

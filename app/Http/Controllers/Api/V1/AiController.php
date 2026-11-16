@@ -15,6 +15,7 @@ use App\Services\Ai\RekomendasiMkService;
 use App\Services\AiKuotaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AiController extends Controller
 {
@@ -73,6 +74,7 @@ class AiController extends Controller
 
     /**
      * M-057: tanya jawab RAG knowledge-base (kuota + guardrail di service).
+     * Prodi penanya diteruskan agar sumber per-prodi tersaring.
      */
     public function rag(Request $request, RagService $svc): JsonResponse
     {
@@ -82,7 +84,25 @@ class AiController extends Controller
             return response()->json(['ok' => false, 'message' => 'Kuota AI harian habis. Coba lagi besok.'], 429);
         }
 
-        return response()->json(['data' => $svc->jawab($data['pertanyaan'], $request->user()?->id)]);
+        return response()->json(['data' => $svc->jawab($data['pertanyaan'], $request->user()?->id, $this->prodiPenanya($request))]);
+    }
+
+    private function prodiPenanya(Request $request): ?int
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return null;
+        }
+
+        try {
+            $prodi = DB::table('mahasiswa')->where('user_id', $user->id)->value('prodi_id')
+                ?? DB::table('dosen')->where('user_id', $user->id)->value('prodi_id');
+
+            return $prodi !== null ? (int) $prodi : null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     public function ringkas(Request $request, MateriAiService $svc): JsonResponse
