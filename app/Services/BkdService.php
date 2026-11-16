@@ -28,6 +28,30 @@ class BkdService
             ->all();
     }
 
+    /**
+     * Rekap beban disetujui per prodi (agregat fakultas): total SKS + dosen aktif.
+     *
+     * @return list<array{prodi: string, dosen: int, total_sks: int}>
+     */
+    public static function rekapPerProdi(?int $tahunId = null): array
+    {
+        try {
+            return BebanDosen::query()
+                ->join('dosen', 'dosen.id', '=', 'beban_dosen.dosen_id')
+                ->join('prodi', 'prodi.id', '=', 'dosen.prodi_id')
+                ->when($tahunId, fn ($q) => $q->where('beban_dosen.tahun_akademik_id', $tahunId))
+                ->where('beban_dosen.status', 'disetujui')
+                ->selectRaw('prodi.nama as prodi, COUNT(DISTINCT beban_dosen.dosen_id) as dosen, COALESCE(SUM(beban_dosen.sks), 0) as total_sks')
+                ->groupBy('prodi.nama')
+                ->orderBy('prodi.nama')
+                ->get()
+                ->map(fn ($r) => ['prodi' => (string) $r->prodi, 'dosen' => (int) $r->dosen, 'total_sks' => (int) $r->total_sks])
+                ->all();
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
     public static function sinkronMengajarDariKelas(int $dosenId, int $tahunId): int
     {
         $kelas = Kelas::with('matakuliah')->where('dosen_id', $dosenId)->where('tahun_akademik_id', $tahunId)->get();

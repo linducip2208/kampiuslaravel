@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\KelasWaitlist;
 use App\Models\Krs;
 use App\Models\Nilai;
+use App\Models\TahunAkademik;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -19,6 +20,31 @@ use Illuminate\Support\Facades\Schema;
  */
 class AkademikService
 {
+    /**
+     * Masa studi dari angkatan × periode aktif.
+     *
+     * @return array{semester_ke: int, tahun: int, semester: int, label: string}
+     */
+    public static function masaStudi(int $angkatan): array
+    {
+        $aktif = TahunAkademik::where('aktif', true)->first();
+
+        if (! $aktif || ! is_numeric($aktif->tahun)) {
+            return ['semester_ke' => 0, 'tahun' => 0, 'semester' => 0, 'label' => '-'];
+        }
+
+        $semesterKe = max(1, ((int) $aktif->tahun - $angkatan) * 2 + ($aktif->semester === 'genap' ? 2 : 1));
+        $tahun = intdiv($semesterKe - 1, 2);
+        $semester = ($semesterKe - 1) % 2;
+
+        return [
+            'semester_ke' => $semesterKe,
+            'tahun' => $tahun,
+            'semester' => $semester,
+            'label' => "Semester {$semesterKe} ({$tahun} tahun {$semester} semester)",
+        ];
+    }
+
     /**
      * @return array{ipk: float, total_sks: int, per_tahun: array<int, array{ip: float, sks: int}>, nilai: Collection}
      */

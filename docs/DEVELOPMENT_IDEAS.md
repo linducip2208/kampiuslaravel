@@ -19,10 +19,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 1. Akademik inti (`AkademikService`, `KhsController`, `TranskripController`)
 
-- [ ] **Masa studi & tanggal lulus di KHS/transkrip.** Sekarang predikat IPK
-      ada, tapi belum ada lama-studi/semester-ke. Proposal: hitung dari
-      `angkatan` × periode aktif; tampilkan di `transkrip.cetak`.
-      (S, tanpa dependensi; terima: tampil benar untuk angkatan 2020–2026.)
+- [x] **Masa studi di transkrip.** SELESAI 2026-11-16: `AkademikService::masaStudi` (angkatan × periode aktif → semester-ke + label tahun/semester) + badge di `transkrip.cetak`. Catatan jujur: tanggal lulus belum ada (butuh kolom baru, di luar cakupan S). Tes: 2024 × 2027/ganjil = Semester 7 + tampil di halaman.
 - [x] **Arsip KRS.** SELESAI 2026-11-16: riwayat 10 pengajuan terakhir + tautan unduh `krs.cetak` di halaman pengajuan (tanpa PDF baru, cetak existing dipakai ulang).
 - [x] **Peringatan SKS di pengajuan.** SELESAI 2026-11-16: kolom "Sisa SKS" (`getSisaSksProperty = sksMaks - totalSks`) di kartu ringkasan pengajuan. Tes: teks tampil sebelum submit.
 
@@ -91,8 +88,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 - [ ] **Cetak SK mengajar.** Nomor SK ada, dokumen SK belum. Proposal:
       template SK + QR verifikasi (pola Surat). (M.)
-- [ ] **Rekap beban fakultas.** Rekap per dosen ada; agregat prodi/
-      fakultas belum. Proposal: tab rekap per prodi. (S.)
+- [x] **Rekap beban fakultas.** SELESAI 2026-11-16: `BkdService::rekapPerProdi` (SKS disetujui + jumlah dosen per prodi, hanya admin) di halaman BKD. Tes: agregat 6 SKS / 1 dosen.
 
 ## 9. Skripsi & sidang (`Yudisium`, `NilaiSidang`, `Pendaftaran`)
 
@@ -121,8 +117,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 - [ ] **SK kepengurusan.** Organisasi tanpa dokumen. Proposal: nomor SK
       + cetak (pola Surat). (M.)
-- [ ] **Cuti: lampiran + histori.** Pengajuan teks saja. Proposal: kolom
-      lampiran + linimasa status. (S.)
+- [x] **Cuti: lampiran + histori.** SELESAI 2026-11-16: kolom `lampiran_path` (migrasi) + unggah opsional PDF/gambar ≤10MB saat ajukan + kolom Lampiran (tautan Lihat) di riwayat; histori daftar sudah ada. Tes: file tersimpan di disk + tautan tampil.
 
 ## 13. Aset & fasilitas (`AsetService`, `PeminjamanRuang`)
 

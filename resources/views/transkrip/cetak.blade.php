@@ -23,6 +23,7 @@
             <span class="badge bg-success">IPK: {{ number_format($ipk, 2) }}</span>
             <span class="badge bg-info">Total SKS: {{ $totalSks ?? 0 }}</span>
             <span class="badge bg-primary">Predikat: {{ $predikat }}</span>
+            <span class="badge bg-secondary">Masa studi: {{ $masaStudi['label'] ?? '-' }}</span>
         </div>
     </div>
     <div class="table-responsive">

@@ -19,6 +19,11 @@
                     <textarea wire:model="alasan" class="form-control" rows="3" placeholder="Tulis alasan minimal 10 karakter"></textarea>
                     @error('alasan')<div class="text-danger">{{ $message }}</div>@enderror
                 </div>
+                <div class="mb-3">
+                    <label class="form-label">Lampiran pendukung (opsional, PDF/gambar ≤10MB)</label>
+                    <input type="file" wire:model="lampiran" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                    @error('lampiran')<div class="text-danger">{{ $message }}</div>@enderror
+                </div>
                 <button type="submit" class="btn btn-primary">Ajukan Cuti</button>
             </div>
         </form>
@@ -26,16 +31,23 @@
             <div class="card-header"><h3 class="card-title">Riwayat Cuti Saya</h3></div>
             <div class="table-responsive">
                 <table class="table table-vcenter">
-                    <thead><tr><th>Tahun Akademik</th><th>Status</th><th>Catatan Admin</th></tr></thead>
+                    <thead><tr><th>Tahun Akademik</th><th>Status</th><th>Catatan Admin</th><th>Lampiran</th></tr></thead>
                     <tbody>
                         @forelse($riwayat as $cuti)
                             <tr>
                                 <td>{{ $cuti->tahun_akademik_id ?? '-' }}</td>
                                 <td><span class="badge bg-secondary">{{ $cuti->status }}</span></td>
                                 <td>{{ $cuti->catatan_admin ?? '-' }}</td>
+                                <td>
+                                    @if($cuti->lampiran_path)
+                                        <a href="{{ Storage::disk('public')->url($cuti->lampiran_path) }}" target="_blank" rel="noopener">Lihat</a>
+                                    @else
+                                        <span class="text-secondary">—</span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
-                            <tr><td colspan="3" class="text-secondary">Belum ada pengajuan cuti.</td></tr>
+                            <tr><td colspan="4" class="text-secondary">Belum ada pengajuan cuti.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

@@ -17,6 +17,14 @@
                 @if(!empty($rekap))
                     <div class="col-12 text-secondary">Rekap: @foreach($rekap as $kat => $sks) {{ $kat }}={{ $sks }} SKS; @endforeach</div>
                 @endif
+                @if($isAdmin && !empty($rekapProdi))
+                    <div class="col-12">
+                        <strong>Rekap per prodi (disetujui):</strong>
+                        @foreach($rekapProdi as $rp)
+                            <span class="badge bg-blue-lt me-1">{{ $rp['prodi'] }}: {{ $rp['total_sks'] }} SKS / {{ $rp['dosen'] }} dosen</span>
+                        @endforeach
+                    </div>
+                @endif
                 <div class="col-md-3">
                     <label class="form-label">Kategori</label>
                     <select class="form-select" wire:model="kategori">

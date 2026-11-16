@@ -448,4 +448,16 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch9Test` (3 tes: snapshot berisi kelas lama, embed tampil,
   klon → 2 baris).
 
+## 2026-11-16 — Ide bank batch 10: masa studi, lampiran cuti, rekap BKD prodi
+
+- Transkrip: `AkademikService::masaStudi(angkatan)` (periode aktif →
+  semester-ke + label "N tahun M semester") + badge "Masa studi" di
+  `transkrip.cetak`. Jujur: tanggal lulus belum (butuh kolom baru).
+- Cuti: migrasi `lampiran_path` + unggah opsional (PDF/gambar ≤10MB) +
+  kolom Lampiran di riwayat; histori daftar sudah ada sebelumnya.
+- BKD: `BkdService::rekapPerProdi` (SKS disetujui + dosen per prodi,
+  admin-only) di halaman kelola.
+- Tes: `Batch10Test` (4 tes: rumus semester-7, tampil di transkrip,
+  file tersimpan + tautan, agregat 6 SKS/1 dosen).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

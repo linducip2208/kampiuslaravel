@@ -145,6 +145,9 @@ class Kelola extends Component
                 ? BkdService::totalSks($this->dosenId(), $this->tahunId)
                 : 0,
             'isAdmin' => $this->isAdmin(),
+            'rekapProdi' => $this->isAdmin() && $this->tahunId
+                ? BkdService::rekapPerProdi($this->tahunId)
+                : [],
         ]);
     }
 }

@@ -25,6 +25,7 @@ class TranskripController extends Controller
 
         $mahasiswa = Mahasiswa::with(['user', 'prodi'])->findOrFail($mahasiswaId);
         $ringkasan = AkademikService::ringkasan($mahasiswaId);
+        $masaStudi = AkademikService::masaStudi((int) $mahasiswa->angkatan);
         $tahunFilter = $request->integer('tahun') ?: null;
 
         $nilaiQuery = Nilai::with('kelas.matakuliah', 'kelas.tahunAkademik')
@@ -45,6 +46,7 @@ class TranskripController extends Controller
             'ipk' => $ringkasan['ipk'],
             'totalSks' => $ringkasan['total_sks'],
             'predikat' => self::predikat((float) $ringkasan['ipk']),
+            'masaStudi' => $masaStudi,
             'tahunFilter' => $tahunFilter,
             'tahunList' => array_keys($ringkasan['per_tahun']),
             'tahunOptions' => TahunAkademik::whereIn('id', array_keys($ringkasan['per_tahun']))

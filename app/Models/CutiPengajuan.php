@@ -24,6 +24,7 @@ class CutiPengajuan extends Model
         'mahasiswa_id',
         'tahun_akademik_id',
         'alasan',
+        'lampiran_path',
         'status',
         'catatan_admin',
         'decided_by',

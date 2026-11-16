@@ -10,11 +10,13 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class Cuti extends Component
 {
     use RequiresRoles;
+    use WithFileUploads;
     use WithPagination;
 
     /** @var list<string> */
@@ -23,6 +25,9 @@ class Cuti extends Component
     public ?int $tahunAkademikId = null;
 
     public string $alasan = '';
+
+    /** Lampiran pendukung (surat sakit/tugas), opsional. */
+    public $lampiran;
 
     public string $search = '';
 
@@ -45,7 +50,10 @@ class Cuti extends Component
         $this->validate([
             'tahunAkademikId' => ['required', 'integer', 'exists:tahun_akademik,id'],
             'alasan' => ['required', 'string', 'min:10', 'max:2000'],
+            'lampiran' => ['nullable', 'file', 'max:10240', 'mimes:pdf,jpg,jpeg,png'],
         ]);
+
+        $lampiranPath = $this->lampiran ? $this->lampiran->store('cuti_lampiran', 'public') : null;
 
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
 
@@ -69,6 +77,7 @@ class Cuti extends Component
             'mahasiswa_id' => $mahasiswa->id,
             'tahun_akademik_id' => $this->tahunAkademikId,
             'alasan' => $this->alasan,
+            'lampiran_path' => $lampiranPath,
             'status' => CutiPengajuan::STATUS_DIAJUKAN,
         ]);
 
@@ -80,6 +89,7 @@ class Cuti extends Component
         ]);
 
         $this->reset(['alasan']);
+        $this->reset('lampiran');
         $this->message = 'Pengajuan cuti berhasil dikirim. Menunggu persetujuan admin prodi.';
     }
 
