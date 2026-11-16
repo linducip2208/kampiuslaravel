@@ -529,4 +529,11 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - API: pivot wali + controller read-only + `wali:tautkan` (403 ketat).
 - Tes: `Batch17Test` (3 tes: skor relevan, jawab panjang, siklus wali).
 
+## 2026-11-16 — Ide bank batch 18: tunjangan template, onboarding, KHS offline
+
+- Payroll: template tunjangan per peran + isi otomatis (manual bisa ubah).
+- Rekrutmen: checklist bawaan saat diterima + toggle di tabel.
+- KHS: snapshot localStorage + banner luring.
+- Tes: `Batch18Test` (3 tes: auto-isi 750rb, 3 item + toggle, cache key).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

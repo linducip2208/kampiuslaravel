@@ -7,6 +7,10 @@
 @endsection
 
 @section('content')
+<div id="khs-offline-banner" class="alert alert-warning d-none d-print-none" role="alert">
+    Luring — menampilkan ringkasan KHS tersimpan <span id="khs-offline-saat"></span>.
+    <span id="khs-offline-ringkas"></span>
+</div>
 <div class="card">
     <div class="card-body">
         <div class="text-center mb-3">
@@ -93,4 +97,29 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+// KHS offline: simpan ringkasan ke localStorage tiap kunjungan; tampilkan
+// banner + ringkasan saat luring (SW menyajikan cache halaman).
+(function () {
+    try {
+        var kunci = 'khs-cache-{{ $mahasiswaId }}';
+        var data = {ipk: {{ number_format($ipk, 2, '.', '') }}, sks: {{ (int) ($totalSks ?? 0) }}, saat: new Date().toISOString()};
+        localStorage.setItem(kunci, JSON.stringify(data));
+        if (!navigator.onLine) {
+            var b = document.getElementById('khs-offline-banner');
+            var c = JSON.parse(localStorage.getItem(kunci) || 'null');
+            if (b && c) {
+                document.getElementById('khs-offline-saat').textContent = '(' + c.saat + ')';
+                document.getElementById('khs-offline-ringkas').textContent = 'IPK ' + c.ipk + ' · ' + c.sks + ' SKS.';
+                b.classList.remove('d-none');
+            }
+        }
+        window.addEventListener('offline', function () {
+            document.getElementById('khs-offline-banner').classList.remove('d-none');
+        });
+    } catch (e) { /* penyimpanan lokal tak tersedia: abaikan */ }
+})();
+</script>
+@endpush
 @endsection

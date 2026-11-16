@@ -52,6 +52,28 @@
             </div>
         </div>
     @endif
+    <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title">Template Tunjangan per Peran</h3></div>
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label class="form-label">Peran</label>
+                    <input type="text" class="form-control" wire:model="templateRole" placeholder="dosen / tendik" list="daftar-peran">
+                    <datalist id="daftar-peran">
+                        @foreach($templates as $t)<option value="{{ $t->role }}">@endforeach
+                    </datalist>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Nominal default</label>
+                    <input type="number" class="form-control" wire:model="templateNominal" min="0">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button class="btn btn-outline-primary" wire:click="simpanTemplate">Simpan Template</button>
+                </div>
+                <div class="col-12 text-secondary small">Dipakai otomatis mengisi tunjangan saat pegawai dipilih (bisa diubah manual). @foreach($templates as $t)<span class="badge bg-blue-lt me-1">{{ $t->role }}: {{ number_format($t->nominal, 0, ',', '.') }}</span>@endforeach</div>
+            </div>
+        </div>
+    </div>
     <div class="card">
         <div class="card-header"><h3 class="card-title">Slip — Total Rp{{ number_format($total, 0, ',', '.') }}</h3></div>
         <div class="table-responsive">

@@ -5,6 +5,7 @@ namespace App\Livewire\Keuangan;
 use App\Livewire\Concerns\RequiresRoles;
 use App\Models\PayrollPeriode;
 use App\Models\PayrollSlip;
+use App\Models\TunjanganTemplate;
 use App\Models\User;
 use App\Services\PayrollService;
 use Livewire\Component;
@@ -25,6 +26,10 @@ class Payroll extends Component
     public string $periodeBaru = '';
 
     public ?int $user_id = null;
+
+    public string $templateRole = '';
+
+    public int $templateNominal = 0;
 
     public int $gaji_pokok = 0;
 
@@ -78,12 +83,53 @@ class Payroll extends Component
         $this->message = 'Periode dikunci (final).';
     }
 
+    /** Isi tunjangan dari template peran pegawai saat pegawai dipilih. */
+    public function updatedUserId(?int $value): void
+    {
+        $this->tunjangan = 0;
+
+        if (! $value) {
+            return;
+        }
+
+        $user = User::find($value);
+
+        if (! $user) {
+            return;
+        }
+
+        $template = TunjanganTemplate::whereIn('role', $user->getRoleNames()->all())->orderByDesc('nominal')->first();
+
+        if ($template) {
+            $this->tunjangan = (int) $template->nominal;
+            $this->message = "Tunjangan diisi dari template peran {$template->role}.";
+        }
+    }
+
+    /** Simpan/ubah template tunjangan per peran. */
+    public function simpanTemplate(): void
+    {
+        $this->validate([
+            'templateRole' => 'required|string|max:50',
+            'templateNominal' => 'required|integer|min:0',
+        ]);
+
+        TunjanganTemplate::updateOrCreate(
+            ['role' => $this->templateRole],
+            ['nominal' => $this->templateNominal]
+        );
+
+        $this->reset(['templateRole', 'templateNominal']);
+        $this->message = 'Template tunjangan tersimpan.';
+    }
+
     public function render()
     {
         $this->periodeId ??= PayrollPeriode::orderByDesc('id')->value('id');
 
         return view('livewire.keuangan.payroll', [
             'periodes' => PayrollPeriode::orderByDesc('id')->get(),
+            'templates' => TunjanganTemplate::orderBy('role')->get(),
             'slips' => $this->periodeId
                 ? PayrollSlip::with('pegawai')->where('periode_id', $this->periodeId)->latest('id')->paginate(10)
                 : null,

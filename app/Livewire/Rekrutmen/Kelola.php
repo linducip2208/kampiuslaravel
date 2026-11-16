@@ -5,6 +5,7 @@ namespace App\Livewire\Rekrutmen;
 use App\Livewire\Concerns\RequiresRoles;
 use App\Models\LamaranKerja;
 use App\Models\LowonganKerja;
+use App\Models\OnboardingChecklist;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -68,8 +69,24 @@ class Kelola extends Component
     {
         abort_unless(in_array($status, LamaranKerja::STATUS, true), 422);
 
-        LamaranKerja::findOrFail($id)->update(['status' => $status]);
+        $lamaran = LamaranKerja::findOrFail($id);
+        $lamaran->update(['status' => $status]);
+
+        // Lamaran diterima → buat checklist onboarding bawaan (idempoten).
+        if ($status === 'diterima') {
+            foreach (OnboardingChecklist::ITEM_DEFAULT as $item) {
+                OnboardingChecklist::firstOrCreate(['lamaran_id' => $lamaran->id, 'item' => $item]);
+            }
+        }
+
         $this->message = "Lamaran #{$id} → {$status}.";
+    }
+
+    /** Centang/buka centang item onboarding. */
+    public function toggleOnboarding(int $checklistId): void
+    {
+        $item = OnboardingChecklist::findOrFail($checklistId);
+        $item->update(['selesai' => ! $item->selesai]);
     }
 
     public function render()
@@ -77,7 +94,7 @@ class Kelola extends Component
         return view('livewire.rekrutmen.kelola', [
             'lowongans' => LowonganKerja::withCount('lamaran')->latest('id')->paginate(10),
             'pelamar' => $this->lihatLowonganId
-                ? LamaranKerja::where('lowongan_id', $this->lihatLowonganId)->latest('id')->paginate(10)
+                ? LamaranKerja::with('onboarding')->where('lowongan_id', $this->lihatLowonganId)->latest('id')->paginate(10)
                 : null,
         ]);
     }

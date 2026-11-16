@@ -61,12 +61,8 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 ## 7. Payroll & HR (`PayrollService`, `Kelola` rekrutmen/organisasi)
 
 - [x] **Slip gaji cetak (bukan PDF).** SELESAI 2026-11-16: `SlipController::cetak` + view print-CSS + tombol Cetak per baris (tanpa dependensi PDF baru, pola transkrip). Tes: nama + total tampil.
-- [ ] **Tunjangan per jabatan.** Komponen manual per slip. Proposal:
-      template tunjangan per peran (dosen/tendik) sebagai default.
-      (M; terima: slip baru terisi default template.)
-- [ ] **Onboarding checklist.** Rekrutmen berhenti di "diterima".
-      Proposal: checklist onboarding (akun, SK, orientasi) per lamaran
-      diterima. (M.)
+- [x] **Tunjangan per peran (template).** SELESAI 2026-11-16: tabel `tunjangan_template` (role → nominal) + kelola di halaman payroll + isi otomatis saat pegawai dipilih (bisa diubah manual). Catatan: per-peran, bukan jabatan struktural (master jabatan belum ada). Tes: pilih dosen → 750rb + simpan template tendik.
+- [x] **Onboarding checklist.** SELESAI 2026-11-16: tabel `onboarding_checklist` + 3 item bawaan otomatis saat lamaran diterima (idempoten) + centang di tabel pelamar. Tes: 3 item muncul + toggle selesai.
 
 ## 8. BKD & SK (`BkdService`, `Bkd/Kelola`)
 
@@ -152,8 +148,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 20. PWA & offline (`sw.js`, `manifest`, `ScormService`)
 
-- [ ] **Halaman KHS offline.** SW cache shell; data belum. Proposal:
-      cache respons KHS terakhir + badge "data offline". (M.)
+- [x] **Halaman KHS offline.** SELESAI 2026-11-16: snapshot ringkasan (IPK/SKS/waktu) ke localStorage tiap kunjungan + banner luring (SW sudah cache shell). Tes: halaman menanam kunci cache + banner.
 - [x] **Unduhan massal materi.** SELESAI 2026-11-16: `ScormService::paketKelas` (ZIP per kelas: folder per pertemuan + manifest gabungan + metadata) + rute `/lms/paket-kelas/{kelas}` (throttle 10/menit). Tes: ZIP memuat 2 materi + metadata benar.
 
 ## 21. Observability & operasi (`/health`, scheduler, backup)

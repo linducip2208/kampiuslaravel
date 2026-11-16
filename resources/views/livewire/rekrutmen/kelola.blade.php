@@ -73,7 +73,7 @@
             <div class="card-header"><h3 class="card-title">Pelamar</h3></div>
             <div class="table-responsive">
                 <table class="table table-vcenter">
-                    <thead><tr><th>Nama</th><th>Email</th><th>HP</th><th>Status</th><th>Aksi</th></tr></thead>
+                    <thead><tr><th>Nama</th><th>Email</th><th>HP</th><th>Status</th><th>Onboarding</th><th>Aksi</th></tr></thead>
                     <tbody>
                         @foreach($pelamar as $p)
                             <tr>
@@ -81,6 +81,18 @@
                                 <td>{{ $p->email }}</td>
                                 <td>{{ $p->hp }}</td>
                                 <td>{{ $p->status }}</td>
+                                <td>
+                                    @if($p->status === 'diterima')
+                                        @foreach($p->onboarding as $o)
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" wire:change="toggleOnboarding({{ $o->id }})" @checked($o->selesai)>
+                                                <label class="form-check-label {{ $o->selesai ? 'text-decoration-line-through text-secondary' : '' }}">{{ $o->item }}</label>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <span class="text-secondary">—</span>
+                                    @endif
+                                </td>
                                 <td>
                                     <button class="btn btn-sm btn-outline-success" wire:click="ubahStatusLamaran({{ $p->id }}, 'diterima')">Terima</button>
                                     <button class="btn btn-sm btn-outline-danger" wire:click="ubahStatusLamaran({{ $p->id }}, 'ditolak')">Tolak</button>

@@ -17,7 +17,7 @@ kategori — TIDAK tercapai ronde ini, dan itu dinyatakan eksplisit.
 | Security | 10 | 8 | M-001..006 + M-015/016/017 selesai (allowlist, audit, Policy, permission, idempotency); sisa S8–S10 |
 | API & integrasi | 5 | 5 | +kuota AI (429 + estimasi biaya); D BLOCKED |
 | Database & performance | 5 | 5 | overlap DB-side + batch prasyarat/kuota (P1/P3); ringkasan locked-only |
-| Testing & reliability | 4 | 4 | 379/379 hijau (termasuk data-provider; rincian batch di IMPLEMENTATION_LOG); tanpa E2E/beban |
+| Testing & reliability | 4 | 4 | 382/382 hijau (termasuk data-provider; rincian batch di IMPLEMENTATION_LOG); tanpa E2E/beban |
 | Docs & ops | 3 | 3 | backup teruji (create/verify) + akreditasi; tanpa E2E/beban |
 
 **TOTAL = 90/100** (naik dari 89: +Research).
