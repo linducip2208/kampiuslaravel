@@ -67,6 +67,12 @@
                 <div class="card-header d-flex flex-wrap gap-2 align-items-center">
                     <h3 class="card-title">Bank Soal</h3>
                     <div class="ms-auto d-flex gap-2">
+                        <select wire:model.live="klonTujuanMk" class="form-select form-select-sm" style="max-width:200px" aria-label="MK tujuan klon">
+                            <option value="">Klon ke MK…</option>
+                            @foreach($matakuliahs as $mk)
+                                <option value="{{ $mk->id }}">{{ $mk->kode }}</option>
+                            @endforeach
+                        </select>
                         <select wire:model.live="filterMk" class="form-select form-select-sm" style="max-width:200px" aria-label="Filter mata kuliah">
                             <option value="">Semua MK</option>
                             @foreach($matakuliahs as $mk)
@@ -88,6 +94,7 @@
                                     <td>{{ $s->kunci ?? '—' }}</td>
                                     <td><span class="badge bg-{{ $s->aktif ? 'success' : 'secondary' }}">{{ $s->aktif ? 'aktif' : 'nonaktif' }}</span></td>
                                     <td class="text-end">
+                                        <button wire:click="klon({{ $s->id }})" class="btn btn-sm btn-outline-secondary" title="Klon ke MK yang dipilih di atas">Klon</button>
                                         <button wire:click="edit({{ $s->id }})" class="btn btn-sm btn-outline-primary">Ubah</button>
                                         <button wire:click="hapus({{ $s->id }})" wire:confirm="Hapus soal #{{ $s->id }} dari bank?" class="btn btn-sm btn-outline-danger">Hapus</button>
                                     </td>

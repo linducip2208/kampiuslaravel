@@ -435,4 +435,17 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch8Test` (3 tes: isi ZIP + metadata, tren 2024 2/1/50%,
   `permission:review` exit 0).
 
+## 2026-11-16 — Ide bank batch 9: revisi KRS, pratinjau PDF, klon bank soal
+
+- Revisi KRS: tabel `krs_revisi` (FK cascade, total_sks, ipk_snapshot,
+  rincian JSON) + snapshot state lama tiap submit ulang + tab "Riwayat
+  Revisi" di halaman pengajuan. Detail kritis: state lama dibaca SEBELUM
+  `updateOrCreate` (yang menimpa angka) — kalau sesudah, snapshot salah.
+- Materi: tombol Pratinjau/Tutup + `<embed type="application/pdf">` +
+  tautan "Buka file" (target blank); non-PDF hanya tautan.
+- Bank soal: `BankSoal::klon` + dropdown "Klon ke MK" di header daftar
+  + tombol Klon per baris (isi + opsi + kunci + bobot ikut).
+- Tes: `Batch9Test` (3 tes: snapshot berisi kelas lama, embed tampil,
+  klon → 2 baris).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

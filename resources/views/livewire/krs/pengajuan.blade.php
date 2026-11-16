@@ -88,4 +88,17 @@
             </div>
         </div>
     @endif
+
+    @if (isset($this->revisiSaya) && $this->revisiSaya->count() > 0)
+        <div class="card kampius-card mt-3">
+            <div class="card-header"><h3 class="card-title">Riwayat Revisi</h3></div>
+            <div class="list-group list-group-flush">
+                @foreach ($this->revisiSaya as $rev)
+                    <div class="list-group-item">
+                        <span>{{ $rev->created_at?->format('d M Y H:i') }} — {{ $rev->total_sks }} SKS ({{ is_countable($rev->rincian) ? count($rev->rincian) : 0 }} kelas) <span class="badge bg-secondary-lt ms-1">sebelum revisi</span></span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
 </div>

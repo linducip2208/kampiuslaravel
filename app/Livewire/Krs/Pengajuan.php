@@ -5,6 +5,7 @@ namespace App\Livewire\Krs;
 use App\Livewire\Concerns\RequiresRoles;
 use App\Models\KelasWaitlist;
 use App\Models\Krs;
+use App\Models\KrsRevisi;
 use App\Models\Notifikasi;
 use App\Services\AkademikService;
 use App\Services\KalenderService;
@@ -126,6 +127,28 @@ class Pengajuan extends Component
             return Krs::query()
                 ->where('mahasiswa_id', $this->mahasiswaId())
                 ->with('tahunAkademik')
+                ->latest('id')
+                ->take(10)
+                ->get();
+        } catch (\Throwable) {
+            return collect();
+        }
+    }
+
+    /**
+     * Riwayat revisi: snapshot rincian sebelum tiap submit ulang.
+     */
+    public function getRevisiSayaProperty(): Collection
+    {
+        if (! Schema::hasTable('krs_revisi')) {
+            return collect();
+        }
+
+        try {
+            $krsIds = Krs::query()->where('mahasiswa_id', $this->mahasiswaId())->pluck('id');
+
+            return KrsRevisi::query()
+                ->whereIn('krs_id', $krsIds)
                 ->latest('id')
                 ->take(10)
                 ->get();
@@ -287,6 +310,34 @@ class Pengajuan extends Component
                         'catatan' => null,
                     ]
                 );
+
+                // Riwayat revisi: baca state lama DULU (updateOrCreate di bawah
+                // menimpa total_sks/ipk, jadi snapshot sesudahnya akan salah).
+                $sebelum = Krs::query()
+                    ->where('mahasiswa_id', $mahasiswaId)
+                    ->where('tahun_akademik_id', $this->tahunAkademikId)
+                    ->first();
+                $rincianLama = $sebelum ? $sebelum->details()->get(['kelas_id', 'sks', 'status']) : collect();
+
+                $krs = Krs::query()->updateOrCreate(
+                    ['mahasiswa_id' => $mahasiswaId, 'tahun_akademik_id' => $this->tahunAkademikId],
+                    [
+                        'status' => Krs::STATUS_DIAJUKAN,
+                        'total_sks' => $sksMap->sum(),
+                        'ipk_snapshot' => $ipkServer,
+                        'catatan' => null,
+                    ]
+                );
+
+                // Pengajuan pertama tidak disnapshot; submit ulang ya.
+                if ($sebelum && $rincianLama->isNotEmpty()) {
+                    KrsRevisi::create([
+                        'krs_id' => $krs->id,
+                        'total_sks' => $sebelum->total_sks,
+                        'ipk_snapshot' => $sebelum->ipk_snapshot,
+                        'rincian' => $rincianLama->map(fn ($d) => $d->only(['kelas_id', 'sks', 'status']))->all(),
+                    ]);
+                }
 
                 $krs->details()->delete();
 

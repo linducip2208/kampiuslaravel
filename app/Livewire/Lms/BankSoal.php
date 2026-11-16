@@ -39,6 +39,9 @@ class BankSoal extends Component
 
     public ?int $filterMk = null;
 
+    /** Tujuan klon soal lintas MK (dipilih di header daftar). */
+    public ?int $klonTujuanMk = null;
+
     public string $search = '';
 
     public string $message = '';
@@ -122,6 +125,26 @@ class BankSoal extends Component
     {
         BankSoalModel::findOrFail($id)->delete();
         $this->message = 'Soal dihapus dari bank.';
+    }
+
+    /** Klon soal ke mata kuliah lain (pakai ulang lintas kelas; kunci ikut). */
+    public function klon(int $id): void
+    {
+        $this->validate(['klonTujuanMk' => 'required|exists:matakuliah,id']);
+
+        $sumber = BankSoalModel::findOrFail($id);
+
+        BankSoalModel::create([
+            'matakuliah_id' => $this->klonTujuanMk,
+            'jenis' => $sumber->jenis,
+            'pertanyaan' => $sumber->pertanyaan,
+            'opsi' => $sumber->opsi,
+            'kunci' => $sumber->kunci,
+            'bobot' => $sumber->bobot,
+            'aktif' => $sumber->aktif,
+        ]);
+
+        $this->message = "Soal #{$id} diklon ke MK tujuan (kunci ikut).";
     }
 
     public function render(): View

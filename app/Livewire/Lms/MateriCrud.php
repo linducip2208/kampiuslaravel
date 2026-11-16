@@ -27,6 +27,9 @@ class MateriCrud extends Component
 
     public ?int $editId = null;
 
+    /** ID materi yang sedang dipratinjau sebaris (null = tidak ada). */
+    public ?int $pratinjauId = null;
+
     protected function rules(): array
     {
         return [
@@ -82,6 +85,16 @@ class MateriCrud extends Component
     public function delete(int $id): void
     {
         Materi::whereKey($id)->delete();
+
+        if ($this->pratinjauId === $id) {
+            $this->pratinjauId = null;
+        }
+    }
+
+    /** Tampilkan/sembunyikan pratinjau PDF sebaris (tanpa unduh). */
+    public function pratinjau(int $id): void
+    {
+        $this->pratinjauId = $this->pratinjauId === $id ? null : $id;
     }
 
     public function render()

@@ -41,9 +41,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 3. KRS & persetujuan (`Pengajuan`, `PersetujuanPa`, `WaliList`)
 
-- [ ] **Riwayat revisi KRS.** Revisi menimpa tanpa jejak. Proposal:
-      snapshot `krs_detail` tiap submit ulang + tab riwayat.
-      (M; terima: 2x submit → 2 snapshot.)
+- [x] **Riwayat revisi KRS.** SELESAI 2026-11-16: tabel `krs_revisi` + snapshot state lama (state dibaca SEBELUM `updateOrCreate` menimpa) tiap submit ulang + tab "Riwayat Revisi". Tes: 2x submit → 1 snapshot berisi kelas lama.
 - [x] **Notifikasi PA otomatis.** SELESAI 2026-11-15: notifikasi inbox ke Dosen PA tiap pengajuan lolos (`Pengajuan::ajukan`). Tes: 1 pengajuan = 1 notif. Persetujuan menunggu tanpa notif.
       Proposal: notifikasi inbox + (bila dikonfigurasi) WA/email ke PA
       saat ada pengajuan baru. (S; terima: 1 pengajuan = 1 notif PA.)
@@ -53,13 +51,10 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [x] **Bank soal: impor CSV.** SELESAI 2026-11-15: `Lms/BankSoalImpor` di `/lms/bank-soal-impor` (`pertanyaan,jenis,opsi|,kunci,bobot`, delimiter otomatis, validasi per baris + laporan gagal). Tes: `BankSoalImporTest`.
       belum. Proposal: impor CSV (pertanyaan,opsi,kunci,bobot) dengan
       validasi baris + laporan gagal. (M; terima: 100 baris valid masuk.)
-- [ ] **Bank soal: pakai ulang lintas kelas.** Soal terikat kuis,
-      belum bisa klon antar-kelas. Proposal: tombol "klon ke kuis lain".
-      (S; terima: soal tercopy, kunci ikut.)
+- [x] **Bank soal: pakai ulang lintas kelas.** SELESAI 2026-11-16: `BankSoal::klon` (salin isi + opsi + kunci + bobot ke MK tujuan via dropdown "Klon ke MK"). Tes: klon → 2 baris, kunci ikut.
 - [x] **Forum: kutipan balasan.** SELESAI 2026-11-15: tombol Kutip mengisi draf (`Forum::kutip`).
       Proposal: tombol kutip mengisi balasan. (S.)
-- [ ] **Materi: pratinjau PDF sebaris.** Sekarang unduhan saja. Proposal:
-      embed viewer PDF di halaman materi. (S; terima: PDF tampil tanpa unduh.)
+- [x] **Materi: pratinjau PDF sebaris.** SELESAI 2026-11-16: tombol Pratinjau/Tutup + `<embed>` PDF + tautan "Buka file" di daftar materi (non-PDF hanya tautan). Tes: `<embed>` + nama file tampil.
 
 ## 5. Keuangan (`KeuanganService`, `Bayar*`, `TagihanMassal`)
 

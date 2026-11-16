@@ -30,8 +30,19 @@
                 <tbody>
                     @forelse($items as $item)
                         <tr>
-                            <td>{{ $item->judul }}</td>
-                            <td class="text-end">
+                            <td>
+                                {{ $item->judul }}
+                                @if($item->file_path)
+                                    <div><a href="{{ Storage::disk('public')->url($item->file_path) }}" target="_blank" rel="noopener" class="small">Buka file</a></div>
+                                @endif
+                                @if($pratinjauId === $item->id && $item->file_path && str_ends_with(strtolower($item->file_path), '.pdf'))
+                                    <embed src="{{ Storage::disk('public')->url($item->file_path) }}" type="application/pdf" width="100%" height="480" class="mt-2 border rounded">
+                                @endif
+                            </td>
+                            <td class="text-end text-nowrap">
+                                @if($item->file_path && str_ends_with(strtolower($item->file_path), '.pdf'))
+                                    <button wire:click="pratinjau({{ $item->id }})" class="btn btn-sm btn-outline-secondary">{{ $pratinjauId === $item->id ? 'Tutup' : 'Pratinjau' }}</button>
+                                @endif
                                 <button wire:click="edit({{ $item->id }})" class="btn btn-sm btn-outline-primary">Edit</button>
                                 <button wire:click="delete({{ $item->id }})" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus materi ini?')">Hapus</button>
                             </td>
