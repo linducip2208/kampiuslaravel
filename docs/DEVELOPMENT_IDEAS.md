@@ -136,19 +136,16 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 ## 18. AI (`ChatbotService`, `RagService`, `AiKuotaService`, `AtRiskService`)
 
 - [x] **Sumber RAG per prodi.** SELESAI 2026-11-16: `knowledge_base.prodi_id` (null = global) + filter di `RagGuardrail::relevan` + `ingest/jawab` ber-parameter + API meneruskan prodi penanya (mahasiswa/dosen). Kompatibel: pemanggil tanpa prodi tak berubah. Tes: dokumen prodi A tak bocor ke prodi B.
-- [ ] **Evaluasi RAG.** Tanpa metrik. Proposal: set Q/A emas + skor
-      kecocokan berkala (command). (M.)
+- [x] **Evaluasi RAG.** SELESAI 2026-11-16: `RagService::evaluasi` (F1 kata vs jawaban emas, deterministik tanpa panggil AI) + command `rag:evaluasi --file=emas.json [--prodi=]`. Tes: relevan > tak-relevan + command mencetak rata-rata.
 - [x] **At-risk: notifikasi wali.** SELESAI 2026-11-16: tombol "Kirim ke PA" per baris level tinggi di `Analitik/AtRisk` → notifikasi inbox ke Dosen PA (try/catch, tanpa gagalkan halaman). Perbaikan penghalang: `daftarBerisiko` memilih kolom `nama` yang tak ada di tabel mahasiswa + query `is_late` atas kolom yang belum ada → daftar selalu kosong; diperbaiki via nama dari relasi `user` + migrasi `add_is_late_to_tugas_kumpul_table`. Tes: 61 skor → notif PA tercatat.
-- [ ] **Batas konteks materi RAG.** Ingest teks panjang utuh. Proposal:
-      potong per N kalimat + tautan sumber di jawaban. (S.)
+- [x] **Batas konteks materi RAG.** SELESAI 2026-11-16: `RagService::MAX_KONTEKS` (4000 karakter, marker potong); sumber lengkap tetap dikembalikan. Tes: dokumen ~20rb karakter tetap terjawab + bersumber.
 
 ## 19. API & mobile (`api.php`, `mobile/`, OpenAPI)
 
 - [ ] **Filter/sort/paging konsisten.** v2 paginasi; v1 campur aduk.
       Proposal: samakan envelope + `?sort=&q=` di 3 endpoint inti
       (tugas, tagihan, pengumuman) + tes kontrak. (M.)
-- [ ] **API orangtua (read-only).** Proposal: token wali + endpoint
-      KHS/tagihan milik anak saja (IDOR ketat). (L.)
+- [x] **API orangtua (read-only).** SELESAI 2026-11-16: pivot `wali_mahasiswa` + `WaliController` (daftar anak, nilai terkunci, tagihan) + command `wali:tautkan`; 403 tanpa tautan/anak orang lain. Tes: siklus taut → baca → tolak.
 - [ ] **Push topik per prodi.** Token ada; segmentasi belum dipakai.
       Proposal: kirim pengumuman ke topik prodi saat publish. (M;
       butuh kredensial FCM — kaitkan M-064.)

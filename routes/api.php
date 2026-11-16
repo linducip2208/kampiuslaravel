@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\NotifikasiController;
 use App\Http\Controllers\Api\V1\PengumumanController;
 use App\Http\Controllers\Api\V1\TagihanController;
 use App\Http\Controllers\Api\V1\TugasController;
+use App\Http\Controllers\Api\V1\WaliController;
 use App\Http\Controllers\Api\V2\PublikApiController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,11 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/notifikasi', [NotifikasiController::class, 'index']);
         Route::post('/notifikasi/{notifikasi}/read', [NotifikasiController::class, 'read']);
         Route::post('/notifikasi/token', [NotifikasiController::class, 'registerToken']);
+
+        // API orangtua read-only (tautan via wali:tautkan; 403 tanpa tautan).
+        Route::get('/wali/anak', [WaliController::class, 'anak']);
+        Route::get('/wali/anak/{mahasiswa}/nilai', [WaliController::class, 'nilai']);
+        Route::get('/wali/anak/{mahasiswa}/tagihan', [WaliController::class, 'tagihan']);
 
         Route::post('/ai/chat', [AiController::class, 'chat'])->middleware('throttle:30,1');
         Route::get('/analitik/at-risk', [AiController::class, 'atRisk']);

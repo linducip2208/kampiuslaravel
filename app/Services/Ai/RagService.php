@@ -16,6 +16,9 @@ class RagService
 {
     public const CHUNK = 800;
 
+    /** Batas total karakter konteks yang diteruskan ke driver AI. */
+    public const MAX_KONTEKS = 4000;
+
     /** Pecah konten menjadi chunk ±800 karakter per batas kalimat. */
     public static function ingest(string $judul, string $konten, ?string $sumber = null, ?int $prodiId = null): KnowledgeBase
     {
@@ -52,8 +55,62 @@ class RagService
     }
 
     /**
-     * @return array{jawaban: string, sumber: list<string>, ditolak: bool, alasan: string}
+     * Evaluasi deterministik (tanpa panggil AI): untuk tiap pasangan
+     * [tanya, harap], ambil chunk teratas lalu skor F1 tumpang-tindih kata
+     * (≥4 huruf) antara chunk dan jawaban harapan.
+     *
+     * @param  list<array{tanya: string, harap: string}>  $pasangan
+     * @return array{skor: float, detail: list<array{tanya: string, skor: float, sumber: list<string>}>}
      */
+    public static function evaluasi(array $pasangan, ?int $prodiId = null): array
+    {
+        $detail = [];
+
+        foreach ($pasangan as $p) {
+            $tanya = (string) ($p['tanya'] ?? '');
+            $harap = (string) ($p['harap'] ?? '');
+            $relevan = RagGuardrail::relevan($tanya, 1, $prodiId);
+            $teks = (string) ($relevan[0]['teks'] ?? '');
+            $skor = self::skorKecocokan($teks, $harap);
+
+            $detail[] = [
+                'tanya' => $tanya,
+                'skor' => $skor,
+                'sumber' => $relevan === [] ? [] : [($relevan[0]['judul'] ?? '')],
+            ];
+        }
+
+        $rata = $detail === [] ? 0.0 : round(array_sum(array_column($detail, 'skor')) / count($detail), 3);
+
+        return ['skor' => $rata, 'detail' => $detail];
+    }
+
+    /** F1 tumpang-tindih kata (case-insensitive, kata ≥4 huruf). */
+    public static function skorKecocokan(string $a, string $b): float
+    {
+        $kata = fn (string $s): array => array_values(array_unique(array_filter(
+            preg_split('/[^a-z0-9]+/u', mb_strtolower($s)) ?: [],
+            fn ($w) => mb_strlen((string) $w) >= 4
+        )));
+
+        $ka = $kata($a);
+        $kb = $kata($b);
+
+        if ($ka === [] || $kb === []) {
+            return 0.0;
+        }
+
+        $iris = count(array_intersect($ka, $kb));
+        $presisi = $iris / count($ka);
+        $recall = $iris / count($kb);
+
+        if ($presisi + $recall <= 0) {
+            return 0.0;
+        }
+
+        return round(2 * $presisi * $recall / ($presisi + $recall), 3);
+    }
+
     public static function jawab(string $pertanyaan, ?int $userId = null, ?int $prodiId = null): array
     {
         $saring = RagGuardrail::saringMasukan($pertanyaan);
@@ -76,6 +133,12 @@ class RagService
             $relevan,
             array_keys($relevan)
         ));
+
+        // Batas konteks: potong agar prompt tak membengkak; sumber lengkap
+        // tetap dikembalikan agar jawaban bisa ditelusur.
+        if (mb_strlen($konteks) > self::MAX_KONTEKS) {
+            $konteks = mb_substr($konteks, 0, self::MAX_KONTEKS)."\n[…konteks dipotong]";
+        }
 
         $messages = [
             ['role' => 'system', 'content' => 'Jawab HANYA dari konteks berikut. Bila tak ada di konteks, katakan tidak tahu. Konteks: '.$konteks],

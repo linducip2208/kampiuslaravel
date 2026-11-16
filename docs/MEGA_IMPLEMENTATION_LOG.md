@@ -523,4 +523,10 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - OBE: tabel + CRUD sub-CPMK + badge di daftar.
 - Tes: `Batch16Test` (3 tes: no-bocor relevance, slip tampil, SUB-1).
 
+## 2026-11-16 — Ide bank batch 17: evaluasi RAG, API orangtua
+
+- AI: `evaluasi` (F1 deterministik) + `rag:evaluasi` + `MAX_KONTEKS`.
+- API: pivot wali + controller read-only + `wali:tautkan` (403 ketat).
+- Tes: `Batch17Test` (3 tes: skor relevan, jawab panjang, siklus wali).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)
