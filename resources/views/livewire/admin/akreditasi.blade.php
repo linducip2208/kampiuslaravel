@@ -43,8 +43,15 @@
         </div>
     </div>
     <div class="card mb-3">
-        <div class="card-header"><h3 class="card-title">Siklus PPEMPMTI</h3></div>
-        <div class="card-body">
+        <div class="card-header"><h3 class="card-title">Draf Borang per Prodi (ekspor CSV, bukan klaim akreditasi)</h3></div>
+        <div class="card-body d-flex flex-wrap gap-2">
+            @foreach($prodis as $p)
+                <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.akreditasi.borang', $p->id) }}">Borang {{ $p->nama }}</a>
+            @endforeach
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title">Siklus PPEMPMTI</h3></div>        <div class="card-body">
             <div class="row g-2">
                 <div class="col-md-3">
                     <label class="form-label">Prodi</label>

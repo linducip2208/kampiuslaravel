@@ -36,6 +36,7 @@ use App\Models\PmbPendaftar;
 use App\Models\Prodi;
 use App\Models\Tagihan;
 use App\Models\Tugas;
+use App\Services\BorangService;
 use App\Services\KeuanganService;
 use App\Services\PmbArsipService;
 use App\Services\ScormService;
@@ -359,6 +360,31 @@ Route::middleware('auth')->group(function () {
     // OBE per prodi: admin penuh + kaprodi/kajur terkunci prodinya di komponen.
     Route::middleware('role:superadmin|admin_prodi|kaprodi|kajur')->group(function () {
         Route::get('/admin/obe', fn () => view('pages.livewire-page', ['component' => 'obe.kelola', 'title' => 'OBE / CPL-CPMK']))->name('admin.obe');
+        // Draf borang akreditasi (ekspor CSV, bukan klaim).
+        Route::get('/admin/akreditasi/borang/{prodi}', function (int $prodi) {
+            $ringkas = BorangService::ringkasan($prodi);
+            $nama = 'borang-prodi-'.$prodi.'-'.now()->format('Ymd-His').'.csv';
+
+            return response()->streamDownload(function () use ($ringkas): void {
+                $out = fopen('php://output', 'w');
+                fputcsv($out, ['BAGIAN', 'A', 'B', 'C'], ';');
+                fputcsv($out, ['profil', 'aktif:'.$ringkas['profil']['aktif'], 'lulus:'.$ringkas['profil']['lulus'], 'cuti:'.$ringkas['profil']['cuti']], ';');
+
+                foreach ($ringkas['cpmk'] as $c) {
+                    fputcsv($out, ['cpmk', $c['kode'], $c['mk'], 'asesmen:'.$c['asesmen']], ';');
+                }
+
+                foreach ($ringkas['tracer'] as $t) {
+                    fputcsv($out, ['tracer', $t['tahun'], 'responden:'.$t['responden'], 'terserap:'.$t['terserap']], ';');
+                }
+
+                foreach ($ringkas['dokumen'] as $d) {
+                    fputcsv($out, ['dokumen', $d['kategori'], 'total:'.$d['total'], 'terverifikasi:'.$d['terverifikasi']], ';');
+                }
+
+                fclose($out);
+            }, $nama);
+        })->name('admin.akreditasi.borang')->middleware('throttle:10,1');
     });
 
     // Perpustakaan: sirkulasi staf + OPAC publik.

@@ -565,4 +565,12 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Cetak: `css/cetak.css` + link print di layout (berlaku semua dokumen).
 - Tes: `Batch22Test` (2 tes: idempoten + badge, link + aturan CSS).
 
+## 2026-11-16 — Ide bank batch 23: borang + triase 2 ide berisiko
+
+- Akreditasi: `BorangService` + ekspor CSV per prodi + tombol
+  (draf, bukan klaim).
+- Triase jujur: push-topik (butuh kredensial FCM) + rotasi token
+  (butuh kontrak Flutter) ditandai DITUNDA, bukan dikerjakan buta.
+- Tes: `Batch23Test` (1 tes: angka ringkasan + header unduhan).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

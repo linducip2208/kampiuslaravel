@@ -119,8 +119,7 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 - [x] **Siklus PPEMPMTI.** SELESAI 2026-11-16: tabel `spmi_siklus` (unik prodi+tahun+tahap, 5 tahap + status) + kartu di halaman Akreditasi (idempoten via updateOrCreate). Tes: simpan → tampil; simpan ulang tak ganda.
 - [x] **Sub-CPMK.** SELESAI 2026-11-16: tabel `sub_cpmk` (unik per CPMK) + `simpanSubCpmk` + kartu form + kolom badge di daftar OBE. Tes: SUB-1 tersimpan + tampil.
-- [ ] **Borang otomatis.** Proposal: isi borang dari rekap OBE + tracer
-      (ekspor, bukan klaim akreditasi). (L.)
+- [x] **Borang otomatis.** SELESAI 2026-11-16: `BorangService::ringkasan` (profil mhs + cakupan CPMK/asesmen + tren tracer + dokumen per kategori) + rute CSV `/admin/akreditasi/borang/{prodi}` + tombol per prodi. Batas jujur: draf ekspor, BUKAN klaim akreditasi. Tes: angka ringkasan + header unduhan.
 
 ## 18. AI (`ChatbotService`, `RagService`, `AiKuotaService`, `AtRiskService`)
 
@@ -136,6 +135,8 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 - [ ] **Push topik per prodi.** Token ada; segmentasi belum dipakai.
       Proposal: kirim pengumuman ke topik prodi saat publish. (M;
       butuh kredensial FCM — kaitkan M-064.)
+      ⏸ DITUNDA 2026-11-16: butuh kredensial FCM server (eksternal);
+      implementasi tanpa kredensial tak bisa diverifikasi.
 
 ## 20. PWA & offline (`sw.js`, `manifest`, `ScormService`)
 
@@ -158,6 +159,8 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
       (M.)
 - [ ] **Rotasi token mobile.** Token abadi. Proposal: expiry + refresh
       endpoint (lihat kontrak Flutter dulu). (M.)
+      ⏸ DITUNDA 2026-11-16: menyentuh kontrak auth aplikasi mobile;
+      butuh keputusan expiry/refresh dari tim Flutter sebelum kode.
 - [x] **Review permission tahunan.** SELESAI 2026-11-16 (verifikasi, tanpa kode baru): `permission:review` sudah mencakup peran-tanpa-user + permission-tanpa-peran + delegasi kedaluwarsa; tercakup `RbacBatch4Test`, berjalan bersih di dev. Dikunci `Batch8Test`.
 
 ## 23. UI/UX (tanpa E2E — tetap jujur)
