@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\HutangDagang;
+use App\Models\JurnalKeuangan;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -16,7 +17,7 @@ class HutangService
      */
     public static function bayar(int $hutangId, int $nominal, ?int $by = null): array
     {
-        return DB::transaction(function () use ($hutangId, $nominal): array {
+        return DB::transaction(function () use ($hutangId, $nominal, $by): array {
             $hutang = HutangDagang::whereKey($hutangId)->lockForUpdate()->firstOrFail();
 
             if ($nominal <= 0) {
@@ -34,6 +35,21 @@ class HutangService
                 : ($terbayar > 0 ? HutangDagang::STATUS_SEBAGIAN : HutangDagang::STATUS_BELUM);
 
             $hutang->update(['terbayar' => $terbayar, 'status' => $status]);
+
+            // Kas keluar dijurnalkan (satu baris per pembayaran nyata).
+            if ($dibayar > 0) {
+                JurnalKeuangan::create([
+                    'tanggal' => today()->toDateString(),
+                    'pembayaran_id' => null,
+                    'tagihan_id' => null,
+                    'jenis' => 'pengeluaran',
+                    'akun_debet' => 'Utang Usaha',
+                    'akun_kredit' => 'Kas/Bank',
+                    'nominal' => $dibayar,
+                    'keterangan' => 'Bayar hutang '.($hutang->nomor ?? "#{$hutang->id}"),
+                    'created_by' => $by,
+                ]);
+            }
 
             return ['terbayar' => $terbayar, 'status' => $status, 'dibayar' => $dibayar];
         });

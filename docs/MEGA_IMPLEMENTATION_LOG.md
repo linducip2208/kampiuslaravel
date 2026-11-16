@@ -498,4 +498,13 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch13Test` (3 tes: bucket + total, surplus 600rb, dry-run
   memuat NIM).
 
+## 2026-11-16 — Ide bank batch 14: saldo awal, arus kas
+
+- GL: `postingSaldoAwal` (jurnal SALDO-AWAL idempoten; tanpa tabel
+  khusus, mengalir ke semua laporan).
+- Kas: `bayar` hutang → jurnal `pengeluaran` (migrasi enum; SQLite
+  rebuild + salin `deleted_at` + lepas index lama) + `arusKas`
+  (masuk/keluar/bersih/bulanan) + kartu di halaman Hutang.
+- Tes: `Batch14Test` (3 tes: idempoten + neraca, 2jt−800rb, skema enum).
+
 ## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)

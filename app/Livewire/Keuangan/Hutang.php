@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\HutangDagang;
 use App\Models\Pemasok;
 use App\Services\HutangService;
+use App\Services\KeuanganService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -92,6 +93,7 @@ class Hutang extends Component
         return view('livewire.keuangan.hutang', [
             'pemasoks' => Pemasok::orderBy('nama')->get(),
             'hutangs' => HutangDagang::with('pemasok')->latest('id')->paginate(10),
+            'arus' => KeuanganService::arusKas(),
         ]);
     }
 }

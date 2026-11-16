@@ -161,6 +161,26 @@ class GlService
     }
 
     /**
+     * Jurnal saldo awal periode: idempoten per tahun via referensi SALDO-AWAL.
+     * Mengalir otomatis ke neraca/buku-besar/laba-rugi (tanpa tabel khusus).
+     */
+    public static function postingSaldoAwal(int $tahunId, array $items, ?int $by = null): JurnalUmum
+    {
+        if (JurnalUmum::where('tahun_akademik_id', $tahunId)->where('referensi', 'SALDO-AWAL')->exists()) {
+            throw new \RuntimeException('Saldo awal periode ini sudah diposting.');
+        }
+
+        return self::posting(
+            $tahunId,
+            (string) today()->toDateString(),
+            'Saldo awal periode',
+            $items,
+            'SALDO-AWAL',
+            $by
+        );
+    }
+
+    /**
      * Neraca saldo: total debet/kredit per akun + cek seimbang.
      *
      * @return array{rows: list<array{kode: string, nama: string, debet: int, kredit: int}>, total_debet: int, total_kredit: int, seimbang: bool}

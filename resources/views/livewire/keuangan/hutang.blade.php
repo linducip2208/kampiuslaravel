@@ -3,6 +3,14 @@
         <div class="alert alert-success">{{ $message }}</div>
     @endif
     <div class="card mb-3">
+        <div class="card-header"><h3 class="card-title">Arus Kas (Jurnal Keuangan)</h3></div>
+        <div class="card-body d-flex gap-4 flex-wrap">
+            <div><span class="text-secondary d-block small">Kas masuk</span><strong class="h3 text-success mb-0">Rp {{ number_format($arus['masuk'], 0, ',', '.') }}</strong></div>
+            <div><span class="text-secondary d-block small">Kas keluar</span><strong class="h3 text-danger mb-0">Rp {{ number_format($arus['keluar'], 0, ',', '.') }}</strong></div>
+            <div><span class="text-secondary d-block small">Bersih</span><strong class="h3 mb-0">Rp {{ number_format($arus['bersih'], 0, ',', '.') }}</strong></div>
+        </div>
+    </div>
+    <div class="card mb-3">
         <div class="card-header"><h3 class="card-title">Pemasok Baru</h3></div>
         <div class="card-body d-flex gap-2">
             <input type="text" class="form-control" wire:model="pemasokNama" placeholder="Nama pemasok">

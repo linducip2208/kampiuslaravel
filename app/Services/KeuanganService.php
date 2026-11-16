@@ -9,6 +9,7 @@ use App\Models\MahasiswaBeasiswa;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use App\Models\TagihanCicilan;
+use App\Models\TahunAkademik;
 use App\Models\TutupBuku;
 use App\Models\UktTemplate;
 use Carbon\Carbon;
@@ -224,6 +225,58 @@ class KeuanganService
         }
 
         return ['rows' => $rows, 'total' => $total];
+    }
+
+    /**
+     * Arus kas sederhana: masuk (penerimaan − refund) vs keluar (pengeluaran).
+     * Filter tahun memakai tahun tagihan untuk penerimaan/refund dan tahun
+     * kalender tanggal untuk pengeluaran (hutang tak terikat tahun akademik).
+     *
+     * @return array{masuk: int, keluar: int, bersih: int, bulanan: array<string, array{masuk: int, keluar: int}>}
+     */
+    public static function arusKas(?int $tahunId = null): array
+    {
+        $masuk = 0;
+        $keluar = 0;
+        $bulanan = [];
+
+        try {
+            $tahunKalender = $tahunId ? (string) TahunAkademik::whereKey($tahunId)->value('tahun') : null;
+
+            $jurnal = JurnalKeuangan::query()
+                ->when($tahunId, function ($q) use ($tahunId, $tahunKalender): void {
+                    $q->where(function ($w) use ($tahunId, $tahunKalender): void {
+                        $w->whereHas('tagihan', fn ($t) => $t->where('tahun_akademik_id', $tahunId))
+                            ->orWhere(function ($x) use ($tahunKalender): void {
+                                $x->whereNull('tagihan_id');
+                                if ($tahunKalender && is_numeric($tahunKalender)) {
+                                    $x->whereYear('tanggal', $tahunKalender);
+                                }
+                            });
+                    });
+                })
+                ->whereIn('jenis', ['penerimaan', 'refund', 'pengeluaran'])
+                ->get(['tanggal', 'jenis', 'nominal']);
+        } catch (\Throwable) {
+            return ['masuk' => 0, 'keluar' => 0, 'bersih' => 0, 'bulanan' => []];
+        }
+
+        foreach ($jurnal as $j) {
+            $bln = substr((string) $j->tanggal, 0, 7);
+            $bulanan[$bln] ??= ['masuk' => 0, 'keluar' => 0];
+
+            if ($j->jenis === 'pengeluaran' || $j->jenis === 'refund') {
+                $keluar += (int) $j->nominal;
+                $bulanan[$bln]['keluar'] += (int) $j->nominal;
+            } else {
+                $masuk += (int) $j->nominal;
+                $bulanan[$bln]['masuk'] += (int) $j->nominal;
+            }
+        }
+
+        ksort($bulanan);
+
+        return ['masuk' => $masuk, 'keluar' => $keluar, 'bersih' => $masuk - $keluar, 'bulanan' => $bulanan];
     }
 
     /**

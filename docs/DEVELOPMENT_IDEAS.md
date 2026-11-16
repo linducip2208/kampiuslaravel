@@ -54,13 +54,9 @@ update doc ini (`[x]`) + `MEGA_IMPLEMENTATION_LOG.md`.
 
 ## 6. GL & anggaran (`GlService`, `AnggaranService`, `TutupBuku`)
 
-- [ ] **Saldo awal periode.** Neraca tanpa opening balance. Proposal:
-      impor saldo awal per CoA per tahun + tampil di buku besar.
-      (M; terima: saldo awal + mutasi = saldo akhir.)
+- [x] **Saldo awal periode.** SELESAI 2026-11-16: `GlService::postingSaldoAwal` (jurnal berimbang referensi SALDO-AWAL, idempoten per tahun) — mengalir otomatis ke neraca/buku besar/laba-rugi tanpa tabel khusus. Tes: sekali masuk neraca, ulangan ditolak.
 - [x] **Laporan laba-rugi.** SELESAI 2026-11-16: `GlService::labaRugi` (pendapatan vs beban per akun tipe COA + surplus) + kartu Laba-Rugi di halaman GL. Tes: 1jt − 400rb = surplus 600rb.
-- [ ] **Arus kas sederhana.** Belum ada. Proposal: kas masuk (penerimaan)
-      vs keluar (hutang lunas + payroll) per bulan. (M; terima: angka
-      cocok dengan jurnal.)
+- [x] **Arus kas sederhana.** SELESAI 2026-11-16: `HutangService::bayar` menjurnalkan kas keluar (`pengeluaran`; migrasi enum + rebuild SQLite) + `KeuanganService::arusKas` (masuk = penerimaan−refund, keluar, bersih, per bulan) + kartu di halaman Hutang. Temuan: rebuild tabel wajib salin `deleted_at` (SoftDeletes) + lepas semua index lama dulu (nama index global di SQLite). Tes: 2jt − 800rb = 1,2jt tampil.
 
 ## 7. Payroll & HR (`PayrollService`, `Kelola` rekrutmen/organisasi)
 
