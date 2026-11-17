@@ -627,4 +627,12 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch28Test` (2 tes: 403 tanpa permission, simpan→terbit→
   tampil publik→tarik) + entri guard-test baru.
 
+## 2026-11-17 — Batch 29: TTE controller via service + paritas dev
+
+- `PddiktiController::tte` memakai `TteService` (respons kompatibel;
+  duplikasi logika kirim dihapus) + 1 tes controller.
+- Paritas dev: permission/role klinik di-seed minimal tanpa sync
+  (tanpa hapus permission manual dev).
+- Tes: 435 (434 hijau + 1 skip env).
+
 ## Status akhir: 60/66 SELESAI lapang + 5 KODE-SELESAI-guard (M-061,062,063,065,066; e2e menunggu kredensial nyata); M-054 DITOLAK desain.

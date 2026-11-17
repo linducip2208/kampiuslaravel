@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Setting;
+use App\Models\User;
 use App\Services\TteService;
+use Database\Seeders\RolesPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -12,6 +14,12 @@ use Tests\TestCase;
 class TteServiceTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(RolesPermissionsSeeder::class);
+    }
 
     private function isiKredensial(): void
     {
@@ -69,5 +77,24 @@ class TteServiceTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         app(TteService::class)->sign('ABCDEF123', '001/UN/2026');
+    }
+
+    /** Controller memakai TteService: 422 tanpa konfigurasi, data terus saat sukses. */
+    public function test_controller_tte_memakai_layanan(): void
+    {
+        $pimpinan = User::factory()->create();
+        $pimpinan->assignRole('pimpinan');
+
+        $this->actingAs($pimpinan)->postJson('/pddikti/tte', ['dokumen_hash' => 'ABC'])
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Integrasi TTE BSrE belum dikonfigurasi di halaman Integrasi (tte.base_url).');
+
+        $this->isiKredensial();
+
+        Http::fake(['tte.test/sign' => Http::response(['signed' => true, 'id' => 'DOC-1'], 200)]);
+
+        $this->actingAs($pimpinan)->postJson('/pddikti/tte', ['dokumen_hash' => 'ABC', 'nomor' => '001/UN/2026'])
+            ->assertOk()
+            ->assertJsonPath('signed', true);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AuditLog;
 use App\Models\Setting;
 use App\Services\PddiktiService;
+use App\Services\TteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -141,25 +142,23 @@ class PddiktiController extends Controller
     }
 
     /** TTE BSrE: ajukan tanda tangan elektronik untuk hash dokumen. */
-    public function tte(Request $request): JsonResponse
+    public function tte(Request $request, TteService $tte): JsonResponse
     {
-        $validated = $request->validate(['dokumen_hash' => 'required|string|max:255']);
+        $validated = $request->validate([
+            'dokumen_hash' => 'required|string|max:255',
+            'nomor' => 'nullable|string|max:100',
+        ]);
 
-        $base = (string) Setting::get('tte.base_url', '');
-
-        if ($base === '') {
+        if (! $tte->isConfigured()) {
             return response()->json(['message' => 'Integrasi TTE BSrE belum dikonfigurasi di halaman Integrasi (tte.base_url).'], 422);
         }
 
         try {
-            $res = Http::withBasicAuth(
-                (string) Setting::get('tte.username', ''),
-                (string) Setting::get('tte.password', '')
-            )->timeout(30)->post(rtrim($base, '/').'/sign', ['hash' => $validated['dokumen_hash']]);
+            $hasil = $tte->sign($validated['dokumen_hash'], (string) ($validated['nomor'] ?? ''));
 
-            return response()->json($res->json() ?? ['error' => 1, 'error_desc' => 'Respons TTE tidak valid.'], $res->status());
-        } catch (\Throwable $e) {
-            return response()->json(['error' => 1, 'error_desc' => 'Gagal hubungi layanan TTE: '.$e->getMessage()], 502);
+            return response()->json($hasil['data']);
+        } catch (\RuntimeException $e) {
+            return response()->json(['error' => 1, 'error_desc' => $e->getMessage()], 502);
         }
     }
 }
