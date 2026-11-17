@@ -77,8 +77,11 @@ class Broadcast extends Component
     {
         $this->validate(['waMessage' => 'nullable|string|max:1000']);
 
+        $simulasi = WaService::isSimulated();
+
         if (trim($this->waMessage) !== '') {
-            $count = 0;
+            $terkirim = 0;
+            $simulasiCount = 0;
 
             PmbPendaftar::query()
                 ->whereIn('status', [PmbPendaftar::STATUS_DIAJUKAN, PmbPendaftar::STATUS_DIVERIFIKASI])
@@ -87,20 +90,28 @@ class Broadcast extends Component
                 })
                 ->orderBy('id')
                 ->limit(100)
-                ->chunk(50, function ($items) use (&$count): void {
+                ->chunk(50, function ($items) use ($wa, $simulasi, &$terkirim, &$simulasiCount): void {
                     foreach ($items as $pendaftar) {
                         if ($wa->send((string) $pendaftar->hp, $this->waMessage)) {
-                            $pendaftar->update(['last_follow_up_at' => now()]);
-                            $count++;
+                            if ($simulasi) {
+                                $simulasiCount++;
+                            } else {
+                                $pendaftar->update(['last_follow_up_at' => now()]);
+                                $terkirim++;
+                            }
                         }
                     }
                 });
 
             $this->reset('waMessage');
-            $this->message = "WA terkirim ke {$count} pendaftar.";
+            $this->message = $simulasi
+                ? "WA terkirim ke 0 pendaftar, {$simulasiCount} simulasi (mode simulasi — gateway WA belum dikonfigurasi)."
+                : "WA terkirim ke {$terkirim} pendaftar.";
         } else {
             $count = $wa->broadcastFollowUp(100);
-            $this->message = "WA follow-up terkirim ke {$count} pendaftar.";
+            $this->message = $simulasi
+                ? "WA follow-up terkirim ke 0 pendaftar, {$count} simulasi (mode simulasi — gateway WA belum dikonfigurasi)."
+                : "WA follow-up terkirim ke {$count} pendaftar.";
         }
     }
 

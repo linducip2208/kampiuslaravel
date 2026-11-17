@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Livewire\Concerns\RequiresRoles;
 use App\Models\Setting;
 use App\Services\Payment\PaymentService;
+use App\Services\WaService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -95,6 +96,8 @@ class Integrasi extends Component
 
     public string $wa_token = '';
 
+    public string $wa_test_to = '';
+
     public string $pajak_npwp = '';
 
     public string $pajak_ppn_persen = '0';
@@ -119,6 +122,7 @@ class Integrasi extends Component
             'storage' => $this->tesStorage(),
             'webhook' => $this->tesWebhook(),
             'ai' => $this->tesAi(),
+            'wa' => $this->tesWa(),
             default => 'Tidak dikenal.',
         };
     }
@@ -274,6 +278,27 @@ class Integrasi extends Component
         }
     }
 
+    private function tesWa(): string
+    {
+        if (trim($this->wa_gateway_url) === '' || trim($this->wa_token) === '') {
+            return 'Belum dikonfigurasi (isi gateway URL + token WA di bawah). Follow-up WA berjalan sebagai simulasi.';
+        }
+
+        if (trim($this->wa_test_to) === '') {
+            return 'Isi nomor tujuan tes dulu (kolom nomor tes WA).';
+        }
+
+        try {
+            $ok = app(WaService::class)->send($this->wa_test_to, 'Tes gateway WA KAMPUS');
+
+            return $ok
+                ? 'OK — pesan tes terkirim ke '.$this->wa_test_to.'.'
+                : 'Gagal: gateway tidak merespons (cek URL & token).';
+        } catch (\Throwable $e) {
+            return 'Gagal: '.$e->getMessage();
+        }
+    }
+
     private const SETTING_KEYS = [
         'pay_driver', 'pay_server_key', 'pay_base_url', 'pay_bank', 'pay_callback_token',
         'pay_merchant_code', 'pay_private_key', 'pay_method',
@@ -317,6 +342,7 @@ class Integrasi extends Component
             'tenant_mode' => ['required', Rule::in(['single', 'sketsa_multi'])],
             'pajak_ppn_persen' => 'nullable|numeric|min:0|max:100',
             'wa_gateway_url' => 'nullable|url|max:255',
+            'wa_test_to' => 'nullable|string|max:20',
         ]);
 
         foreach (self::SETTING_KEYS as $key) {

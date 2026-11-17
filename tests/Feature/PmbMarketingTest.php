@@ -7,11 +7,13 @@ use App\Models\PmbGelombang;
 use App\Models\PmbPendaftar;
 use App\Models\PmbReferral;
 use App\Models\Prodi;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\PmbVaService;
 use App\Services\WaService;
 use Database\Seeders\RolesPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -112,8 +114,22 @@ class PmbMarketingTest extends TestCase
             'last_follow_up_at' => null,
         ]);
 
+        // Mode simulasi (tanpa gateway): return true tapi timestamp TIDAK
+        // dibump — jujur, bukan klaim terkirim.
         $this->assertTrue(app(WaService::class)->followUp($pendaftar));
+        $this->assertNull($pendaftar->fresh()->last_follow_up_at);
 
-        $this->assertNotNull($pendaftar->fresh()->last_follow_up_at);
+        // Gateway terkonfigurasi: timestamp dicatat.
+        Setting::set('wa.gateway_url', 'https://wa.example.test/send');
+        Setting::set('wa.token', 'tok');
+        Http::fake(['*' => Http::response(['ok' => true])]);
+
+        $pendaftar2 = PmbPendaftar::factory()->create([
+            'status' => PmbPendaftar::STATUS_DIAJUKAN,
+            'last_follow_up_at' => null,
+        ]);
+
+        $this->assertTrue(app(WaService::class)->followUp($pendaftar2));
+        $this->assertNotNull($pendaftar2->fresh()->last_follow_up_at);
     }
 }

@@ -74,18 +74,18 @@ Format: `ID | modul | prioritas | kompleksitas | wave | kriteria terima + tes`.
 - M-059 kontrak mobile Flutter per dokumen Fase 6 (P1/L).
 - M-060 PWA portal mahasiswa (P2/L).
 
-## WAVE D — integrasi (6 item, semua BLOCKED sampai konektivitas nyata diuji)
+## WAVE D — integrasi (6 item; kode guard+simulasi SELESAI 2026-11-17, kirim nyata menunggu kredensial)
 
-- M-061 PDDikti/Feeder adapter (BLOCKED). M-062 payment gateway prod (BLOCKED).
-- M-063 WhatsApp (BLOCKED). M-064 Email/FCM (SELESAI: FCM token + channel email + inbox/WA/notifikasi).
-- M-065 SSO Google/Microsoft (BLOCKED). M-066 tanda-tangan dokumen (BLOCKED).
+- M-061 PDDikti/Feeder adapter (KODE SELESAI: CSV + live-sync + guard SSRF + audit blokir; butuh base_url+username+password produksi untuk e2e). M-062 payment gateway prod (KODE SELESAI: 4 driver + refund + checkStatus QRIS/ewallet + callback terverifikasi; butuh kredensial prod + callback URL publik untuk e2e).
+- M-063 WhatsApp (KODE SELESAI: simulasi jujur + tombol tes + counter tak lagi menyesatkan; butuh gateway_url+token untuk kirim nyata). M-064 Email/FCM (SELESAI: FCM token + channel email + inbox/WA/notifikasi).
+- M-065 SSO Google/Microsoft (KODE SELESAI: OAuth2 manual tanpa Socialite + tombol login + proteksi state; butuh Client ID/Secret + redirect URI terdaftar untuk login nyata). M-066 tanda-tangan dokumen (KODE SELESAI: stamp internal + QR verify + TteService BSrE guard; butuh server BSrE + sertifikat untuk TTE legal).
 
 ## Status global
 
 TOTAL=66: WAVE-A=20, WAVE-B=28, WAVE-C=12, WAVE-D=6.
 Selesai=60 (2026-11-15, suite 304 hijau):
 Wave A 20/20, Wave B 28/28, Wave C 11/12 SELESAI (M-054 DITOLAK — single-institution).
-Wave D: M-061,062,063,065,066 BLOCKED + M-064 SELESAI
+Wave D: M-061,062,063,065,066 KODE SELESAI 2026-11-17 (guard + simulasi jujur + tes; kirim nyata menunggu kredensial) + M-064 SELESAI
 (channel email `MailService`; kirim nyata butuh SMTP). Rincian batch di bawah.
 Wave A 20/20 (bukti: `tests/Feature/WaveACriticalTest.php` 11 tes +
 `tests/Feature/WaveABatch2Test.php` 8 tes): M-001..M-020 — detail di bawah.
@@ -143,7 +143,7 @@ posting-berimbang/buku-besar/neraca-saldo + guard tutup-buku +
 `seederDasarCoa` + Livewire `Keuangan/Gl` di `/keuangan/gl`).
 Wave C Batch 4: RAG + SCORM (bukti: `tests/Feature/WaveCBatch4Test.php` 4 tes).
 Sisa Wave C: tidak ada (M-054 DITOLAK — single-institution, tanpa multi-tenant).
-Wave D: 5 item BLOCKED (M-061,062,063,065,066 — butuh konektivitas nyata);
+Wave D: 5 item KODE SELESAI 2026-11-17 (guard + simulasi jujur + tes; e2e nyata menunggu kredensial);
 M-064 SELESAI di level kode.
 M-001 (callback PMBVA: fallback hanya driver simulasi), M-002 (tx+lock PmbVa),
 M-003 (lock baris di BayarManual + cek lunas ulang), M-004 (check → driver →

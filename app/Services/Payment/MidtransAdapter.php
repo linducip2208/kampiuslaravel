@@ -5,6 +5,7 @@ namespace App\Services\Payment;
 use App\Models\Setting;
 use App\Models\Tagihan;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -99,5 +100,35 @@ class MidtransAdapter implements PaymentGatewayInterface
     public function requiredSettings(): array
     {
         return ['pay.server_key' => 'Server Key Midtrans'];
+    }
+
+    /**
+     * Refund sisi gateway Midtrans (POST /v2/{order_id}/refund).
+     * Return false bila gateway menolak / tak terjangkau — pemanggil
+     * (PaymentService::refundByReference) tetap menangani reversal lokal.
+     */
+    public function refund(string $reference, int $nominal): bool
+    {
+        $serverKey = (string) Setting::get('pay.server_key', '');
+        $base = rtrim((string) Setting::get('pay.base_url', (string) config('payment.defaults.midtrans_base_url')), '/');
+
+        try {
+            $res = Http::withBasicAuth($serverKey, '')->timeout(30)->post($base.'/v2/'.$reference.'/refund', [
+                'amount' => $nominal,
+                'reason' => 'Customer refund request',
+            ]);
+
+            if (! $res->successful()) {
+                Log::warning('Refund Midtrans ditolak gateway.', ['reference' => $reference, 'status' => $res->status()]);
+
+                return false;
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('Refund Midtrans gagal: '.$e->getMessage(), ['reference' => $reference]);
+
+            return false;
+        }
     }
 }

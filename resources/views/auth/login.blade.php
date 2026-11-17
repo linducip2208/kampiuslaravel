@@ -52,6 +52,11 @@
                                         <button type="submit" class="btn btn-primary w-100">Masuk</button>
                                     </div>
                                 </form>
+                                <hr>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ route('sso.redirect', 'google') }}" class="btn btn-outline-secondary w-100">Masuk dengan Google</a>
+                                    <a href="{{ route('sso.redirect', 'microsoft') }}" class="btn btn-outline-secondary w-100">Masuk dengan Microsoft</a>
+                                </div>
                                 <div class="text-center text-secondary mt-3">
                                     <div class="mb-2">Akun demo — klik untuk isi otomatis:</div>
                                     <div class="d-flex flex-wrap justify-content-center gap-1">

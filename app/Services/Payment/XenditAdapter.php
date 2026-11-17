@@ -2,9 +2,11 @@
 
 namespace App\Services\Payment;
 
+use App\Models\Pembayaran;
 use App\Models\Setting;
 use App\Models\Tagihan;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -107,18 +109,100 @@ class XenditAdapter implements PaymentGatewayInterface
         $apiKey = (string) Setting::get('pay.server_key', '');
         $base = rtrim((string) Setting::get('pay.base_url', (string) config('payment.defaults.xendit_base_url')), '/');
 
-        $res = Http::withBasicAuth($apiKey, '')->timeout(15)->get($base.'/callback_virtual_accounts/'.$reference);
+        try {
+            // Pilih endpoint dari kanal pembayaran tersimpan (metode: qris_xendit,
+            // ewallet_xendit-*, va_xendit). Tanpa baris Pembayaran, fallback ke VA.
+            $metode = strtolower((string) (Pembayaran::where('reference', $reference)->value('metode') ?? ''));
 
-        if (! $res->successful()) {
+            // QRIS: QR dinamis dibuat via /qr_codes dengan external_id = reference.
+            if (str_starts_with($metode, 'qris_')) {
+                $res = Http::withBasicAuth($apiKey, '')->timeout(15)->get($base.'/qr_codes/'.$reference);
+
+                if (! $res->successful()) {
+                    return 'pending';
+                }
+
+                return match (strtolower((string) $res->json('status'))) {
+                    'completed', 'paid' => 'verified',
+                    'expired' => 'failed',
+                    default => 'pending',
+                };
+            }
+
+            // E-wallet: status charge via /ewallets/charges/{charge_id}.
+            // createTransaction menyimpan charge id Xendit di va_number
+            // (atau URL action bila gateway mengembalikan deeplink).
+            if (str_starts_with($metode, 'ewallet_')) {
+                $chargeId = (string) (Pembayaran::where('reference', $reference)->value('va_number') ?? '');
+
+                if ($chargeId === '' || str_contains($chargeId, '://')) {
+                    $chargeId = $reference;
+                }
+
+                $res = Http::withBasicAuth($apiKey, '')->timeout(15)->get($base.'/ewallets/charges/'.$chargeId);
+
+                if (! $res->successful()) {
+                    return 'pending';
+                }
+
+                return match (strtoupper((string) $res->json('status'))) {
+                    'SUCCEEDED', 'COMPLETED', 'PAID' => 'verified',
+                    'FAILED', 'EXPIRED', 'VOIDED', 'REFUNDED' => 'failed',
+                    default => 'pending',
+                };
+            }
+        } catch (\Throwable) {
             return 'pending';
         }
 
-        return match (strtolower((string) $res->json('status'))) {
-            'active', 'pending' => 'pending',
-            'expired', 'inactive' => 'failed',
-            'completed', 'paid' => 'verified',
-            default => 'pending',
-        };
+        // Fallback lama: Virtual Account via /callback_virtual_accounts/{external_id}.
+        try {
+            $res = Http::withBasicAuth($apiKey, '')->timeout(15)->get($base.'/callback_virtual_accounts/'.$reference);
+
+            if (! $res->successful()) {
+                return 'pending';
+            }
+
+            return match (strtolower((string) $res->json('status'))) {
+                'active', 'pending' => 'pending',
+                'expired', 'inactive' => 'failed',
+                'completed', 'paid' => 'verified',
+                default => 'pending',
+            };
+        } catch (\Throwable) {
+            return 'pending';
+        }
+    }
+
+    /**
+     * Refund sisi gateway Xendit (POST /refunds).
+     * Return false bila gateway menolak / tak terjangkau — pemanggil
+     * (PaymentService::refundByReference) tetap menangani reversal lokal.
+     */
+    public function refund(string $reference, int $nominal): bool
+    {
+        $apiKey = (string) Setting::get('pay.server_key', '');
+        $base = rtrim((string) Setting::get('pay.base_url', (string) config('payment.defaults.xendit_base_url')), '/');
+
+        try {
+            $res = Http::withBasicAuth($apiKey, '')->timeout(30)->post($base.'/refunds', [
+                'reference_id' => $reference,
+                'amount' => $nominal,
+                'reason' => 'REQUESTED_BY_CUSTOMER',
+            ]);
+
+            if (! $res->successful()) {
+                Log::warning('Refund Xendit ditolak gateway.', ['reference' => $reference, 'status' => $res->status()]);
+
+                return false;
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('Refund Xendit gagal: '.$e->getMessage(), ['reference' => $reference]);
+
+            return false;
+        }
     }
 
     public function requiredSettings(): array

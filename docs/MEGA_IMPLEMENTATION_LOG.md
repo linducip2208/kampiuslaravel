@@ -594,4 +594,14 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: `Batch25Test` (4 tes: guard, payload, default abadi, rotasi).
 - **Bank ide TUNTAS 60/60** — tak ada lagi item terbuka/ditunda.
 
-## Status akhir: 60/66 — 5 tersisa semuanya BLOCKED eksternal (M-061,062,063,065,066)
+## 2026-11-17 — Wave D batch 26: 5 item BLOCKED dibuka via guard jujur (5 subagen paralel)
+
+- M-061: guard SSRF Feeder (`guard_ssrf` opt-in; tolak IP privat/reserved + audit blokir; default OFF agar kompatibel).
+- M-062: refund gateway per driver (Xendit/Midtrans API, Tripay jujur manual) + checkStatus Xendit QRIS/ewallet.
+- M-063: WA jujur (flag simulasi, counter tak menyesatkan, tombol tes kirim di Integrasi); 1 tes lama disesuaikan kontrak baru.
+- M-065: SSO OAuth2 manual tanpa Socialite (proteksi state, link-akun saja, tombol login); tanpa ubah dependensi.
+- M-066: `TteService` BSrE (guard + sign + status) teruji via Http::fake.
+- Tes: 23 baru + 1 lama disesuaikan; 422 hijau + 1 skip env.
+- Batas jujur: e2e nyata (Feeder kampus, gateway prod, WA gateway, Google/Entra, BSrE) tetap menunggu kredensial; tak ada klaim kirim nyata.
+
+## Status akhir: 60/66 SELESAI lapang + 5 KODE-SELESAI-guard (M-061,062,063,065,066; e2e menunggu kredensial nyata); M-054 DITOLAK desain.

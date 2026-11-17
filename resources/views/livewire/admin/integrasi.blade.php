@@ -40,6 +40,13 @@
                     <div class="col-md-6 mb-3"><label class="form-label">Token / API key</label><input type="password" wire:model="wa_token" class="form-control"></div>
                 </div>
                 <div class="text-muted small">Jadwal: <code>tagihan:ingatkan</code> tiap 08:00. Nomor diambil dari profil user (<code>no_wa</code>). Tanpa gateway: pesan hanya masuk inbox notifikasi.</div>
+                <div class="row mt-2">
+                    <div class="col-md-6 mb-3"><label class="form-label">Nomor tes (format 62...)</label><input type="text" wire:model="wa_test_to" class="form-control" placeholder="62812xxxxxxx"></div>
+                    <div class="col-md-6 mb-3 d-flex align-items-end">
+                        <button type="button" wire:click="test('wa')" class="btn btn-outline-secondary mb-0">Tes Kirim WA</button>
+                    </div>
+                </div>
+                @if(!empty($tes['wa']))<div class="alert alert-info">{{ $tes['wa'] }}</div>@endif
             </div>
         </div>
         <div class="card mb-3">

@@ -14,16 +14,25 @@ use Throwable;
  */
 class WaService
 {
+    /** True bila gateway WA belum dikonfigurasi (pengiriman hanya simulasi). */
+    public static function isSimulated(): bool
+    {
+        $url = trim((string) (Setting::get('wa.gateway_url', '') ?? ''));
+        $token = trim((string) (Setting::get('wa.token', '') ?? ''));
+
+        return $url === '' || $token === '';
+    }
+
     public function send(string $hp, string $pesan): bool
     {
-        $url = (string) (Setting::get('wa.gateway_url', '') ?? '');
-        $token = (string) (Setting::get('wa.token', '') ?? '');
-
-        if ($url === '' || $token === '') {
+        if (self::isSimulated()) {
             Log::info('WA simulated (gateway belum dikonfigurasi)', ['hp' => $hp, 'pesan' => $pesan]);
 
             return true;
         }
+
+        $url = (string) (Setting::get('wa.gateway_url', '') ?? '');
+        $token = (string) (Setting::get('wa.token', '') ?? '');
 
         try {
             $res = Http::withToken($token)->timeout(15)->post($url, [
@@ -60,7 +69,7 @@ class WaService
 
         $ok = $this->send((string) $pendaftar->hp, $pesan);
 
-        if ($ok) {
+        if ($ok && ! self::isSimulated()) {
             $pendaftar->update(['last_follow_up_at' => now()]);
         }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\Auth\SsoController;
 use App\Http\Controllers\BayarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KalenderController;
@@ -151,6 +152,13 @@ Route::get('/', function () {
 
 Route::get('/login', [SessionAuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [SessionAuthController::class, 'login'])->middleware('throttle:login')->name('login.attempt');
+
+// M-065: SSO Google/Microsoft (OAuth2 manual, tanpa Socialite).
+// Aktif bila client_id/secret terisi; tanpa itu redirect kembali ke login.
+Route::middleware('throttle:login')->group(function (): void {
+    Route::get('/auth/{provider}/redirect', [SsoController::class, 'redirect'])->whereIn('provider', ['google', 'microsoft'])->name('sso.redirect');
+    Route::get('/auth/{provider}/callback', [SsoController::class, 'callback'])->whereIn('provider', ['google', 'microsoft'])->name('sso.callback');
+});
 
 Route::get('/prodi', [PublikController::class, 'prodi'])->name('publik.prodi');
 Route::get('/prodi/{slug}', [PublikController::class, 'prodiDetail'])->name('publik.prodi.detail');

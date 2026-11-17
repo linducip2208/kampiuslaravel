@@ -5,6 +5,7 @@ namespace App\Services\Payment;
 use App\Models\Setting;
 use App\Models\Tagihan;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -109,5 +110,20 @@ class TripayAdapter implements PaymentGatewayInterface
             'pay.server_key' => 'API Key Tripay',
             'pay.private_key' => 'Private Key Tripay',
         ];
+    }
+
+    /**
+     * Tripay TIDAK menyediakan endpoint refund publik — refund dilakukan
+     * manual via panel Tripay. Selalu false + dicatat agar pemanggil tahu
+     * reversal lokal tetap jalan tapi dana dikembalikan manual.
+     */
+    public function refund(string $reference, int $nominal): bool
+    {
+        Log::info('Refund Tripay manual via panel (tidak ada API refund publik).', [
+            'reference' => $reference,
+            'nominal' => $nominal,
+        ]);
+
+        return false;
     }
 }
