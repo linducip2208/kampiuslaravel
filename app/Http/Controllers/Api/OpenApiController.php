@@ -13,6 +13,19 @@ use Illuminate\Support\Facades\Route;
  */
 class OpenApiController extends Controller
 {
+    /**
+     * Koleksi GET yang memakai App\Support\ApiPaging (`?q=&sort=&per_page=`
+     * + envelope `{data, meta}`). Kunci = path hasil generate di bawah.
+     *
+     * @var array<string, list<string>>
+     */
+    private const PAGED_SORTS = [
+        '/api/v1/tugas' => ['id', 'judul', 'deadline'],
+        '/api/v1/tagihan' => ['id', 'nominal', 'jatuh_tempo'],
+        '/api/v1/pengumuman' => ['id', 'published_at'],
+        '/api/v2/pengumuman' => ['id', 'published_at'],
+    ];
+
     public function show(): JsonResponse
     {
         $paths = [];
@@ -40,7 +53,7 @@ class OpenApiController extends Controller
                 : $action;
 
             foreach ($methods as $method) {
-                $paths[$path][strtolower($method)] = [
+                $operation = [
                     'summary' => $summary,
                     'responses' => [
                         '200' => ['description' => 'OK'],
@@ -49,6 +62,16 @@ class OpenApiController extends Controller
                         '422' => ['description' => 'Validation error'],
                     ],
                 ];
+
+                if ($method === 'GET' && isset(self::PAGED_SORTS[$path])) {
+                    $operation['parameters'] = [
+                        ['name' => 'q', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'string', 'maxLength' => 100], 'description' => 'Kata kunci pencarian.'],
+                        ['name' => 'sort', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'string', 'enum' => self::allowedSortValues(self::PAGED_SORTS[$path])], 'description' => 'Kolom sort (prefix `-` untuk desc).'],
+                        ['name' => 'per_page', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'integer', 'minimum' => 1, 'maximum' => 50, 'default' => 15], 'description' => 'Jumlah item per halaman.'],
+                    ];
+                }
+
+                $paths[$path][strtolower($method)] = $operation;
             }
         }
 
@@ -63,6 +86,37 @@ class OpenApiController extends Controller
             ],
             'servers' => [['url' => rtrim(config('app.url'), '/').'/api']],
             'paths' => $paths,
+            'components' => [
+                'schemas' => [
+                    'Meta' => [
+                        'type' => 'object',
+                        'description' => 'Envelope paging App\Support\ApiPaging: {data, meta}.',
+                        'properties' => [
+                            'current_page' => ['type' => 'integer'],
+                            'last_page' => ['type' => 'integer'],
+                            'per_page' => ['type' => 'integer'],
+                            'total' => ['type' => 'integer'],
+                        ],
+                        'required' => ['current_page', 'last_page', 'per_page', 'total'],
+                    ],
+                ],
+            ],
         ]);
+    }
+
+    /**
+     * @param  list<string>  $sorts
+     * @return list<string>
+     */
+    private static function allowedSortValues(array $sorts): array
+    {
+        $values = [];
+
+        foreach ($sorts as $kolom) {
+            $values[] = $kolom;
+            $values[] = '-'.$kolom;
+        }
+
+        return $values;
     }
 }

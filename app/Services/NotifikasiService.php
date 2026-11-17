@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AuditLog;
 use App\Models\Notifikasi;
 use App\Models\NotifLog;
 use App\Models\Setting;
@@ -57,16 +58,24 @@ class NotifikasiService
         if ($projectId === '' || $serviceAccount === '' || ! is_file($serviceAccount)) {
             Log::info('FCM topik dilewati (belum dikonfigurasi)', ['topic' => "prodi_{$prodiId}"]);
 
+            $this->catatAuditTopik($prodiId, $judul, 'dilewati', 'tanpa kredensial');
+
             return false;
         }
 
         $accessToken = $this->googleAccessToken($serviceAccount);
 
         if (! $accessToken) {
+            $this->catatAuditTopik($prodiId, $judul, 'dilewati', 'token google gagal');
+
             return false;
         }
 
-        return $this->kirimPesanTopik($projectId, $accessToken, $prodiId, $judul, $isi);
+        $ok = $this->kirimPesanTopik($projectId, $accessToken, $prodiId, $judul, $isi);
+
+        $this->catatAuditTopik($prodiId, $judul, $ok ? 'terkirim' : 'gagal', null);
+
+        return $ok;
     }
 
     /** POST pesan ke topik FCM (dipisah agar dapat diuji tanpa kredensial). */
@@ -78,6 +87,21 @@ class NotifikasiService
         );
 
         return $res->successful();
+    }
+
+    private function catatAuditTopik(int $prodiId, string $judul, string $hasil, ?string $keterangan): void
+    {
+        try {
+            AuditLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'notifikasi.broadcast_topik',
+                'model' => null,
+                'model_id' => null,
+                'diff_json' => ['prodi_id' => $prodiId, 'topic' => "prodi_{$prodiId}", 'judul' => $judul, 'hasil' => $hasil, 'keterangan' => $keterangan],
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable) {
+        }
     }
 
     private function pushFcm(User $user, string $judul, string $isi, ?int $notifikasiId = null): void

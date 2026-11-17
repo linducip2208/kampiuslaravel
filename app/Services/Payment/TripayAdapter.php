@@ -2,6 +2,8 @@
 
 namespace App\Services\Payment;
 
+use App\Models\AuditLog;
+use App\Models\Pembayaran;
 use App\Models\Setting;
 use App\Models\Tagihan;
 use Illuminate\Support\Facades\Http;
@@ -123,6 +125,25 @@ class TripayAdapter implements PaymentGatewayInterface
             'reference' => $reference,
             'nominal' => $nominal,
         ]);
+
+        try {
+            $pembayaranId = null;
+
+            try {
+                $pembayaranId = Pembayaran::where('reference', $reference)->value('id');
+            } catch (\Throwable) {
+            }
+
+            AuditLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'gateway.refund',
+                'model' => $pembayaranId ? Pembayaran::class : self::class,
+                'model_id' => $pembayaranId ? (int) $pembayaranId : null,
+                'diff_json' => ['reference' => $reference, 'nominal' => $nominal, 'hasil' => 'gagal', 'gateway' => 'tripay', 'keterangan' => 'manual via panel'],
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable) {
+        }
 
         return false;
     }

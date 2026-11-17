@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -126,6 +127,18 @@ class SsoController extends Controller
 
         Auth::login($user, false);
         $request->session()->regenerate();
+
+        try {
+            AuditLog::create([
+                'user_id' => $user->id,
+                'action' => 'sso.login',
+                'model' => User::class,
+                'model_id' => $user->id,
+                'diff_json' => ['provider' => $provider, 'email' => $email],
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable) {
+        }
 
         return redirect()->intended(route('dashboard'));
     }

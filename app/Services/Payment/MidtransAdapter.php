@@ -2,6 +2,8 @@
 
 namespace App\Services\Payment;
 
+use App\Models\AuditLog;
+use App\Models\Pembayaran;
 use App\Models\Setting;
 use App\Models\Tagihan;
 use Illuminate\Support\Facades\Http;
@@ -121,14 +123,42 @@ class MidtransAdapter implements PaymentGatewayInterface
             if (! $res->successful()) {
                 Log::warning('Refund Midtrans ditolak gateway.', ['reference' => $reference, 'status' => $res->status()]);
 
+                $this->catatAuditRefund($reference, $nominal, false, 'status '.$res->status());
+
                 return false;
             }
+
+            $this->catatAuditRefund($reference, $nominal, true);
 
             return true;
         } catch (\Throwable $e) {
             Log::warning('Refund Midtrans gagal: '.$e->getMessage(), ['reference' => $reference]);
 
+            $this->catatAuditRefund($reference, $nominal, false, $e->getMessage());
+
             return false;
+        }
+    }
+
+    private function catatAuditRefund(string $reference, int $nominal, bool $hasil, ?string $keterangan = null): void
+    {
+        try {
+            $pembayaranId = null;
+
+            try {
+                $pembayaranId = Pembayaran::where('reference', $reference)->value('id');
+            } catch (\Throwable) {
+            }
+
+            AuditLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'gateway.refund',
+                'model' => $pembayaranId ? Pembayaran::class : self::class,
+                'model_id' => $pembayaranId ? (int) $pembayaranId : null,
+                'diff_json' => ['reference' => $reference, 'nominal' => $nominal, 'hasil' => $hasil ? 'sukses' : 'gagal', 'gateway' => 'midtrans', 'keterangan' => $keterangan],
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable) {
         }
     }
 }

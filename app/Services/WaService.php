@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AuditLog;
 use App\Models\PmbPendaftar;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
@@ -40,11 +41,34 @@ class WaService
                 'message' => $pesan,
             ]);
 
-            return $res->successful();
+            $ok = $res->successful();
+
+            $this->catatAuditKirim($hp, $ok, $ok ? null : 'status '.$res->status());
+
+            return $ok;
         } catch (Throwable $e) {
             Log::warning('WA gateway gagal', ['hp' => $hp, 'error' => $e->getMessage()]);
 
+            $this->catatAuditKirim($hp, false, $e->getMessage());
+
             return false;
+        }
+    }
+
+    private function catatAuditKirim(string $hp, bool $hasil, ?string $keterangan = null): void
+    {
+        try {
+            $digits = preg_replace('/\D/', '', $hp) ?? '';
+
+            AuditLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'wa.kirim',
+                'model' => null,
+                'model_id' => null,
+                'diff_json' => ['hp' => '****'.substr($digits, -4), 'hasil' => $hasil ? 'terkirim' : 'gagal', 'keterangan' => $keterangan],
+                'created_at' => now(),
+            ]);
+        } catch (Throwable) {
         }
     }
 

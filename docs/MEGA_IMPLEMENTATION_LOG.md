@@ -604,4 +604,13 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Tes: 23 baru + 1 lama disesuaikan; 422 hijau + 1 skip env.
 - Batas jujur: e2e nyata (Feeder kampus, gateway prod, WA gateway, Google/Entra, BSrE) tetap menunggu kredensial; tak ada klaim kirim nyata.
 
+## 2026-11-17 — Hardening batch 27: guard-test rute, readiness command, audit forensik, OpenAPI, perf (5 subagen paralel)
+
+- Guard: 12 rute sensitif baru dikunci di `RouteGuardTest`.
+- Operasi: `integrasi:cek` (8 layanan, read-only, exit selalu 0).
+- Forensik: audit refund gateway, push topik, WA nyata (nomor tersamar), login SSO.
+- API: OpenAPI generate + parameter q/sort/per_page + skema Meta + test kontrak.
+- Perf: eager-load terverifikasi aman, 2 index tracer baru, test batas query.
+- Tes: 10 baru; 432 hijau + 1 skip env.
+
 ## Status akhir: 60/66 SELESAI lapang + 5 KODE-SELESAI-guard (M-061,062,063,065,066; e2e menunggu kredensial nyata); M-054 DITOLAK desain.

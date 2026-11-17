@@ -38,6 +38,18 @@ class RouteGuardTest extends TestCase
             'dosen.krs.persetujuan' => ['dosen'],
             'nilai.input' => ['dosen'],
             'lms.bank' => ['dosen'],
+            'klinik.kunjungan' => ['permission:klinik.manage'],
+            'asrama.kelola' => ['superadmin'],
+            'aset.opname' => ['superadmin'],
+            'sk-mengajar.cetak' => ['auth'],
+            'kwitansi.gabungan' => ['auth'],
+            'keuangan.piutang-aging' => ['keuangan'],
+            'keuangan.slip.cetak' => ['keuangan'],
+            'admin.akreditasi.borang' => ['superadmin'],
+            'admin.pmb.arsip' => ['superadmin'],
+            'lms.paket.kelas' => ['auth'],
+            'perpus.sirkulasi' => ['pustakawan'],
+            'fasilitas.kalender' => ['auth'],
         ];
     }
 
