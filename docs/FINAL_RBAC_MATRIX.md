@@ -61,3 +61,18 @@ permission review otomatis berkala.
 Catatan ronde ini: gate lapis-2 Livewire (`allowedRoles`) ikut diperbarui —
 rute saja memberi rasa aman palsu (terbukti tes merah sebelum fix);
 BKD + riset menolak akun tanpa baris dosen (anti null===null IDOR).
+
+## v2 (2026-11-17) — adendum: peran & permission sejak v1
+
+Perubahan aditif (6 peran lama + permission lama tak berubah;
+`RbacExpansionTest::test_enam_peran_lama_utuh` mengunci hitungan):
+
+| Role | Permission baru | Wiring |
+|---|---|---|
+| pustakawan | (tidak ada; gate via grup role) | R (`role:pustakawan|superadmin|admin_prodi` di `/perpus/sirkulasi`) |
+| petugas_klinik | `klinik.manage`, `klinik.read` | R+P (grup route `permission:klinik.manage` + `can()` per aksi Livewire; di luar grup admin) |
+| superadmin | + `klinik.manage`, `klinik.read` (total 17) | memegang semua permission by design |
+
+Catatan: tabel v1 di atas adalah snapshot beku (judul v1 dipertahankan
+apa adanya); sumber kebenaran berjalan = `RolesPermissionsSeeder` +
+`RbacExpansionTest`.
