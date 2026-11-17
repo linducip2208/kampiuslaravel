@@ -450,6 +450,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/media/generate', fn () => view('pages.livewire-page', ['component' => 'media.generator', 'title' => 'Generate Gambar AI']))->name('media.generate');
     });
 
+    // Pengumuman: gate permission terpisah (pengumuman.manage).
+    Route::middleware('permission:pengumuman.manage')->group(function () {
+        Route::get('/notifikasi/pengumuman', fn () => view('pages.livewire-page', ['component' => 'notifikasi.pengumuman-kelola', 'title' => 'Kelola Pengumuman']))->name('notifikasi.pengumuman');
+    });
+
     // SDM: payroll + rekrutmen (hrd tidak masuk grup keuangan penuh — SoD).
     Route::middleware('role:hrd|superadmin|admin_prodi')->group(function () {
         Route::get('/hrd/payroll', fn () => view('pages.livewire-page', ['component' => 'keuangan.payroll', 'title' => 'Penggajian']))->name('hrd.payroll');

@@ -613,4 +613,18 @@ cek syarat wisuda `WisudaService` (pratinjau; alur `luluskan` utuh).
 - Perf: eager-load terverifikasi aman, 2 index tracer baru, test batas query.
 - Tes: 10 baru; 432 hijau + 1 skip env.
 
+## 2026-11-17 — Batch 28: CRUD pengumuman + push-topik saat terbit (temuan audit konektivitas)
+
+- Audit jujur menjawab "apakah semua fitur saling terkoneksi": mayoritas
+  terhubung (KRS↔tunggakan, verifikasi→jurnal, hutang→jurnal kas keluar,
+  daftarUlang→tagihan, SSO→link akun, wali→pivot, notif PA/inbox,
+  audit tulis+baca, scheduler). Celah nyata ditemukan: pengumuman
+  ditampilkan di mana-mana tapi TAK ADA UI penerbitan + permission
+  `pengumuman.manage` tak dipakai siapa pun.
+- `Notifikasi/PengumumanKelola`: tulis draf, terbit/tarik, hapus + audit;
+  checkbox push topik FCM prodi saat terbit (guard di service).
+  Rute `/notifikasi/pengumuman` di grup `permission:pengumuman.manage`.
+- Tes: `Batch28Test` (2 tes: 403 tanpa permission, simpan→terbit→
+  tampil publik→tarik) + entri guard-test baru.
+
 ## Status akhir: 60/66 SELESAI lapang + 5 KODE-SELESAI-guard (M-061,062,063,065,066; e2e menunggu kredensial nyata); M-054 DITOLAK desain.

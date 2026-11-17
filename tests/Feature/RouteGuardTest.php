@@ -50,6 +50,7 @@ class RouteGuardTest extends TestCase
             'lms.paket.kelas' => ['auth'],
             'perpus.sirkulasi' => ['pustakawan'],
             'fasilitas.kalender' => ['auth'],
+            'notifikasi.pengumuman' => ['permission:pengumuman.manage'],
         ];
     }
 
